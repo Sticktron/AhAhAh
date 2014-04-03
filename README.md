@@ -20,3 +20,4 @@ You may not use the source code for any commercial product without the original 
 
 * Sticktron (@sticktron, /u/sticktron) - original author
 * /r/jailbreak/ community - idea
+* Steven Spielberg & some YouTuber for the video clip
