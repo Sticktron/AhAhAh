@@ -3,6 +3,8 @@
 You didn't say the magic word!
 After two (2) failed unlock attempts (passcode entries) you get... Newman!
 
+Screenshot: [Imgur](http://i.imgur.com/5XE2oiR.png)
+
 Filling a request for the [r/jailbreak/](http://reddit.com/r/jailbreak/) community.
 
 Licence:
