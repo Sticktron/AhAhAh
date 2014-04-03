@@ -1,0 +1,9 @@
+Package: com.sticktron.ahahah
+Name: Ah! Ah! Ah!
+Depends: mobilesubstrate, firmware (>= 7.0)
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Ah! Ah! Ah! You didn't say the magic word! Custom passcode error.
+Maintainer: Sticktron
+Author: Sticktron
+Section: Tweaks
