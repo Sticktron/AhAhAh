@@ -3,7 +3,7 @@ Name: Ah! Ah! Ah!
 Depends: mobilesubstrate, firmware (>= 7.0)
 Version: 1.0.0
 Architecture: iphoneos-arm
-Description: Ah! Ah! Ah! You didn't say the magic word! Custom passcode error.
+Description: A custom passcode error alarm inspired by Jurassic Park.
 Maintainer: Sticktron
 Author: Sticktron
 Section: Tweaks
