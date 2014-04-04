@@ -1,4 +1,5 @@
-## Ah! Ah! Ah! You didn't say the magic word!
+Ah! Ah! Ah! You didn't say the magic word!
+==========================================
 
 A custom passcode error alarm inspired by Jurassic Park.
 Triggers after two (2) failed passcode unlock attempts.
