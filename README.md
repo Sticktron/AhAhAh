@@ -1,9 +1,9 @@
-## Ah! Ah! Ah!
+## Ah! Ah! Ah! You didn't say the magic word!
 
-You didn't say the magic word!
-After two (2) failed unlock attempts (passcode entries) you get... Newman!
+A custom passcode error alarm inspired by Jurassic Park.
+Triggers after two (2) failed passcode unlock attempts.
 
-Screenshot: [Imgur](http://i.imgur.com/5XE2oiR.png)
+[Screenshot](http://i.imgur.com/5XE2oiR.png)
 
 Filling a request for the [r/jailbreak/](http://reddit.com/r/jailbreak/) community.
 
@@ -18,6 +18,6 @@ You may not use any of the supplied materials for any commercial use whatsoever.
 
 ## Credits
 
-* Sticktron (@sticktron, /u/sticktron) - original author
 * /r/jailbreak/ community - idea
-* Steven Spielberg & some YouTuber for the video clip
+* Sticktron (@sticktron, /u/sticktron) - original author
+* Steven Spielberg & some YouTuber - video clip
