@@ -7,11 +7,17 @@ THEOS_BUILD_DIR = Packages
 include theos/makefiles/common.mk
 
 TWEAK_NAME = AhAhAh
+
 AhAhAh_CFLAGS = -fobjc-arc
-AhAhAh_FILES = AhAhAh.xm
+AhAhAh_FILES = Tweak.xm NewmanController.m
 AhAhAh_FRAMEWORKS = Foundation UIKit MediaPlayer
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+
+
+SUBPROJECTS += Prefs
+include $(THEOS_MAKE_PATH)/aggregate.mk
+
 
 after-install::
 	install.exec "killall -9 SpringBoard"
