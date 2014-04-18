@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = AhAhAhPrefs;
+		cell = PSLinkCell;
+		detail = "AhAhAhPrefsController";
+		icon = "Icon.png";
+		isController = 1;
+		label = "Ah! Ah! Ah!";
+	};
+}

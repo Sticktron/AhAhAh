@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>title</key>
+	<string>Ah! Ah! Ah!</string>
+	
+	<key>items</key>
+	<array>
+
+
+
+		<!-- [GROUP]	ENABLE/DISABLE ------------------------------------------------------------>
+		
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>⚠️ SpringBoard must be restarted to enable or disable this tweak.</string>
+		</dict>
+		
+		
+		<!-- [SWITCH]	Enabled = YES -->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Enabled</string>
+			
+			<key>key</key>
+			<string>Enabled</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+		</dict>
+		
+		
+		<!-- [BUTTON]	Respring -->
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Respring</string>
+			<key>action</key>
+			<string>respring</string>
+			
+			<key>confirmation</key>
+			<dict>
+				<key>title</key>
+				<string>Respring?</string>
+				<key>prompt</key>
+				<string>Restart SpringBoard?</string>
+				<key>cancelTitle</key>
+				<string>Not Now</string>
+				<key>okTitle</key>
+				<string>OK</string>
+			</dict>
+			
+			<key>isDestructive</key>
+			<true/>
+		</dict>
+		
+		
+		
+		<!-- [GROUP]	ACTIVATING ---------------------------------------------------------------->
+		
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Activating</string>
+		</dict>
+		
+		
+		<!-- [LIST]		MaxFailures = 2 -->
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>label</key>
+			<string>Max Failed Attempts</string>
+			
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>validTitles</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>4</string>
+				<string>5</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>4</string>
+				<string>5</string>
+			</array>
+			
+			<key>key</key>
+			<string>MaxFailures</string>
+			<key>default</key>
+			<string>2</string>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		
+		<!-- [SWITCH]	IgnoreBioFailure = YES -->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Don't count TouchID fails</string>
+			
+			<key>id</key>
+			<string>IgnoreBioFailure</string>
+			<key>key</key>
+			<string>IgnoreBioFailure</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		
+		
+		<!-- [GROUP]	DE-ACTIVATING ------------------------------------------------------------->
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Deactivating</string>
+			<key>footerText</key>
+			<string>⚠️ If you don't enable a way to deactivate you will have to reboot to stop the alarm !!</string>
+		</dict>
+		
+		
+		<!-- [SWITCH]	AllowBioRemoval = YES -->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Remove with TouchID match</string>
+			
+			<key>id</key>
+			<string>AllowBioRemoval</string>
+			<key>key</key>
+			<string>AllowBioRemoval</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		
+		<!-- [SWITCH]	AllowLockRemoval = YES -->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Remove after Lock/AutoLock</string>
+			
+			<key>key</key>
+			<string>AllowLockRemoval</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		
+		
+		<!-- [GROUP]	CONTACT INFO -------------------------------------------------------------->
+		
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Contact</string>
+		</dict>
+		
+		
+		<!-- [BUTTON]	openEmail -->
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>sticktron@hotmail.com</string>
+			<key>icon</key>
+			<string>Email.png</string>
+			<key>action</key>
+			<string>openEmail</string>
+		</dict>
+		
+		
+		<!-- [BUTTON]	openTwitter -->
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>@Sticktron</string>
+			<key>icon</key>
+			<string>Twitter.png</string>
+			<key>action</key>
+			<string>openTwitter</string>
+		</dict>
+		
+		
+		<!-- [BUTTON]	openGitHub -->
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Source code</string>
+			<key>icon</key>
+			<string>GitHub.png</string>
+			<key>action</key>
+			<string>openGitHub</string>
+		</dict>
+		
+		
+		<!-- [BUTTON]	openPayPal-->
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Donate with PayPal</string>
+			<key>icon</key>
+			<string>PayPal.png</string>
+			<key>action</key>
+			<string>openPayPal</string>
+		</dict>
+		
+		
+		
+		<!-- [GROUP]	CREDITS ------------------------------------------------------------------->
+		
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Credits</string>
+			<key>footerText</key>
+			<string>idea by /u/harrybond
+media by Universal Pictures
+built by Sticktron
+
+😈</string>
+		</dict>
+		
+		
+		
+	</array>
+</dict>
+</plist>
