@@ -7,7 +7,7 @@ include theos/makefiles/common.mk
 
 BUNDLE_NAME = AhAhAhPrefs
 AhAhAhPrefs_CFLAGS = -fobjc-arc
-AhAhAhPrefs_FILES = NewmanPrefs.mm
+AhAhAhPrefs_FILES = AhAhAhPrefs.m
 AhAhAhPrefs_INSTALL_PATH = /Library/PreferenceBundles
 AhAhAhPrefs_FRAMEWORKS = UIKit
 AhAhAhPrefs_PRIVATE_FRAMEWORKS = Preferences

@@ -1,18 +1,17 @@
 //
-//  NewmanPrefs.mm
+//  AhAhAhPrefs.m
 //  Preferences for Ah! Ah! Ah!
 //
 //  Created by Sticktron in 2014. All rights reserved.
 //
-//
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <Preferences/PSListController.h>
-#import <Preferences/PSSpecifier.h>
+#import "Headers/Preferences/PSListController.h"
+#import "Headers/Preferences/PSSpecifier.h"
 
 #define DEBUG_MODE_ON
-#define DEBUG_PREFIX @"😈✏️ [Newman Prefs]"
+#define DEBUG_PREFIX @"💾 [Newman Prefs]"
 #import "../DebugLog.h"
 
 
@@ -80,6 +79,12 @@
 	return _specifiers;
 }
 
+- (void)respring {
+	DebugLog(@"Respringing");
+	system("killall -HUP SpringBoard");
+}
+
+
 - (void)openPayPal {
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURL_PayPal]];
 }
@@ -99,11 +104,6 @@
 
 - (void)openGitHub {
     [[UIApplication sharedApplication]openURL:[NSURL URLWithString:kURL_GitHub]];
-}
-
-- (void)respring {
-	DebugLog(@"Respringing");
-	system("killall -HUP SpringBoard");
 }
 
 @end

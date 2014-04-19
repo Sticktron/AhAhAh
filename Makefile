@@ -9,7 +9,7 @@ include theos/makefiles/common.mk
 TWEAK_NAME = AhAhAh
 
 AhAhAh_CFLAGS = -fobjc-arc
-AhAhAh_FILES = Tweak.xm NewmanController.m
+AhAhAh_FILES = Tweak.xm AhAhAhController.m
 AhAhAh_FRAMEWORKS = Foundation UIKit MediaPlayer
 
 include $(THEOS_MAKE_PATH)/tweak.mk
