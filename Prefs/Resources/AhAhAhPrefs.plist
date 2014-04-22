@@ -63,6 +63,52 @@
 		
 		
 		
+		<!-- [GROUP]	CUSTOMIZE ----------------------------------------------------------------->
+		
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Customize</string>
+		</dict>
+		
+		<!-- LINK: Choose Video / Background Image -->
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>Video / Background</string>
+			<key>detail</key>
+			<string>AhAhAhPrefsMediaController</string>
+		</dict>
+		
+		<!-- SWITCH: RepeatVideo = YES -->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Loop Video</string>
+			
+			<key>id</key>
+			<string>RepeatVideo</string>
+			<key>key</key>
+			<string>RepeatVideo</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+
+
+		
+		
+		
+		
+		
 		<!-- [GROUP]	ACTIVATING ---------------------------------------------------------------->
 		
 		<dict>

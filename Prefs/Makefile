@@ -9,7 +9,7 @@ BUNDLE_NAME = AhAhAhPrefs
 AhAhAhPrefs_CFLAGS = -fobjc-arc
 AhAhAhPrefs_FILES = AhAhAhPrefs.m
 AhAhAhPrefs_INSTALL_PATH = /Library/PreferenceBundles
-AhAhAhPrefs_FRAMEWORKS = UIKit
+AhAhAhPrefs_FRAMEWORKS = Foundation UIKit MobileCoreServices AssetsLibrary
 AhAhAhPrefs_PRIVATE_FRAMEWORKS = Preferences
 
 include $(THEOS_MAKE_PATH)/bundle.mk

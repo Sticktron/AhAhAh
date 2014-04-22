@@ -9,12 +9,11 @@
 //
 //
 
-#import <NewmanController.h>
+#import <AhAhAhController.h>
 
-//#import <SpringBoard/SpringBoard.h>
-#import <SpringBoard/SBLockScreenManager.h>
-#import <SpringBoard/SBLockScreenViewController.h>
-#import <SpringBoardUIServices/SBUIBiometricEventMonitor.h>
+#import "Headers/SpringBoard/SBLockScreenManager.h"
+#import "Headers/SpringBoard/SBLockScreenViewController.h"
+#import "Headers/SpringBoardUIServices/SBUIBiometricEventMonitor.h"
 
 #define DEBUG_MODE_ON
 #define DEBUG_PREFIX @"😈 [Newman!]"
@@ -29,7 +28,7 @@
 @end
 
 
-static NewmanController *newman = nil;
+static AhAhAhController *newman = nil;
 
 
 // handle notifications from settings
@@ -67,6 +66,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 	%orig;
 }
 
+
 /* other hooks to try */
 /*
 - (void)prepareForMesaUnlockWithCompletion:(id)arg1 {
@@ -94,6 +94,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 	%orig;
 }
 */
+
 
 %end
 
@@ -134,6 +135,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 	return result;
 }
 
+
 /* other methods to hook maybe ? */
 /*
 - (void)_deviceLockedChanged:(id)arg1 {
@@ -150,6 +152,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 - (void)_postLockCompletedNotification:(_Bool)arg1 { %log; %orig; }
 - (_Bool)handleMenuButtonTap; { return %orig; }
 */
+
 
 %end
 
@@ -268,8 +271,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 			NSLog(@" [Ah! Ah! Ah!] I'm DISABLED !!");
 			
 		} else {
-			// create Newman controller
-			newman = [[NewmanController alloc] init];
+			newman = [[AhAhAhController alloc] init];
 			
 			// check if the device has a TouchID sensor
 			NSString *deviceId = [[UIDevice currentDevice] _deviceInfoForKey:@"ProductType"];

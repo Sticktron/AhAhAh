@@ -14,7 +14,7 @@
 #import <MediaPlayer/MPMoviePlayerController.h>
 
 
-@interface NewmanController : NSObject
+@interface AhAhAhController : NSObject
 
 @property (nonatomic, assign) int failedAttempts;
 @property (nonatomic, assign) BOOL isShowing;

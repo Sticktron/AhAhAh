@@ -9,7 +9,7 @@
 //
 //
 
-#import "NewmanController.h"
+#import "AhAhAhController.h"
 
 #import <SpringBoard/SpringBoard.h>
 #import <SpringBoard/SBLockScreenManager.h>
@@ -37,11 +37,11 @@
 
 
 
-@implementation NewmanController
+@implementation AhAhAhController
 
 - (id)init {
 	if (self = [super init]) {
-		DebugLog(@"NewmanController init'd");
+		DebugLog(@"AhAhAhController init'd");
 		
 		_failedAttempts = 0;
 		_isShowing = NO;
