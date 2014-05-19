@@ -47,7 +47,7 @@
 #else
 	/* ignore macros */
 	#define DebugLog0
-	#define DebugLog1
+	#define DebugLog1(s, ...)
 	#define DebugLog(s, ...)
 	#define DebugLogMore(s, ...)
 #endif

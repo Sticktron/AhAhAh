@@ -8,9 +8,7 @@
 	<key>items</key>
 	<array>
 
-
-
-		<!-- [GROUP]	ENABLE/DISABLE ------------------------------------------------------------>
+		<!-- [GROUP: ENABLE/DISABLE] ------------------------------------------>
 		
 		<dict>
 			<key>cell</key>
@@ -19,14 +17,12 @@
 			<string>⚠️ SpringBoard must be restarted to enable or disable this tweak.</string>
 		</dict>
 		
-		
-		<!-- [SWITCH]	Enabled = YES -->
+		<!-- SWITCH: Enabled (YES) ----->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>label</key>
 			<string>Enabled</string>
-			
 			<key>key</key>
 			<string>Enabled</string>
 			<key>default</key>
@@ -35,8 +31,7 @@
 			<string>com.sticktron.ahahah</string>
 		</dict>
 		
-		
-		<!-- [BUTTON]	Respring -->
+		<!-- BUTTON: Respring ----->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
@@ -44,7 +39,6 @@
 			<string>Respring</string>
 			<key>action</key>
 			<string>respring</string>
-			
 			<key>confirmation</key>
 			<dict>
 				<key>title</key>
@@ -56,33 +50,34 @@
 				<key>okTitle</key>
 				<string>OK</string>
 			</dict>
-			
 			<key>isDestructive</key>
 			<true/>
 		</dict>
 		
 		
 		
-		<!-- [GROUP]	CUSTOMIZE ----------------------------------------------------------------->
+		<!-- GROUP: CUSTOMIZE ------------------------------------------------->
 		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Customize</string>
+			<key>footerText</key>
+			<string></string>
 		</dict>
 		
-		<!-- LINK: Choose Video / Background Image -->
+		<!-- LINK: Media Controller ----->
 		<dict>
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Video / Background</string>
+			<string>Choose Video/Background</string>
 			<key>detail</key>
 			<string>AhAhAhPrefsMediaController</string>
 		</dict>
 		
-		<!-- SWITCH: RepeatVideo = YES -->
+		<!-- SWITCH: RepeatVideo (YES) -----
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -101,15 +96,29 @@
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
+		-->
+		
+		<!-- SWITCH: FullScreenVideo (NO) ----->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>FullScreen Video</string>
+			<key>key</key>
+			<string>FullScreenVideo</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
 		
 
-
 		
 		
 		
-		
-		
-		<!-- [GROUP]	ACTIVATING ---------------------------------------------------------------->
+		<!-- GROUP: ACTIVATING ------------------------------------------------>
 		
 		<dict>
 			<key>cell</key>
@@ -118,14 +127,12 @@
 			<string>Activating</string>
 		</dict>
 		
-		
-		<!-- [LIST]		MaxFailures = 2 -->
+		<!-- LIST: MaxFailures (2) ----->
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>label</key>
 			<string>Max Failed Attempts</string>
-			
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>validTitles</key>
@@ -144,95 +151,84 @@
 				<string>4</string>
 				<string>5</string>
 			</array>
-			
 			<key>key</key>
 			<string>MaxFailures</string>
 			<key>default</key>
 			<string>2</string>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
-			
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		
-		<!-- [SWITCH]	IgnoreBioFailure = YES -->
+		<!-- SWITCH: IgnoreBioFailure (YES) ----->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
-			<key>label</key>
-			<string>Don't count TouchID fails</string>
-			
 			<key>id</key>
 			<string>IgnoreBioFailure</string>
+			<key>label</key>
+			<string>Don't count TouchID fails</string>
 			<key>key</key>
 			<string>IgnoreBioFailure</string>
 			<key>default</key>
 			<true/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
-			
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
 		
 		
-		<!-- [GROUP]	DE-ACTIVATING ------------------------------------------------------------->
-
+		<!-- GROUP: DE-ACTIVATING --------------------------------------------->
+		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Deactivating</string>
 			<key>footerText</key>
-			<string>⚠️ If you don't enable a way to deactivate you will have to reboot to stop the alarm !!</string>
+			<string>The alarm will automatically stop when the device goes to sleep.</string>
 		</dict>
 		
-		
-		<!-- [SWITCH]	AllowBioRemoval = YES -->
+		<!-- SWITCH: AllowBioRemoval (NO) ----->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
-			<key>label</key>
-			<string>Remove with TouchID match</string>
-			
 			<key>id</key>
 			<string>AllowBioRemoval</string>
+			<key>label</key>
+			<string>Remove using TouchID</string>
 			<key>key</key>
 			<string>AllowBioRemoval</string>
 			<key>default</key>
 			<false/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
-			
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		
-		<!-- [SWITCH]	AllowLockRemoval = YES -->
+		<!-- SWITCH: AllowLockRemoval (YES) ----->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>label</key>
-			<string>Remove after Lock/AutoLock</string>
-			
+			<string>Remove using Lock Button</string>
 			<key>key</key>
 			<string>AllowLockRemoval</string>
 			<key>default</key>
 			<true/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
-			
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
 		
 		
-		<!-- [GROUP]	CONTACT INFO -------------------------------------------------------------->
+		<!-- GROUP: CONTACT INFO ---------------------------------------------->
 		
 		<dict>
 			<key>cell</key>
@@ -240,9 +236,8 @@
 			<key>label</key>
 			<string>Contact</string>
 		</dict>
-		
-		
-		<!-- [BUTTON]	openEmail -->
+				
+		<!-- BUTTON: openEmail ----->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
@@ -254,8 +249,7 @@
 			<string>openEmail</string>
 		</dict>
 		
-		
-		<!-- [BUTTON]	openTwitter -->
+		<!-- BUTTON: openTwitter ----->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
@@ -267,8 +261,7 @@
 			<string>openTwitter</string>
 		</dict>
 		
-		
-		<!-- [BUTTON]	openGitHub -->
+		<!-- BUTTON: openGitHub ----->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
@@ -280,8 +273,7 @@
 			<string>openGitHub</string>
 		</dict>
 		
-		
-		<!-- [BUTTON]	openPayPal-->
+		<!-- BUTTON: openPayPal ----->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
@@ -295,7 +287,7 @@
 		
 		
 		
-		<!-- [GROUP]	CREDITS ------------------------------------------------------------------->
+		<!-- GROUP: CREDITS --------------------------------------------------->
 		
 		<dict>
 			<key>cell</key>
@@ -309,8 +301,6 @@ built by Sticktron
 
 😈</string>
 		</dict>
-		
-		
 		
 	</array>
 </dict>

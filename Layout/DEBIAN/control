@@ -1,9 +1,9 @@
 Package: com.sticktron.ahahah
 Name: Ah! Ah! Ah!
 Depends: mobilesubstrate, firmware (>= 7.0)
-Version: 1.0.0
+Version: 1.1.0
 Architecture: iphoneos-arm
-Description: A custom passcode error alarm inspired by Jurassic Park.
+Description: A Customizable Unlock Error Alarm, inspired by Jurassic Park.
 Maintainer: Sticktron
 Author: Sticktron
 Section: Tweaks

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "*** Removing old preferences..."
+#rm -f /User/Library/Preferences/com.sticktron.ahahah.plist
+rm /User/Library/Preferences/com.sticktron.ahahah.plist
+echo "*** Done."
+
+exit 0
