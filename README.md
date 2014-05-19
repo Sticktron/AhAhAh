@@ -1,11 +1,16 @@
 ## Ah! Ah! Ah! You didn't say the magic word!
-
-A custom passcode error alarm inspired by Jurassic Park.
-Triggers after two (2) failed passcode unlock attempts.
+A Customizable Unlock Error Alarm inspired by that scene in Jurassic Park.
 
 [Screenshot](http://i.imgur.com/5XE2oiR.png)
 
-Filling a request for the [r/jailbreak/](http://reddit.com/r/jailbreak/) community.
+
+###New in 1.1.0
+
+* Choose your own video and/or background image!
+* Add videos and images manually, or use the built-in picker!
+* Change the number of failures before triggering the alarm!
+* Configurable TouchID support!
+* Disable the Lock button so the video plays until the screen sleeps (more time to catch someone with sticky fingers!)
 
 Licence:
 You may not use any of the supplied materials for any commercial use whatsoever.
