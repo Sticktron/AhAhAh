@@ -12,8 +12,6 @@ A Customizable Unlock Error Alarm inspired by that scene in Jurassic Park.
 * Configurable TouchID support!
 * Disable the Lock button so the video plays until the screen sleeps (more time to catch someone with sticky fingers!)
 
-Licence:
-You may not use any of the supplied materials for any commercial use whatsoever.
 
 ### Device Compatibility
 
@@ -26,3 +24,7 @@ You may not use any of the supplied materials for any commercial use whatsoever.
 * /r/jailbreak/ community - idea
 * Sticktron (@sticktron, /u/sticktron) - original author
 * Steven Spielberg & some YouTuber - video clip
+
+
+Licence:
+You may not use any of the supplied materials for any commercial use whatsoever.
