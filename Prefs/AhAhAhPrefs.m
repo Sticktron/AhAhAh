@@ -17,8 +17,9 @@
 #import "theos/include/Preferences/PSSpecifier.h"
 
 //#define DEBUG_MODE_ON
-#define DEBUG_PREFIX @"🌀 [Newman Prefs]"
+#define DEBUG_PREFIX @"🌀 [Ah! Ah! Ah! Prefs]"
 #import "../DebugLog.h"
+
 
 #define URL_EMAIL					@"mailto:sticktron@hotmail.com"
 #define URL_GITHUB					@"http://github.com/Sticktron/AhAhAh"
@@ -49,6 +50,7 @@
 #define ID_NONE						@"_none"
 #define FILE_KEY					@"file"
 #define SIZE_KEY					@"size"
+
 
 
 @interface UIDevice (Private)
@@ -97,9 +99,19 @@
 	
     return [self imageWithImage:image scaledToSize:newSize];
 }
+- (UIImage *)normalizedImage {
+	if (self.imageOrientation == UIImageOrientationUp) {
+		return self;
+	} else {
+		UIGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);
+		[self drawInRect:(CGRect){{0, 0}, self.size}];
+		UIImage *normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
+		UIGraphicsEndImageContext();
+		
+		return normalizedImage;
+	}
+}
 @end
-
-
 
 
 
@@ -181,8 +193,6 @@
 }
 
 @end
-
-
 
 
 
@@ -458,16 +468,6 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-	DebugLog(@"picker returned with this: %@", info);
-	
-//	UIAlertView *alert = [[UIAlertView alloc]
-//						  initWithTitle:@"Ah! Ah! Ah!"
-//						  message:@"Media saved"
-//						  delegate:nil
-//						  cancelButtonTitle:@"Done"
-//						  otherButtonTitles:nil];
-//	[alert show];
-	
 	/*
 		< Info Object Format >
 	 
@@ -483,6 +483,7 @@
 			UIImagePickerControllerReferenceURL = "assets-library://asset/asset.mp4?id={GUID}&ext=mp4";
 		}
 	*/
+	DebugLog(@"picker returned with this: %@", info);
 	
 	
 	// callback
@@ -501,6 +502,75 @@
 			// save to disk
 			NSString *path = [NSString stringWithFormat:@"%@/%@", BACKGROUNDS_PATH, filename];
 			UIImage *image = (UIImage *)info[UIImagePickerControllerOriginalImage];
+			
+			DebugLog(@"••••••••• image.size=%@", NSStringFromCGSize(image.size));
+			
+///////////////////////////
+			
+			switch (image.imageOrientation) {
+				case UIImageOrientationUp:
+					DebugLog(@"UIImageOrientationUp");
+					break;
+				case UIImageOrientationDown:
+					DebugLog(@"UIImageOrientationDown");
+					break;
+				case UIImageOrientationLeft:
+					DebugLog(@"UIImageOrientationLeft");
+					break;
+				case UIImageOrientationRight:
+					DebugLog(@"UIImageOrientationRight");
+					break;
+				case UIImageOrientationUpMirrored:
+					DebugLog(@"UIImageOrientationUpMirrored");
+					break;
+				case UIImageOrientationDownMirrored:
+					DebugLog(@"UIImageOrientationDownMirrored");
+					break;
+				case UIImageOrientationLeftMirrored:
+					DebugLog(@"UIImageOrientationLeftMirrored");
+					break;
+				case UIImageOrientationRightMirrored:
+					DebugLog(@"UIImageOrientationRightMirrored");
+					break;
+				default:
+					break;
+			}
+			
+			// correct the orientation
+			image = [image normalizedImage];
+			
+			DebugLog(@"••••••••• normalized image orientation: ");
+			switch (image.imageOrientation) {
+				case UIImageOrientationUp:
+					DebugLog(@"UIImageOrientationUp");
+					break;
+				case UIImageOrientationDown:
+					DebugLog(@"UIImageOrientationDown");
+					break;
+				case UIImageOrientationLeft:
+					DebugLog(@"UIImageOrientationLeft");
+					break;
+				case UIImageOrientationRight:
+					DebugLog(@"UIImageOrientationRight");
+					break;
+				case UIImageOrientationUpMirrored:
+					DebugLog(@"UIImageOrientationUpMirrored");
+					break;
+				case UIImageOrientationDownMirrored:
+					DebugLog(@"UIImageOrientationDownMirrored");
+					break;
+				case UIImageOrientationLeftMirrored:
+					DebugLog(@"UIImageOrientationLeftMirrored");
+					break;
+				case UIImageOrientationRightMirrored:
+					DebugLog(@"UIImageOrientationRightMirrored");
+					break;
+				default:
+					break;
+			}
+			
+/////////////////////////
+			
 			NSData *imageData = UIImagePNGRepresentation(image);
 			[imageData writeToFile:path atomically:YES];
 			
@@ -789,6 +859,7 @@
 		return nil;
 	}
 }
+
 
 // tableview selecting & deleting
 
