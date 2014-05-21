@@ -52,6 +52,8 @@
 #define SIZE_KEY					@"size"
 
 
+//--------------------------------------------------------------------------------------------------
+
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -68,6 +70,10 @@
 + (id)systemGreenColor;
 + (id)systemRedColor;
 @end
+
+
+//--------------------------------------------------------------------------------------------------
+
 
 @implementation UIImage (Private)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
@@ -111,11 +117,45 @@
 		return normalizedImage;
 	}
 }
+- (NSString *)orientation {
+	NSString *result;
+	
+	switch (self.imageOrientation) {
+		case UIImageOrientationUp:
+			result = @"UIImageOrientationUp";
+			break;
+		case UIImageOrientationDown:
+			result = @"UIImageOrientationDown";
+			break;
+		case UIImageOrientationLeft:
+			result = @"UIImageOrientationLeft";
+			break;
+		case UIImageOrientationRight:
+			result = @"UIImageOrientationRight";
+			break;
+		case UIImageOrientationUpMirrored:
+			result = @"UIImageOrientationUpMirrored";
+			break;
+		case UIImageOrientationDownMirrored:
+			result = @"UIImageOrientationDownMirrored";
+			break;
+		case UIImageOrientationLeftMirrored:
+			result = @"UIImageOrientationLeftMirrored";
+			break;
+		case UIImageOrientationRightMirrored:
+			result = @"UIImageOrientationRightMirrored";
+			break;
+		default:
+			result = @"Error";
+	}
+	
+	return result;
+}
 @end
 
 
+//--------------------------------------------------------------------------------------------------
 
-#pragma mark • Main Controller Interface
 
 @interface AhAhAhPrefsController : PSListController
 - (void)respring;
@@ -125,9 +165,6 @@
 - (void)openGitHub;
 @end
 
-
-
-#pragma mark • Main Controller Implementation
 
 @implementation AhAhAhPrefsController
 
@@ -195,8 +232,8 @@
 @end
 
 
+//--------------------------------------------------------------------------------------------------
 
-#pragma mark • Media Controller Interface
 
 @interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate,
 										UINavigationControllerDelegate, UIImagePickerControllerDelegate>
@@ -216,9 +253,6 @@
 
 @end
 
-
-
-#pragma mark • Media Controller Implementation
 
 @implementation AhAhAhPrefsMediaController
 
@@ -498,78 +532,14 @@
 			DebugLog(@"Picked image asset with representation: %@", imageRep);
 			
 			NSString *filename = [imageRep filename];
-			
-			// save to disk
 			NSString *path = [NSString stringWithFormat:@"%@/%@", BACKGROUNDS_PATH, filename];
+			
 			UIImage *image = (UIImage *)info[UIImagePickerControllerOriginalImage];
+			DebugLog(@"image size=%@", NSStringFromCGSize(image.size));
 			
-			DebugLog(@"••••••••• image.size=%@", NSStringFromCGSize(image.size));
-			
-///////////////////////////
-			
-			switch (image.imageOrientation) {
-				case UIImageOrientationUp:
-					DebugLog(@"UIImageOrientationUp");
-					break;
-				case UIImageOrientationDown:
-					DebugLog(@"UIImageOrientationDown");
-					break;
-				case UIImageOrientationLeft:
-					DebugLog(@"UIImageOrientationLeft");
-					break;
-				case UIImageOrientationRight:
-					DebugLog(@"UIImageOrientationRight");
-					break;
-				case UIImageOrientationUpMirrored:
-					DebugLog(@"UIImageOrientationUpMirrored");
-					break;
-				case UIImageOrientationDownMirrored:
-					DebugLog(@"UIImageOrientationDownMirrored");
-					break;
-				case UIImageOrientationLeftMirrored:
-					DebugLog(@"UIImageOrientationLeftMirrored");
-					break;
-				case UIImageOrientationRightMirrored:
-					DebugLog(@"UIImageOrientationRightMirrored");
-					break;
-				default:
-					break;
-			}
-			
-			// correct the orientation
+			DebugLog(@"image orientation=%@", [image orientation]);
 			image = [image normalizedImage];
-			
-			DebugLog(@"••••••••• normalized image orientation: ");
-			switch (image.imageOrientation) {
-				case UIImageOrientationUp:
-					DebugLog(@"UIImageOrientationUp");
-					break;
-				case UIImageOrientationDown:
-					DebugLog(@"UIImageOrientationDown");
-					break;
-				case UIImageOrientationLeft:
-					DebugLog(@"UIImageOrientationLeft");
-					break;
-				case UIImageOrientationRight:
-					DebugLog(@"UIImageOrientationRight");
-					break;
-				case UIImageOrientationUpMirrored:
-					DebugLog(@"UIImageOrientationUpMirrored");
-					break;
-				case UIImageOrientationDownMirrored:
-					DebugLog(@"UIImageOrientationDownMirrored");
-					break;
-				case UIImageOrientationLeftMirrored:
-					DebugLog(@"UIImageOrientationLeftMirrored");
-					break;
-				case UIImageOrientationRightMirrored:
-					DebugLog(@"UIImageOrientationRightMirrored");
-					break;
-				default:
-					break;
-			}
-			
-/////////////////////////
+			DebugLog(@"normalized image orientation: %@", [image orientation]);
 			
 			NSData *imageData = UIImagePNGRepresentation(image);
 			[imageData writeToFile:path atomically:YES];

@@ -17,6 +17,22 @@
 #import "DebugLog.h"
 
 
+#define PREFS_PLIST					@"/User/Library/Preferences/com.sticktron.ahahah.plist"
+
+#define DEFAULT_BACKGROUND			@"/Library/Application Support/AhAhAh/Default/BlueScreenError.png"
+#define DEFAULT_VIDEO				@"/Library/Application Support/AhAhAh/Default/AhAhAh.m4v"
+#define CUSTOM_VIDEOS_PATH			@"/Library/Application Support/AhAhAh/Custom/Videos"
+#define CUSTOM_BACKGROUNDS_PATH		@"/Library/Application Support/AhAhAh/Custom/Backgrounds"
+
+#define ID_NONE						@"_none"
+#define ID_DEFAULT					@"_default"
+
+#define iPad						(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+
+
+//--------------------------------------------------------------------------------------------------
+
+
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
 @end
@@ -45,7 +61,7 @@
 @end
 
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 
 @interface AhAhAhController : NSObject
@@ -71,39 +87,6 @@
 @end
 
 
-//------------------------------------------------------------------------------
-
-
-#define PREFS_PLIST					@"/User/Library/Preferences/com.sticktron.ahahah.plist"
-
-#define DEFAULT_BACKGROUND			@"/Library/Application Support/AhAhAh/Default/BlueScreenError.png"
-#define DEFAULT_VIDEO				@"/Library/Application Support/AhAhAh/Default/AhAhAh.m4v"
-#define CUSTOM_VIDEOS_PATH			@"/Library/Application Support/AhAhAh/Custom/Videos"
-#define CUSTOM_BACKGROUNDS_PATH		@"/Library/Application Support/AhAhAh/Custom/Backgrounds"
-
-#define ID_NONE						@"_none"
-#define ID_DEFAULT					@"_default"
-
-#define iPad						(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-
-
-static AhAhAhController *newman = nil;
-
-// Handle settings changed notifications
-NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
-							const void *object, CFDictionaryRef userInfo) {
-	
-	DebugLog1(@"******** Preferences Changed Notification ********");
-	
-	if (newman) {
-		[newman loadPrefs];
-	}
-}
-
-
-//------------------------------------------------------------------------------
-
-
 @implementation AhAhAhController
 
 - (instancetype)init {
@@ -127,12 +110,50 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 	return self;
 }
 
-- (void)unlockFailed {
-	newman.failedAttempts++;
-	DebugLog(@"Failed Attempts: %d", newman.failedAttempts);
+- (void)loadPrefs {
+	NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST];
+	DebugLog(@"loading prefs: %@", prefs);
 	
-	if (newman.failedAttempts == newman.maxFailures) {
-		[newman show];
+	if (prefs) {
+		
+		if (prefs[@"VideoFile"]) {
+			self.videoFile = prefs[@"VideoFile"];
+		}
+		
+		if (prefs[@"BackgroundFile"]) {
+			self.backgroundFile = prefs[@"BackgroundFile"];
+		}
+		
+		if (prefs[@"MaxFailures"]) {
+			self.maxFailures = [prefs[@"MaxFailures"] intValue];
+		}
+		
+		if (prefs[@"IgnoreBioFailure"]) {
+			self.ignoreBioFailure = [prefs[@"IgnoreBioFailure"] boolValue];
+		}
+		
+		if (prefs[@"AllowLockRemoval"]) {
+			self.allowLockRemoval = [prefs[@"AllowLockRemoval"] boolValue];
+		}
+		
+		if (prefs[@"AllowBioRemoval"]) {
+			self.allowBioRemoval = [prefs[@"AllowBioRemoval"] boolValue];
+		}
+		
+		if (prefs[@"FullScreenVideo"]) {
+			self.fullScreenVideo = [prefs[@"FullScreenVideo"] boolValue];
+		}
+		
+		DebugLog(@"user settings applied");
+	}
+}
+
+- (void)unlockFailed {
+	self.failedAttempts++;
+	DebugLog(@"Failed Attempts: %d", self.failedAttempts);
+	
+	if (self.failedAttempts == self.maxFailures) {
+		[self show];
 	}
 }
 
@@ -296,64 +317,37 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 	
 }
 
-//- (void)enableSleep {
-//	DebugLog0;
-//	[self.sleepTimer invalidate];
-//	self.sleepTimer = nil;
-//	[[UIApplication sharedApplication] setIdleTimerDisabled:NO];
-//}
-
-- (void)loadPrefs {
-	NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST];
-	DebugLog(@"loading prefs: %@", prefs);
-	
-	if (prefs) {
-		
-		if (prefs[@"VideoFile"]) {
-			self.videoFile = prefs[@"VideoFile"];
-		}
-		
-		if (prefs[@"BackgroundFile"]) {
-			self.backgroundFile = prefs[@"BackgroundFile"];
-		}
-		
-		if (prefs[@"MaxFailures"]) {
-			self.maxFailures = [prefs[@"MaxFailures"] intValue];
-		}
-		
-		if (prefs[@"IgnoreBioFailure"]) {
-			self.ignoreBioFailure = [prefs[@"IgnoreBioFailure"] boolValue];
-		}
-		
-		if (prefs[@"AllowLockRemoval"]) {
-			self.allowLockRemoval = [prefs[@"AllowLockRemoval"] boolValue];
-		}
-		
-		if (prefs[@"AllowBioRemoval"]) {
-			self.allowBioRemoval = [prefs[@"AllowBioRemoval"] boolValue];
-		}
-		
-		if (prefs[@"FullScreenVideo"]) {
-			self.fullScreenVideo = [prefs[@"FullScreenVideo"] boolValue];
-		}
-		
-		DebugLog(@"user settings applied");
-	}
-}
-
 @end
 
 
+//--------------------------------------------------------------------------------------------------
+
+
+static AhAhAhController *newman = nil;
+
+
+// Handle settings changed notifications
+NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
+							const void *object, CFDictionaryRef userInfo) {
+	
+	DebugLog1(@"******** Preferences Changed Notification ********");
+	
+	if (newman) {
+		[newman loadPrefs];
+	}
+}
 
 
 
-//------------------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------------------------------------
 // Main Hooks
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %group Main
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %hook SpringBoard
 
@@ -395,7 +389,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 %end
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %hook SBLockScreenViewController
 
@@ -409,40 +403,17 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 }
 
 /*
-- (void)_handleDisplayTurnedOff {
-	DebugLog0;
-	%orig;
-	
-	if (newman.isShowing) {
-		[newman remove];
-	}
-}
-- (void)prepareForMesaUnlockWithCompletion:(id)arg1 {
-	DebugLog(@"arg=%@", arg1);
-	%orig;
-}
-- (void)passcodeLockViewPasscodeEnteredViaMesa:(id)arg1 {
-	DebugLog(@"!!!!!!!!!!!!!!!!!!  arg=%@", arg1);
-	%orig;
-}
-- (void)passcodeLockViewPasscodeEntered:(id)arg1 {
-	DebugLog(@"arg=%@", arg1);
-	%orig;
-}
-- (void)_passcodeStateChanged {
-	DebugLog0;
-	%orig;
-}
-- (void)_handlePasscodeLockStateChanged {
-	DebugLog0;
-	%orig;
-}
+- (void)_handleDisplayTurnedOff;
+- (void)prepareForMesaUnlockWithCompletion:(id)arg1;
+- (void)passcodeLockViewPasscodeEnteredViaMesa:(id)arg1;
+- (void)passcodeLockViewPasscodeEntered:(id)arg1;
+- (void)_passcodeStateChanged;
+- (void)_handlePasscodeLockStateChanged;
 */
 
 %end
 
-
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %hook SBLockScreenManager
 
@@ -463,110 +434,21 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 /*
 - (void)_deviceLockedChanged:(id)arg1 {
-	DebugLog(@"notification=%@", arg1);
-	
 	// NSConcreteNotification {
 	//	name = SBDevicePasscodeLockStateDidChangeNotification
 	// }
 	
 	%orig;
 }
-- (void)_lockUI {
-	%log;
-	%orig
-}
-- (void)_setUILocked:(BOOL)locked {
-	DebugLog(@"arg=%@", locked?@"YES":@"NO");
-	
-	if (locked && newman.isShowing) {
-		[newman remove];
-	}
-	
-	%orig;
-}
-- (void)_postLockCompletedNotification:(BOOL)arg1 { %log; %orig; }
-- (BOOL)handleMenuButtonTap {
-	DebugLog0;
-	return %orig;
-}
+- (void)_lockUI;
+- (void)_setUILocked:(BOOL)locked;
+- (void)_postLockCompletedNotification:(BOOL)arg1;
+- (BOOL)handleMenuButtonTap;
 */
 
 %end
 
-//------------------------------------------------------------------------------
-
-
-//%hook SBBacklightController
-
-/*
-- (void)_lockScreenDimTimerFired {
-	DebugLog0;
-}
-- (double)_nextIdleTimeDuration {
-	double result = %orig;
-	DebugLog(@"_nextIdleTimeDuration=%f", result);
-	
-//    if (enableDimDelay) {
-//        if (disableDimDelayOnAC && [[%c(SBUIController) sharedInstance] isOnAC]) {
-//            return %orig;
-//		} else {
-//            return autoDimDelay;
-//		}
-//    }
-	
-    return result;
-}
-- (double)defaultLockScreenDimIntervalWhenNotificationsPresent {
-	double result = %orig;
-	DebugLog(@"defaultLockScreenDimIntervalWhenNotificationsPresent=%f", result);
-	
-//    if (enableDimDelay) {
-//        if (onlyLSDimDelayOnAC == NO || (onlyLSDimDelayOnAC && [[%c(SBUIController) sharedInstance] isOnAC])) {
-//            return autoDimLSDelay;
-//		}
-//	}
-	
-    return result;
-}
-- (double)defaultLockScreenDimInterval {
-	double result = %orig;
-	DebugLog(@"defaultLockScreenDimInterval=%f", result);
-//    if (enableDimDelay) {
-//        if (onlyLSDimDelayOnAC == NO || (onlyLSDimDelayOnAC && [[%c(SBUIController) sharedInstance] isOnAC])) {
-//            return autoDimLSDelay;
-//		}
-//	}
-    return result;
-}
-- (double)_currentLockScreenIdleTimerInterval {
-	double result = %orig;
-	DebugLog(@"_currentLockScreenIdleTimerInterval=%f", result);
-//    if (enableDimDelay) {
-//        if (onlyLSDimDelayOnAC == NO || (onlyLSDimDelayOnAC && [[%c(SBUIController) sharedInstance] isOnAC])) {
-//            return autoDimLSDelay;
-//		}
-//	}
-    return result;
-}
-- (void)_didIdle {
-	DebugLog0;
-//    if (enableDimDelay) {
-//        NSDictionary *blacklist = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.lodc.ios.faceoff7.blacklist.plist"];
-//        NSString *prefix = @"Blacklist-";
-//		
-//        if ([blacklist objectForKey: [prefix stringByAppendingString:getCurrentApp()]] != nil) {
-//            if ([[blacklist objectForKey: [prefix stringByAppendingString:getCurrentApp()]] boolValue]) {
-//                return;
-//			}
-//		}
-//    }
-    %orig;
-}
-*/
-
-//%end
-
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %end //group:Main
 
@@ -574,32 +456,19 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 // TouchID Hooks
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %group BioSupport
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 //%hook SBUIBiometricEventMonitor
-
-/*
-- (void)_setMatchingEnabled:(BOOL)enable {
-	if (enable && newman.isShowing && !newman.allowBioRemoval) {
-		// don't allow it
-		DebugLog(@"blocked");
-		%orig(NO);
-	} else {
-		enable ? DebugLog(@"enabling") : DebugLog(@"disabling");
-		%orig;
-	}
-}
-*/
-
+//- (void)_setMatchingEnabled:(BOOL)enable;
 //%end
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %hook SBLockScreenManager
 
@@ -636,7 +505,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 %end
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %end //group:BioSupport
 
@@ -644,9 +513,9 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 // Constructor
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 %ctor {
 	@autoreleasepool {
