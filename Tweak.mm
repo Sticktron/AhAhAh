@@ -17,11 +17,6 @@
 #import "DebugLog.h"
 
 
-#define PREFS_PLIST					@"/User/Library/Preferences/com.sticktron.ahahah.plist"
-
-#define CUSTOM_VIDEOS_PATH			@"/User/Library/Application Support/AhAhAh/Videos"
-#define CUSTOM_BACKGROUNDS_PATH		@"/User/Library/Application Support/AhAhAh/Backgrounds"
-
 #define DEFAULT_BACKGROUND			@"/Library/Application Support/AhAhAh/BlueScreenError.png"
 #define DEFAULT_VIDEO				@"/Library/Application Support/AhAhAh/AhAhAh.m4v"
 
@@ -30,9 +25,12 @@
 
 #define iPad						(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 
+#define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
+#define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
+#define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
+
 
 //--------------------------------------------------------------------------------------------------
-
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -61,7 +59,6 @@
 - (void)_stopMatching;
 @end
 
-
 //--------------------------------------------------------------------------------------------------
 
 
@@ -88,6 +85,7 @@
 @end
 
 
+
 @implementation AhAhAhController
 
 - (instancetype)init {
@@ -112,7 +110,7 @@
 }
 
 - (void)loadPrefs {
-	NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST];
+	NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 	DebugLog(@"loading prefs: %@", prefs);
 	
 	if (prefs) {
@@ -217,7 +215,7 @@
 		if (isDefaultBG) {
 			bgPath = DEFAULT_BACKGROUND;
 		} else {
-			bgPath = [NSString stringWithFormat:@"%@/%@", CUSTOM_BACKGROUNDS_PATH, self.backgroundFile];
+			bgPath = [USER_BGS_PATH stringByAppendingPathComponent:self.backgroundFile];
 		}
 		DebugLog(@"using background: %@", bgPath);
 		
@@ -247,7 +245,7 @@
 		if ([self.videoFile isEqualToString:ID_DEFAULT]) {
 			videoPath = DEFAULT_VIDEO;
 		} else {
-			videoPath = [NSString stringWithFormat:@"%@/%@", CUSTOM_VIDEOS_PATH, self.videoFile];
+			videoPath = [USER_VIDEOS_PATH stringByAppendingPathComponent:self.videoFile];
 		}
 		DebugLog(@"video path: %@", videoPath);
 		
@@ -521,7 +519,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 %ctor {
 	@autoreleasepool {
 		BOOL enabled = YES;
-		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST];
+		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 		
 		if (prefs && prefs[@"Enabled"] && ([prefs[@"Enabled"] boolValue] == NO)) {
 			enabled = NO;
@@ -532,7 +530,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 			// check if the device has a TouchID sensor
 			NSString *deviceId = [[UIDevice currentDevice] _deviceInfoForKey:@"ProductType"];
 			
-			if ([deviceId isEqualToString:@"iPhone6,1"]) { // iPhone 5S
+			if ([deviceId isEqualToString:@"iPhone6,1"] || [deviceId isEqualToString:@"iPhone6,2"]) { // iPhone 5S
 				NSLog(@" [Ah! Ah! Ah!] detected iPhone 5S");
 				newman.hasTouchID = YES;
 				

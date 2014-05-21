@@ -27,12 +27,11 @@
 #define URL_TWITTER_WEB				@"http://twitter.com/Sticktron"
 #define URL_TWITTER_APP				@"twitter://user?screen_name=Sticktron"
 
-#define PREFS_PLIST					@"/User/Library/Preferences/com.sticktron.ahahah.plist"
-#define VIDEOS_PATH					@"/User/Library/AhAhAh/Videos"
-#define BACKGROUNDS_PATH			@"/User/Library/AhAhAh/Backgrounds"
+#define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
+#define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
+#define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
 #define DEFAULT_PATH				@"/Library/Application Support/AhAhAh"
-
 #define DEFAULT_VIDEO_TITLE			@"Ah! Ah! Ah!"
 #define DEFAULT_VIDEO_THUMB			@"thumb_AhAhAh.png"
 #define DEFAULT_BG_TITLE			@"BlueScreen Error"
@@ -266,21 +265,33 @@
 		
 		_queue = [[NSOperationQueue alloc] init];
 		_queue.maxConcurrentOperationCount = 4;
-		
 		_imageCache = [[NSCache alloc] init];
 		
-		// init lists with default items
 		
+		// init lists with default items
 		_videos = [NSMutableArray arrayWithObject:@{FILE_KEY: ID_DEFAULT}];
 		_backgrounds = [NSMutableArray arrayWithObject:@{FILE_KEY: ID_DEFAULT}];
 		
+		
 		// set selected items
-		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST];
+		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 		DebugLog(@"Read user prefs: %@", prefs);
 		_selectedVideo = prefs[@"VideoFile"] ?: ID_DEFAULT;
 		_selectedBackground = prefs[@"BackgroundFile"] ?: ID_DEFAULT;
+		
+		
+		// create directories for user media if needed...
+		
+		[[NSFileManager defaultManager] createDirectoryAtPath:USER_BGS_PATH
+								  withIntermediateDirectories:YES
+												   attributes:nil
+														error:nil];
+		
+		[[NSFileManager defaultManager] createDirectoryAtPath:USER_VIDEOS_PATH
+								  withIntermediateDirectories:YES
+												   attributes:nil
+														error:nil];
 	}
-	
 	return self;
 }
 
@@ -360,7 +371,7 @@
 	
 	// backgrounds ...
 	
-	url = [NSURL fileURLWithPath:BACKGROUNDS_PATH isDirectory:YES];
+	url = [NSURL fileURLWithPath:USER_BGS_PATH isDirectory:YES];
 	NSMutableArray *backgrounds = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
 									includingPropertiesForKeys:keys
 													   options:NSDirectoryEnumerationSkipsHiddenFiles
@@ -394,8 +405,7 @@
 	
 	// videos ...
 	
-	url = [NSURL fileURLWithPath:VIDEOS_PATH isDirectory:YES];
-	//url = [NSURL URLWithString:VIDEOS_PATH];
+	url = [NSURL fileURLWithPath:USER_VIDEOS_PATH isDirectory:YES];
 	NSMutableArray *videos = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
 										  includingPropertiesForKeys:keys
 															 options:NSDirectoryEnumerationSkipsHiddenFiles
@@ -427,7 +437,7 @@
 - (UIImage *)thumbnailForVideo:(NSString *)filename withMaxSize:(CGSize)size {
 	UIImage *thumbnail = nil;
 	
-	NSString *path = [NSString stringWithFormat:@"%@/%@", VIDEOS_PATH, filename];
+	NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, filename];
 	NSURL *url = [NSURL fileURLWithPath:path];
 	DebugLog(@"Requested thumbnail for file at url: %@", url);
 	
@@ -454,7 +464,7 @@
 }
 
 - (void)savePrefs:(BOOL)notificate {
-	NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST];
+	NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 	
 	if (!prefs) {
 		prefs = [NSMutableDictionary dictionary];
@@ -465,7 +475,7 @@
 	prefs[@"BackgroundFile"] = self.selectedBackground;
 	
 	DebugLog(@"##### Writing Preferences: %@", prefs);
-	[prefs writeToFile:PREFS_PLIST atomically:YES];
+	[prefs writeToFile:PREFS_PLIST_PATH atomically:YES];
 	
 	// apply settings to tweak
 	if (notificate) {
@@ -532,7 +542,7 @@
 			DebugLog(@"Picked image asset with representation: %@", imageRep);
 			
 			NSString *filename = [imageRep filename];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", BACKGROUNDS_PATH, filename];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BGS_PATH, filename];
 			
 			UIImage *image = (UIImage *)info[UIImagePickerControllerOriginalImage];
 			DebugLog(@"image size=%@", NSStringFromCGSize(image.size));
@@ -557,7 +567,7 @@
 			NSString *filename = [videoRep filename];
 			
 			// save to disk
-			NSString *path = [NSString stringWithFormat:@"%@/%@", VIDEOS_PATH, filename];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, filename];
 			NSURL *videoURL = info[UIImagePickerControllerMediaURL];
 			NSData *videoData = [NSData dataWithContentsOfURL:videoURL];
 			[videoData writeToFile:path atomically:YES];
@@ -786,7 +796,7 @@
 				} else {
 					[self.queue addOperationWithBlock:^{
 						// load
-						NSString *path = [NSString stringWithFormat:@"%@/%@", BACKGROUNDS_PATH, filename];
+						NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BGS_PATH, filename];
 						UIImage *image = [UIImage imageWithContentsOfFile:path];
 						
 						if (image) {
@@ -915,7 +925,7 @@
 			// delete video
 			//
 			NSString *file = self.videos[indexPath.row][FILE_KEY];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", VIDEOS_PATH, file];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, file];
 			DebugLog(@"deleting video at path: %@", path);
 			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 			
@@ -931,7 +941,7 @@
 			// delete image
 			//
 			NSString *file = self.backgrounds[indexPath.row][FILE_KEY];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", BACKGROUNDS_PATH, file];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BGS_PATH, file];
 			DebugLog(@"deleting image at path: %@", path);
 			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 			
