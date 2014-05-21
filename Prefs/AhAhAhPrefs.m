@@ -28,10 +28,10 @@
 #define URL_TWITTER_APP				@"twitter://user?screen_name=Sticktron"
 
 #define PREFS_PLIST					@"/User/Library/Preferences/com.sticktron.ahahah.plist"
+#define VIDEOS_PATH					@"/User/Library/AhAhAh/Videos"
+#define BACKGROUNDS_PATH			@"/User/Library/AhAhAh/Backgrounds"
 
-#define DEFAULT_PATH				@"/Library/Application Support/AhAhAh/Default"
-#define VIDEOS_PATH					@"/Library/Application Support/AhAhAh/Custom/Videos"
-#define BACKGROUNDS_PATH			@"/Library/Application Support/AhAhAh/Custom/Backgrounds"
+#define DEFAULT_PATH				@"/Library/Application Support/AhAhAh"
 
 #define DEFAULT_VIDEO_TITLE			@"Ah! Ah! Ah!"
 #define DEFAULT_VIDEO_THUMB			@"thumb_AhAhAh.png"
@@ -824,7 +824,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
 	if (section == IMPORT_SECTION) {
-		return @"Content can also be added manually to /Library/Application Support/AhAhAh/Custom/";
+		return @"Content can also be added manually to /User/Library/AhAhAh/";
 	} else {
 		return nil;
 	}

@@ -19,10 +19,11 @@
 
 #define PREFS_PLIST					@"/User/Library/Preferences/com.sticktron.ahahah.plist"
 
-#define DEFAULT_BACKGROUND			@"/Library/Application Support/AhAhAh/Default/BlueScreenError.png"
-#define DEFAULT_VIDEO				@"/Library/Application Support/AhAhAh/Default/AhAhAh.m4v"
-#define CUSTOM_VIDEOS_PATH			@"/Library/Application Support/AhAhAh/Custom/Videos"
-#define CUSTOM_BACKGROUNDS_PATH		@"/Library/Application Support/AhAhAh/Custom/Backgrounds"
+#define CUSTOM_VIDEOS_PATH			@"/User/Library/Application Support/AhAhAh/Videos"
+#define CUSTOM_BACKGROUNDS_PATH		@"/User/Library/Application Support/AhAhAh/Backgrounds"
+
+#define DEFAULT_BACKGROUND			@"/Library/Application Support/AhAhAh/BlueScreenError.png"
+#define DEFAULT_VIDEO				@"/Library/Application Support/AhAhAh/AhAhAh.m4v"
 
 #define ID_NONE						@"_none"
 #define ID_DEFAULT					@"_default"
