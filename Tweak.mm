@@ -17,20 +17,23 @@
 #import "DebugLog.h"
 
 
-#define DEFAULT_BACKGROUND			@"/Library/Application Support/AhAhAh/BlueScreenError.png"
-#define DEFAULT_VIDEO				@"/Library/Application Support/AhAhAh/AhAhAh.m4v"
+#define DEFAULT_BACKGROUND	@"/Library/Application Support/AhAhAh/BlueScreenError.png"
+#define DEFAULT_VIDEO		@"/Library/Application Support/AhAhAh/AhAhAh.mp4"
 
-#define ID_NONE						@"_none"
-#define ID_DEFAULT					@"_default"
+#define ID_NONE				@"_none"
+#define ID_DEFAULT			@"_default"
 
-#define iPad						(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+#define iPad				(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 
 #define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
 
-//--------------------------------------------------------------------------------------------------
+
+//------------------------------//
+// Private Interfaces
+//------------------------------//
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -59,8 +62,11 @@
 - (void)_stopMatching;
 @end
 
-//--------------------------------------------------------------------------------------------------
 
+
+//------------------------------//
+// AhAhAh Controller
+//------------------------------//
 
 @interface AhAhAhController : NSObject
 
@@ -84,7 +90,7 @@
 
 @end
 
-
+//------------------------------//
 
 @implementation AhAhAhController
 
@@ -319,16 +325,31 @@
 @end
 
 
-//--------------------------------------------------------------------------------------------------
 
+//------------------------------//
+// Stuff
+//------------------------------//
 
 static AhAhAhController *newman = nil;
 
-
-// Handle settings changed notifications
-NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
-							const void *object, CFDictionaryRef userInfo) {
+static BOOL deviceHasTouchID() {
+	BOOL result = NO;
+	UIDevice *device = [UIDevice currentDevice];
 	
+	if ([device respondsToSelector:@selector(_deviceInfoForKey)]) { // iOS 7
+		NSString *productType = [device _deviceInfoForKey:@"ProductType"];
+		
+		if ([productType isEqualToString:@"iPhone6,1"]) { // iPhone 5s
+			result = YES;
+		} else if ([productType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
+			result = YES;
+		}
+	}
+	return result;
+}
+
+static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
+						 const void *object, CFDictionaryRef userInfo) {
 	DebugLog1(@"******** Preferences Changed Notification ********");
 	
 	if (newman) {
@@ -338,15 +359,12 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 
 
-
-
-//--------------------------------------------------------------------------------------------------
+//------------------------------//
 // Main Hooks
-//--------------------------------------------------------------------------------------------------
+//------------------------------//
 
 %group Main
 
-//--------------------------------------------------------------------------------------------------
 
 %hook SpringBoard
 
@@ -388,7 +406,6 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 %end
 
-//--------------------------------------------------------------------------------------------------
 
 %hook SBLockScreenViewController
 
@@ -412,7 +429,6 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 %end
 
-//--------------------------------------------------------------------------------------------------
 
 %hook SBLockScreenManager
 
@@ -447,27 +463,22 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 %end
 
-//--------------------------------------------------------------------------------------------------
 
 %end //group:Main
 
 
 
-
-
-//--------------------------------------------------------------------------------------------------
+//------------------------------//
 // TouchID Hooks
-//--------------------------------------------------------------------------------------------------
+//------------------------------//
 
 %group BioSupport
 
-//--------------------------------------------------------------------------------------------------
 
 //%hook SBUIBiometricEventMonitor
 //- (void)_setMatchingEnabled:(BOOL)enable;
 //%end
 
-//--------------------------------------------------------------------------------------------------
 
 %hook SBLockScreenManager
 
@@ -504,17 +515,14 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 
 %end
 
-//--------------------------------------------------------------------------------------------------
 
 %end //group:BioSupport
 
 
 
-
-
-//--------------------------------------------------------------------------------------------------
+//------------------------------//
 // Constructor
-//--------------------------------------------------------------------------------------------------
+//------------------------------//
 
 %ctor {
 	@autoreleasepool {
@@ -527,10 +535,7 @@ NS_INLINE void prefsChanged(CFNotificationCenterRef center, void *observer, CFSt
 			newman = [[AhAhAhController alloc] init];
 			%init(Main);
 			
-			// check if the device has a TouchID sensor
-			NSString *deviceId = [[UIDevice currentDevice] _deviceInfoForKey:@"ProductType"];
-			
-			if ([deviceId isEqualToString:@"iPhone6,1"] || [deviceId isEqualToString:@"iPhone6,2"]) { // iPhone 5S
+			if (deviceHasTouchID()) {
 				NSLog(@" [Ah! Ah! Ah!] detected iPhone 5S");
 				newman.hasTouchID = YES;
 				

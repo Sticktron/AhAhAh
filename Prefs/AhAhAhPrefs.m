@@ -21,11 +21,15 @@
 #import "../DebugLog.h"
 
 
-#define URL_EMAIL					@"mailto:sticktron@hotmail.com"
-#define URL_GITHUB					@"http://github.com/Sticktron/AhAhAh"
-#define URL_PAYPAL					@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
-#define URL_TWITTER_WEB				@"http://twitter.com/Sticktron"
-#define URL_TWITTER_APP				@"twitter://user?screen_name=Sticktron"
+//------------------------------//
+// Constants
+//------------------------------//
+
+#define URL_EMAIL			@"mailto:sticktron@hotmail.com"
+#define URL_GITHUB			@"http://github.com/Sticktron/AhAhAh"
+#define URL_PAYPAL			@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
+#define URL_TWITTER_WEB		@"http://twitter.com/Sticktron"
+#define URL_TWITTER_APP		@"twitter://user?screen_name=Sticktron"
 
 #define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
@@ -45,14 +49,16 @@
 #define TITLE_TAG					2
 #define SUBTITLE_TAG				3
 
-#define ID_DEFAULT					@"_default"
-#define ID_NONE						@"_none"
-#define FILE_KEY					@"file"
-#define SIZE_KEY					@"size"
+#define ID_DEFAULT			@"_default"
+#define ID_NONE				@"_none"
+#define FILE_KEY			@"file"
+#define SIZE_KEY			@"size"
 
 
-//--------------------------------------------------------------------------------------------------
 
+//------------------------------//
+// Private Interfaces
+//------------------------------//
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -71,8 +77,10 @@
 @end
 
 
-//--------------------------------------------------------------------------------------------------
 
+//------------------------------//
+// UIImage Helpers
+//------------------------------//
 
 @implementation UIImage (Private)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
@@ -153,8 +161,9 @@
 @end
 
 
-//--------------------------------------------------------------------------------------------------
-
+//------------------------------//
+// Settings Controller
+//------------------------------//
 
 @interface AhAhAhPrefsController : PSListController
 - (void)respring;
@@ -231,8 +240,10 @@
 @end
 
 
-//--------------------------------------------------------------------------------------------------
 
+//------------------------------//
+// Custom Media Controller
+//------------------------------//
 
 @interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate,
 										UINavigationControllerDelegate, UIImagePickerControllerDelegate>
@@ -914,6 +925,11 @@
 	}
 }
 
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    [self.tableView setEditing:editing animated:YES];
+}
+
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 											forRowAtIndexPath:(NSIndexPath *)indexPath {
 	DebugLog(@"User wants to delete media");
@@ -958,11 +974,6 @@
 		[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationTop];
 		[tableView reloadData];
     }
-}
-
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    [super setEditing:editing animated:animated];
-    [self.tableView setEditing:editing animated:YES];
 }
 
 @end
