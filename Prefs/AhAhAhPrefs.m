@@ -161,6 +161,20 @@
 @end
 
 
+
+static NSString* getDeviceType() {
+	NSString *result = nil;
+	UIDevice *device = [UIDevice currentDevice];
+	
+	if ([device respondsToSelector:@selector(_deviceInfoForKey:)]) { // iOS 7
+		result = [device _deviceInfoForKey:@"ProductType"];
+	}
+	return result;
+}
+
+
+
+
 //------------------------------//
 // Settings Controller
 //------------------------------//
@@ -184,13 +198,17 @@
 		
 		// hide some settings from non-TouchID devices...
 		
-		NSString *deviceId = [[UIDevice currentDevice] _deviceInfoForKey:@"ProductType"];
-		if ([deviceId isEqualToString:@"iPhone6,1"]) {
-			DebugLog(@"Found an iPhone 5S");
-		} else {
-			//
-			// not an iPhone 5S, no TouchID
-			//
+		BOOL hasTouchID = NO;
+		NSString *deviceType = getDeviceType();
+		DebugLog(@"device type is: %@", deviceType);
+		
+		if ([deviceType isEqualToString:@"iPhone6,1"]) {		// iPhone 5s
+			hasTouchID = YES;
+		} else if ([deviceType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
+			hasTouchID = YES;
+		}
+			
+		if (!hasTouchID) {
 			DebugLog(@"Not an iPhone 5S, disabling some preferences...");
 			
 			for (PSSpecifier *spec in specs) {
@@ -204,6 +222,7 @@
 					props[@"enabled"] = @NO;
 				}
 			}
+			
 		}
 		_specifiers = [specs copy];
 	}

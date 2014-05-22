@@ -174,7 +174,6 @@
 		[monitor _stopMatching];
 	}
 	
-	
 	// delay sleep
 	//
 	//Class $SBBacklightController = NSClassFromString(@"SBBacklightController");
@@ -189,21 +188,19 @@
 	//DebugLog(@"delaying sleep by: %f", self.sleepDelay);
 	
 	
-	// create the overlay view...
-	
+	// create the overlay view
 	self.overlay = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	DebugLog(@"[[UIScreen mainScreen] bounds]=%@", NSStringFromCGRect([[UIScreen mainScreen] bounds]));
-	
 	self.overlay.opaque = YES;
 	self.overlay.backgroundColor = [UIColor blackColor];
 	self.overlay.autoresizesSubviews = NO;
 	self.overlay.exclusiveTouch = YES;
 	
+	// show the overlay
 	UIViewController *parentViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
 	DebugLog(@"our gracious host: %@", parentViewController);
 	[parentViewController.view addSubview:self.overlay];
 	[parentViewController.view bringSubviewToFront:self.overlay];
-	
 	
 	// hide the statusbar
 	[(SpringBoard *)[UIApplication sharedApplication] hideSpringBoardStatusBar];
@@ -268,8 +265,6 @@
 		self.player.scalingMode = MPMovieScalingModeAspectFit;
 		self.player.view.backgroundColor = [UIColor clearColor];
 		self.player.backgroundView.backgroundColor = [UIColor clearColor];
-		//self.player.view.opaque = NO;
-		//self.player.backgroundView.opaque = NO;
 		
 		// set frame
 		if (self.fullScreenVideo) {
@@ -297,12 +292,8 @@
 	[self.overlay removeFromSuperview];
 	self.overlay = nil;
 	
-	// un-hide the statusbar
-	//[(SpringBoard *)[UIApplication sharedApplication] showSpringBoardStatusBar];
-	
 	self.failedAttempts = 0;
 	self.isShowing = NO;
-	
 	
 	// allow sleep
 	//
@@ -310,16 +301,6 @@
 	//[[$SBBacklightController sharedInstance] allowIdleSleep];
 	//
 	//[self enableSleep];
-
-	
-	// re-enable TouchID
-	//
-	//if (self.hasTouchID && !self.allowBioRemoval) {
-	//	SBUIBiometricEventMonitor *monitor = [NSClassFromString(@"SBUIBiometricEventMonitor") sharedInstance];
-	//	[monitor _setMatchingEnabled:YES];
-	//	//[monitor _startMatching];
-	//}
-	
 }
 
 @end
@@ -332,18 +313,12 @@
 
 static AhAhAhController *newman = nil;
 
-static BOOL deviceHasTouchID() {
-	BOOL result = NO;
+static NSString* getDeviceType() {
+	NSString *result = nil;
 	UIDevice *device = [UIDevice currentDevice];
 	
-	if ([device respondsToSelector:@selector(_deviceInfoForKey)]) { // iOS 7
-		NSString *productType = [device _deviceInfoForKey:@"ProductType"];
-		
-		if ([productType isEqualToString:@"iPhone6,1"]) { // iPhone 5s
-			result = YES;
-		} else if ([productType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
-			result = YES;
-		}
+	if ([device respondsToSelector:@selector(_deviceInfoForKey:)]) { // iOS 7
+		result = [device _deviceInfoForKey:@"ProductType"];
 	}
 	return result;
 }
@@ -369,7 +344,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 %hook SpringBoard
 
 - (void)_lockButtonDownFromSource:(int)arg1 {
-	DebugLog0;
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
 		// no-op
 	} else {
@@ -378,7 +353,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 }
 
 - (void)lockButtonDown:(id)arg1 {
-	DebugLog0;
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
 		// no-op
 	} else {
@@ -387,7 +362,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 }
 
 - (void)lockButtonUp:(id)arg1 {
-	DebugLog0;
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
 		// no-op
 	} else {
@@ -396,7 +371,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 }
 
 - (void)_lockButtonUpFromSource:(int)arg1 {
-	DebugLog0;
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
 		// no-op
 	} else {
@@ -496,6 +471,8 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 			DebugLog(@"TouchID: Event %llu (unlock failed)", event);
 			[newman unlockFailed];
 		}
+	} else {
+		DebugLog(@"TouchID: Event %llu", event);
 	}
 	
 	%orig;
@@ -535,10 +512,21 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 			newman = [[AhAhAhController alloc] init];
 			%init(Main);
 			
-			if (deviceHasTouchID()) {
+			// check for TouchID and init...
+			
+			BOOL hasTouchID = NO;
+			NSString *deviceType = getDeviceType();
+			NSLog(@" [Ah! Ah! Ah!] device type is: %@", deviceType);
+			
+			if ([deviceType isEqualToString:@"iPhone6,1"]) {		// iPhone 5s
+				hasTouchID = YES;
+			} else if ([deviceType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
+				hasTouchID = YES;
+			}
+			
+			if (hasTouchID) {
 				NSLog(@" [Ah! Ah! Ah!] detected iPhone 5S");
 				newman.hasTouchID = YES;
-				
 				%init(BioSupport);
 			}
 			
