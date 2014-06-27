@@ -12,7 +12,7 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MPMoviePlayerController.h>
 
-//#define DEBUG_MODE_ON
+#define DEBUG_MODE_ON
 #define DEBUG_PREFIX @"😈 [Ah!Ah!Ah!]"
 #import "DebugLog.h"
 
@@ -28,6 +28,9 @@
 #define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
+
+#define ANDROIDLOCK_UNLOCK_ATTEMPT_FAILED		@"com.zmaster.androidlock.wrong-attempt"
+#define ANDROIDLOCK_UNLOCK_FAILED				@"com.zmaster.androidlock.too-many-wrong-attempts"
 
 
 
@@ -53,8 +56,16 @@
 @end
 
 @interface SBLockScreenManager : NSObject
++ (id)sharedInstance;
 - (BOOL)attemptUnlockWithPasscode:(id)passcode;
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)event;
+@end
+
+@interface SBLockScreenManager (AndroidLock)
+- (BOOL)androidlockIsEnabled;
+- (BOOL)androidlockIsLocked;
+//- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext;
+//- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext animatingPasscode:(BOOL)animatingPasscode;
 @end
 
 @interface SBUIBiometricEventMonitor : NSObject
@@ -83,10 +94,14 @@
 @property (nonatomic, assign) BOOL fullScreenVideo;
 @property (nonatomic, assign) BOOL isShowing;
 
+@property (nonatomic, assign) BOOL isAndroidLockInstalled;
+@property (nonatomic, assign) BOOL isAndroidLockEnabled;
+
 - (void)loadPrefs;
 - (void)unlockFailed;
 - (void)show;
 - (void)remove;
+- (void)handleNSNotification:(NSNotification *)notification;
 
 @end
 
@@ -109,6 +124,28 @@
 		_fullScreenVideo = NO;
 		_videoFile = ID_DEFAULT;
 		_backgroundFile = ID_DEFAULT;
+		
+		_isAndroidLockInstalled = NO;
+		_isAndroidLockEnabled = NO;
+		
+		
+		// check for AndroidLock XT...
+		
+		//SBLockScreenManager *lsm = [%c(SBLockScreenManager) sharedInstance];
+		//SBLockScreenManager *lsm = [NSClassFromString(@"SBLockScreenManager") sharedInstance];
+		//DebugLog(@"lockScreenManager=%@", lsm);
+		
+		/*
+		 if ([lockScreenManager respondsToSelector:@selector(androidlockIsEnabled)]) {
+		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is installed");
+		 newman.isAndroidLockInstalled = YES;
+		 
+		 newman.isAndroidLockEnabled = [lockScreenManager androidlockIsEnabled];
+		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is %@", newman.isAndroidLockEnabled?@"enabled":@"disabled");
+		 
+		 //[newman supportAndroidLock];
+		 }
+		*/
 		
 		[self loadPrefs];
 	}
@@ -293,7 +330,6 @@
 	self.overlay = nil;
 	
 	self.failedAttempts = 0;
-	self.isShowing = NO;
 	
 	// allow sleep
 	//
@@ -301,6 +337,27 @@
 	//[[$SBBacklightController sharedInstance] allowIdleSleep];
 	//
 	//[self enableSleep];
+	
+	self.isShowing = NO;
+}
+
+- (void)supportAndroidLock {
+	self.isAndroidLockInstalled = YES;
+	
+	// listen for notifications from AndroidLock
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(handleNSNotification:)
+												 name:ANDROIDLOCK_UNLOCK_FAILED
+											   object:nil];
+}
+
+- (void)handleNSNotification:(NSNotification *)notification {
+	DebugLog(@"Notification from AndroidLock XT... name=%@", notification.name);
+	
+	//
+	//
+	//
+	
 }
 
 @end
@@ -508,11 +565,13 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 		
 		if (prefs && prefs[@"Enabled"] && ([prefs[@"Enabled"] boolValue] == NO)) {
 			enabled = NO;
+			
 		} else {
 			newman = [[AhAhAhController alloc] init];
 			%init(Main);
 			
-			// check for TouchID and init...
+			
+			// init TouchID hooks if supported...
 			
 			BOOL hasTouchID = NO;
 			NSString *deviceType = getDeviceType();
@@ -525,12 +584,15 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 			}
 			
 			if (hasTouchID) {
-				NSLog(@" [Ah! Ah! Ah!] detected iPhone 5S");
+				NSLog(@" [Ah! Ah! Ah!] TouchID supported");
 				newman.hasTouchID = YES;
 				%init(BioSupport);
+			} else {
+				NSLog(@" [Ah! Ah! Ah!] TouchID not supported");
 			}
 			
-			// register for notifications from Settings
+			
+			// listen for notifications from Settings
 			CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
 											NULL,
 											(CFNotificationCallback)prefsChanged,

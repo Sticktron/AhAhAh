@@ -12,13 +12,14 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
-#import "theos/include/Preferences/PSViewController.h"
-#import "theos/include/Preferences/PSListController.h"
-#import "theos/include/Preferences/PSSpecifier.h"
+#import <Preferences/PSViewController.h>
+#import <Preferences/PSListController.h>
+#import <Preferences/PSSpecifier.h>
 
 //#define DEBUG_MODE_ON
 #define DEBUG_PREFIX @"🌀 [Ah! Ah! Ah! Prefs]"
 #import "../DebugLog.h"
+
 
 
 //------------------------------//
