@@ -26,5 +26,4 @@ A Customizable Unlock Error Alarm inspired by that scene in Jurassic Park.
 * Steven Spielberg & some YouTuber - video clip
 
 
-Licence:
 You may not use any of the supplied materials for any commercial use whatsoever.
