@@ -29,8 +29,8 @@
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
-#define ANDROIDLOCK_UNLOCK_ATTEMPT_FAILED		@"com.zmaster.androidlock.wrong-attempt"
-#define ANDROIDLOCK_UNLOCK_FAILED				@"com.zmaster.androidlock.too-many-wrong-attempts"
+//#define ANDROIDLOCK_UNLOCK_ATTEMPT_FAILED		@"com.zmaster.androidlock.wrong-attempt"
+//#define ANDROIDLOCK_UNLOCK_FAILED				@"com.zmaster.androidlock.too-many-wrong-attempts"
 
 
 
@@ -61,12 +61,12 @@
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)event;
 @end
 
-@interface SBLockScreenManager (AndroidLock)
-- (BOOL)androidlockIsEnabled;
-- (BOOL)androidlockIsLocked;
-//- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext;
-//- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext animatingPasscode:(BOOL)animatingPasscode;
-@end
+//@interface SBLockScreenManager (AndroidLock)
+//- (BOOL)androidlockIsEnabled;
+//- (BOOL)androidlockIsLocked;
+////- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext;
+////- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext animatingPasscode:(BOOL)animatingPasscode;
+//@end
 
 @interface SBUIBiometricEventMonitor : NSObject
 + (id)sharedInstance;
@@ -93,15 +93,14 @@
 @property (nonatomic, assign) BOOL allowBioRemoval;
 @property (nonatomic, assign) BOOL fullScreenVideo;
 @property (nonatomic, assign) BOOL isShowing;
-
-@property (nonatomic, assign) BOOL isAndroidLockInstalled;
-@property (nonatomic, assign) BOOL isAndroidLockEnabled;
+//@property (nonatomic, assign) BOOL isAndroidLockInstalled;
+//@property (nonatomic, assign) BOOL isAndroidLockEnabled;
 
 - (void)loadPrefs;
 - (void)unlockFailed;
 - (void)show;
 - (void)remove;
-- (void)handleNSNotification:(NSNotification *)notification;
+//- (void)handleNSNotification:(NSNotification *)notification;
 
 @end
 
@@ -125,27 +124,26 @@
 		_videoFile = ID_DEFAULT;
 		_backgroundFile = ID_DEFAULT;
 		
-		_isAndroidLockInstalled = NO;
-		_isAndroidLockEnabled = NO;
+//		_isAndroidLockInstalled = NO;
+//		_isAndroidLockEnabled = NO;
 		
-		
-		// check for AndroidLock XT...
-		
-		//SBLockScreenManager *lsm = [%c(SBLockScreenManager) sharedInstance];
-		//SBLockScreenManager *lsm = [NSClassFromString(@"SBLockScreenManager") sharedInstance];
-		//DebugLog(@"lockScreenManager=%@", lsm);
-		
-		/*
-		 if ([lockScreenManager respondsToSelector:@selector(androidlockIsEnabled)]) {
-		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is installed");
-		 newman.isAndroidLockInstalled = YES;
-		 
-		 newman.isAndroidLockEnabled = [lockScreenManager androidlockIsEnabled];
-		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is %@", newman.isAndroidLockEnabled?@"enabled":@"disabled");
-		 
-		 //[newman supportAndroidLock];
-		 }
-		*/
+//		 check for AndroidLock XT...
+//		
+//		SBLockScreenManager *lsm = [%c(SBLockScreenManager) sharedInstance];
+//		SBLockScreenManager *lsm = [NSClassFromString(@"SBLockScreenManager") sharedInstance];
+//		DebugLog(@"lockScreenManager=%@", lsm);
+//		
+//		/*
+//		 if ([lockScreenManager respondsToSelector:@selector(androidlockIsEnabled)]) {
+//		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is installed");
+//		 newman.isAndroidLockInstalled = YES;
+//		 
+//		 newman.isAndroidLockEnabled = [lockScreenManager androidlockIsEnabled];
+//		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is %@", newman.isAndroidLockEnabled?@"enabled":@"disabled");
+//		 
+//		 [newman supportAndroidLock];
+//		 }
+//		*/
 		
 		[self loadPrefs];
 	}
@@ -341,6 +339,7 @@
 	self.isShowing = NO;
 }
 
+/*
 - (void)supportAndroidLock {
 	self.isAndroidLockInstalled = YES;
 	
@@ -350,15 +349,11 @@
 												 name:ANDROIDLOCK_UNLOCK_FAILED
 											   object:nil];
 }
-
 - (void)handleNSNotification:(NSNotification *)notification {
 	DebugLog(@"Notification from AndroidLock XT... name=%@", notification.name);
-	
-	//
-	//
-	//
-	
+	// TODO
 }
+*/
 
 @end
 
@@ -450,15 +445,6 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 	}
 }
 
-/*
-- (void)_handleDisplayTurnedOff;
-- (void)prepareForMesaUnlockWithCompletion:(id)arg1;
-- (void)passcodeLockViewPasscodeEnteredViaMesa:(id)arg1;
-- (void)passcodeLockViewPasscodeEntered:(id)arg1;
-- (void)_passcodeStateChanged;
-- (void)_handlePasscodeLockStateChanged;
-*/
-
 %end
 
 
@@ -515,15 +501,29 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 %hook SBLockScreenManager
 
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)event {
-	// arg1 is <SBUIBiometricEventMonitor>
+	//
+	// Notes:
+	//
+	// • arg1 is an SBUIBiometricEventMonitor
+	//
+	// • event values seem to be:
+	//		0: scanner off
+	//		1: scanner on
+	//		2: ?
+	//		4: success
+	//		9: fail (iOS 7.0.x)
+	//		10: fail (iOS 7.1.x)
+	//
 	
-	if (event == 4) {			// TouchID match successful //
+	if (event == 4) {
+		// TouchID match successful !!
 		if (newman.isShowing) {
 			DebugLog(@"TouchID: Event %llu (unlock successful)", event);
 			[newman remove];
 		}
 		
-	} else if (event == 9) {	// TouchID match failed //
+	} else if (event == 9 || event == 10) {
+		// TouchID match failed !!
 		if (newman.ignoreBioFailure == NO) {
 			DebugLog(@"TouchID: Event %llu (unlock failed)", event);
 			[newman unlockFailed];
@@ -538,7 +538,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 //
 // Handle TouchID Unlock Notification.
 //		NSConcreteNotification {
-//		  name = SBBiometricEventMonitorHasAuthenticated;
+//		  name = ;
 //		  object = <SBUIBiometricEventMonitor>
 //		}
 //
@@ -577,9 +577,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 			NSString *deviceType = getDeviceType();
 			NSLog(@" [Ah! Ah! Ah!] device type is: %@", deviceType);
 			
-			if ([deviceType isEqualToString:@"iPhone6,1"]) {		// iPhone 5s
-				hasTouchID = YES;
-			} else if ([deviceType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
+			if ([deviceType isEqualToString:@"iPhone6,1"] || [deviceType isEqualToString:@"iPhone6,2"]) {
 				hasTouchID = YES;
 			}
 			
