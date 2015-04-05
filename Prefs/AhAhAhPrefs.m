@@ -11,7 +11,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/MobileCoreServices.h>
-
+#import <LocalAuthentication/LAContext.h>
 #import <Preferences/PSViewController.h>
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
@@ -161,8 +161,6 @@
 }
 @end
 
-
-
 static NSString* getDeviceType() {
 	NSString *result = nil;
 	UIDevice *device = [UIDevice currentDevice];
@@ -171,6 +169,13 @@ static NSString* getDeviceType() {
 		result = [device _deviceInfoForKey:@"ProductType"];
 	}
 	return result;
+}
+
+static BOOL hasTouchID() {
+    if ([LAContext class]) {
+        return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
+    }
+    return [getDeviceType() hasPrefix:@"iPhone6"];
 }
 
 
@@ -198,7 +203,7 @@ static NSString* getDeviceType() {
 		NSMutableArray *specs = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
 		
 		// hide some settings from non-TouchID devices...
-		
+		/*
 		BOOL hasTouchID = NO;
 		NSString *deviceType = getDeviceType();
 		DebugLog(@"device type is: %@", deviceType);
@@ -208,8 +213,8 @@ static NSString* getDeviceType() {
 		} else if ([deviceType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
 			hasTouchID = YES;
 		}
-			
-		if (!hasTouchID) {
+		*/	
+		if (!hasTouchID()) {
 			DebugLog(@"Not an iPhone 5S, disabling some preferences...");
 			
 			for (PSSpecifier *spec in specs) {
@@ -231,9 +236,41 @@ static NSString* getDeviceType() {
 	return _specifiers;
 }
 
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
+	NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
+	
+	if (!prefs) {
+		prefs = [NSMutableDictionary dictionary];
+	}
+	
+	// new settings
+	prefs[specifier.properties[@"key"]] = value;
+	
+	DebugLog(@"##### Writing Preferences: %@", prefs);
+	[prefs writeToFile:PREFS_PLIST_PATH atomically:YES];
+	
+	// apply settings to tweak
+	DebugLog(@"notified tweak");
+		
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
+										 CFSTR("com.sticktron.ahahah.prefschanged"),
+										 NULL,
+										 NULL,
+										 true);
+}
+
+-(id)readPreferenceValue:(PSSpecifier *)specifier {
+	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
+	return prefs[specifier.properties[@"key"]];
+}
+
 - (void)respring {
 	NSLog(@"Ah!Ah!Ah! called for respring");
-	system("killall -HUP SpringBoard");
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
+										 CFSTR("com.sticktron.ahahah.respring"),
+										 NULL,
+										 NULL,
+										 true);
 }
 
 - (void)openPayPal {
