@@ -6,6 +6,7 @@ A customizable unlock error alarm inspired by that scene in Jurassic Park.
 * Play video fullscreen or windowed with a background image
 * Import videos and images from your Camera Roll or add files manually (using iExplorer, iFunbox, etc.)
 * Stop the Lock button from turning off the alarm (have to wait until screen shuts off)
+* Choose how many failed attempts at unlocking before the alarm is triggered
 * Supports Touch ID
 
 
