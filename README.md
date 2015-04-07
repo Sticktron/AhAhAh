@@ -1,23 +1,21 @@
 ## Ah Ah Ah, You didn't say the magic word!
-A Customizable Unlock Error Alarm inspired by that scene in Jurassic Park.
-//Version 8
+A customizable unlock error alarm inspired by that scene in Jurassic Park.
 
 ###Features
 
-* Choose your own video and background image!
-* Import from Camera Roll or add files via iFunbox/SSH
-* Fullscreen or windowed video
-* Prevent the Lock button from turning off the alarm
+* Play video fullscreen or windowed with a background image
+* Import videos and images from your Camera Roll or add files manually (using iExplorer, iFunbox, etc.)
+* Stop the Lock button from turning off the alarm (have to wait until screen shuts off)
 * Supports Touch ID
 
 
 ### Device Compatibility
 
-* iOS 8, 7
-* built for ARM64
+* Supports all devices on iOS 7 or newer
 
 
-### Credits
+### Thanks
 
-* /r/jailbreak/ community - idea
-* Steven Spielberg - video clip
+* /r/jailbreak community for the idea
+* milodarling for the iOS 8 update!
+* Steven Spielberg for Jurassic Park
