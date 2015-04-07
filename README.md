@@ -1,4 +1,4 @@
-## Ah Ah Ah, You didn't say the magic word!
+## Ah! Ah! Ah! You didn't say the magic word!
 A customizable unlock error alarm inspired by that scene in Jurassic Park.
 
 ###Features
