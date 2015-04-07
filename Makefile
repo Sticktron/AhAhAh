@@ -5,7 +5,7 @@ THEOS_BUILD_DIR = Packages
 TWEAK_NAME = AhAhAh
 AhAhAh_CFLAGS = -fobjc-arc
 AhAhAh_FILES = Tweak.xm
-AhAhAh_FRAMEWORKS = Foundation UIKit MediaPlayer
+AhAhAh_FRAMEWORKS = Foundation UIKit MediaPlayer LocalAuthentication
 
 SUBPROJECTS += Prefs
 
