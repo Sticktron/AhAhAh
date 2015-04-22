@@ -5,15 +5,15 @@
 //  Custom Unlock Error Alarm.
 //  Inspired by Jurassic Park.
 //
-//  Created by Sticktron in 2014.
+//  Copyright (c) 2014-2015 Sticktron. All rights reserved.
 //
 //
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MPMoviePlayerController.h>
 #import <LocalAuthentication/LAContext.h>
 
-#define DEBUG_MODE_ON
 #define DEBUG_PREFIX @"😈 [Ah!Ah!Ah!]"
 #import "DebugLog.h"
 
@@ -30,33 +30,11 @@
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
-//#define ANDROIDLOCK_UNLOCK_ATTEMPT_FAILED		@"com.zmaster.androidlock.wrong-attempt"
-//#define ANDROIDLOCK_UNLOCK_FAILED				@"com.zmaster.androidlock.too-many-wrong-attempts"
 
-enum {
-   MPMovieControlStyleNone,
-   MPMovieControlStyleEmbedded,
-   MPMovieControlStyleFullscreen,
-   MPMovieControlStyleDefault = MPMovieControlStyleFullscreen 
-};
-typedef NSInteger MPMovieControlStyle;
 
-enum {
-   MPMovieRepeatModeNone,
-   MPMovieRepeatModeOne 
-};
-typedef NSInteger MPMovieRepeatMode;
-
-typedef enum {
-   MPMovieScalingModeNone,
-   MPMovieScalingModeAspectFit,
-   MPMovieScalingModeAspectFill,
-   MPMovieScalingModeFill 
-} MPMovieScalingMode;
-
-//------------------------------//
+//------------------------------------------------------------------------------
 // Private Interfaces
-//------------------------------//
+//------------------------------------------------------------------------------
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -82,13 +60,6 @@ typedef enum {
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)event;
 @end
 
-//@interface SBLockScreenManager (AndroidLock)
-//- (BOOL)androidlockIsEnabled;
-//- (BOOL)androidlockIsLocked;
-////- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext;
-////- (BOOL)androidlockAttemptUnlockWithUnlockActionContext:(id)unlockActionContext animatingPasscode:(BOOL)animatingPasscode;
-//@end
-
 @interface SBUIBiometricEventMonitor : NSObject
 + (id)sharedInstance;
 - (void)_stopMatching;
@@ -96,9 +67,9 @@ typedef enum {
 
 
 
-//------------------------------//
-// AhAhAh Controller
-//------------------------------//
+//------------------------------------------------------------------------------
+// Ah!Ah!Ah! Controller
+//------------------------------------------------------------------------------
 
 @interface AhAhAhController : NSObject
 
@@ -114,18 +85,12 @@ typedef enum {
 @property (nonatomic, assign) BOOL allowBioRemoval;
 @property (nonatomic, assign) BOOL fullScreenVideo;
 @property (nonatomic, assign) BOOL isShowing;
-//@property (nonatomic, assign) BOOL isAndroidLockInstalled;
-//@property (nonatomic, assign) BOOL isAndroidLockEnabled;
-
 - (void)loadPrefs;
 - (void)unlockFailed;
 - (void)show;
 - (void)remove;
-//- (void)handleNSNotification:(NSNotification *)notification;
-
 @end
 
-//------------------------------//
 
 @implementation AhAhAhController
 
@@ -137,6 +102,7 @@ typedef enum {
 		_isShowing = NO;
 		_hasTouchID = NO;
 		
+		// default settings
 		_maxFailures = 2;
 		_ignoreBioFailure = YES;
 		_allowBioRemoval = NO;
@@ -145,27 +111,7 @@ typedef enum {
 		_videoFile = ID_DEFAULT;
 		_backgroundFile = ID_DEFAULT;
 		
-//		_isAndroidLockInstalled = NO;
-//		_isAndroidLockEnabled = NO;
-		
-//		 check for AndroidLock XT...
-//		
-//		SBLockScreenManager *lsm = [%c(SBLockScreenManager) sharedInstance];
-//		SBLockScreenManager *lsm = [NSClassFromString(@"SBLockScreenManager") sharedInstance];
-//		DebugLog(@"lockScreenManager=%@", lsm);
-//		
-//		/*
-//		 if ([lockScreenManager respondsToSelector:@selector(androidlockIsEnabled)]) {
-//		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is installed");
-//		 newman.isAndroidLockInstalled = YES;
-//		 
-//		 newman.isAndroidLockEnabled = [lockScreenManager androidlockIsEnabled];
-//		 NSLog(@" [Ah! Ah! Ah!] AndroidLock XT is %@", newman.isAndroidLockEnabled?@"enabled":@"disabled");
-//		 
-//		 [newman supportAndroidLock];
-//		 }
-//		*/
-		
+		// load user prefs if any
 		[self loadPrefs];
 	}
 	return self;
@@ -213,13 +159,13 @@ typedef enum {
 	self.failedAttempts++;
 	DebugLog(@"Failed Attempts: %d", self.failedAttempts);
 	
-	if (self.failedAttempts == self.maxFailures) {
+	if (self.failedAttempts >= self.maxFailures) {
 		[self show];
 	}
 }
 
 - (void)show {
-	NSLog(@"••• Ah!Ah!Ah! says RING THE ALARM •••");
+	NSLog(@"•••••••••• Ah!Ah!Ah! says RING THE ALARM! ••••••••••");
 	
 	self.isShowing = YES;
 	
@@ -246,7 +192,6 @@ typedef enum {
 	
 	// create the overlay view
 	self.overlay = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	DebugLog(@"[[UIScreen mainScreen] bounds]=%@", NSStringFromCGRect([[UIScreen mainScreen] bounds]));
 	self.overlay.opaque = YES;
 	self.overlay.backgroundColor = [UIColor blackColor];
 	self.overlay.autoresizesSubviews = NO;
@@ -262,7 +207,7 @@ typedef enum {
 	[(SpringBoard *)[UIApplication sharedApplication] hideSpringBoardStatusBar];
 	
 	
-	// background view...
+	// create the background image view...
 	
 	if ([self.backgroundFile isEqualToString:ID_NONE]) {
 		DebugLog(@"no backgound");
@@ -292,7 +237,7 @@ typedef enum {
 	}
 	
 	
-	// movie view...
+	// create the movie view...
 	
 	if ([self.videoFile isEqualToString:ID_NONE]) {
 		DebugLog(@"no video");
@@ -309,13 +254,8 @@ typedef enum {
 		DebugLog(@"video path: %@", videoPath);
 		
 		NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
-		DebugLog(@"video URL: %@", videoURL);
 		
 		self.player = [[MPMoviePlayerController alloc] initWithContentURL:videoURL];
-		//[self.player prepareToPlay];
-		
-		// (todo: check if movie loaded)
-		
 		self.player.controlStyle = MPMovieControlStyleNone;
 		self.player.repeatMode = MPMovieRepeatModeOne;
 		self.player.scalingMode = MPMovieScalingModeAspectFit;
@@ -338,7 +278,7 @@ typedef enum {
 }
 
 - (void)remove {
-	NSLog(@"••• Ah!Ah!Ah! is going away (for now!) •••");
+	NSLog(@"•••••••••• Ah!Ah!Ah! is going away (for now) ••••••••••");
 	
 	if (self.player) {
 		[self.player stop];
@@ -350,7 +290,7 @@ typedef enum {
 	
 	self.failedAttempts = 0;
 	
-	// allow sleep
+	// allow sleep again
 	//
 	//Class $SBBacklightController = NSClassFromString(@"SBBacklightController");
 	//[[$SBBacklightController sharedInstance] allowIdleSleep];
@@ -360,52 +300,25 @@ typedef enum {
 	self.isShowing = NO;
 }
 
-/*
-- (void)supportAndroidLock {
-	self.isAndroidLockInstalled = YES;
-	
-	// listen for notifications from AndroidLock
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(handleNSNotification:)
-												 name:ANDROIDLOCK_UNLOCK_FAILED
-											   object:nil];
-}
-- (void)handleNSNotification:(NSNotification *)notification {
-	DebugLog(@"Notification from AndroidLock XT... name=%@", notification.name);
-	// TODO
-}
-*/
-
 @end
 
 
 
-//------------------------------//
-// Stuff
-//------------------------------//
+//------------------------------------------------------------------------------
 
 static AhAhAhController *newman = nil;
-
-static NSString* getDeviceType() {
-	NSString *result = nil;
-	UIDevice *device = [UIDevice currentDevice];
-	
-	if ([device respondsToSelector:@selector(_deviceInfoForKey:)]) { // iOS 7
-		result = [device _deviceInfoForKey:@"ProductType"];
-	}
-	return result;
-}
 
 static BOOL hasTouchID() {
     if ([LAContext class]) {
         return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
+    } else {
+    	return NO;
     }
-    return [getDeviceType() hasPrefix:@"iPhone6"];
 }
 
 static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStringRef name,
 						 const void *object, CFDictionaryRef userInfo) {
-	DebugLog1(@"******** Preferences Changed Notification ********");
+	DebugLogC(@"***** Ah!Ah!Ah! Preferences Changed Notification *****");
 	
 	if (newman) {
 		[newman loadPrefs];
@@ -418,12 +331,11 @@ static void respring() {
 
 
 
-//------------------------------//
+//------------------------------------------------------------------------------
 // Main Hooks
-//------------------------------//
+//------------------------------------------------------------------------------
 
 %group Main
-
 
 %hook SpringBoard
 
@@ -497,38 +409,17 @@ static void respring() {
 	return successful;
 }
 
-/*
-- (void)_deviceLockedChanged:(id)arg1 {
-	// NSConcreteNotification {
-	//	name = SBDevicePasscodeLockStateDidChangeNotification
-	// }
-	
-	%orig;
-}
-- (void)_lockUI;
-- (void)_setUILocked:(BOOL)locked;
-- (void)_postLockCompletedNotification:(BOOL)arg1;
-- (BOOL)handleMenuButtonTap;
-*/
-
 %end
-
 
 %end //group:Main
 
 
 
-//------------------------------//
+//------------------------------------------------------------------------------
 // TouchID Hooks
-//------------------------------//
+//------------------------------------------------------------------------------
 
 %group BioSupport
-
-
-//%hook SBUIBiometricEventMonitor
-//- (void)_setMatchingEnabled:(BOOL)enable;
-//%end
-
 
 %hook SBLockScreenManager
 
@@ -544,7 +435,7 @@ static void respring() {
 	//		2: ?
 	//		4: success
 	//		9: fail (iOS 7.0.x)
-	//		10: fail (iOS 7.1.x)
+	//		10: fail (iOS >= 7.1.x)
 	//
 	
 	if (event == 4) {
@@ -567,28 +458,13 @@ static void respring() {
 	%orig;
 }
 
-//
-// Handle TouchID Unlock Notification.
-//		NSConcreteNotification {
-//		  name = ;
-//		  object = <SBUIBiometricEventMonitor>
-//		}
-//
-//- (void)_bioAuthenticated:(id)notification {
-//	DebugLog(@"notification=%@", notification);
-//	%orig;
-//}
-
 %end
-
 
 %end //group:BioSupport
 
 
 
-//------------------------------//
-// Constructor
-//------------------------------//
+//------------------------------------------------------------------------------
 
 %ctor {
 	@autoreleasepool {

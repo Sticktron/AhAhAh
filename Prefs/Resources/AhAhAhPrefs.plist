@@ -8,8 +8,7 @@
 	<key>items</key>
 	<array>
 
-		<!-- [GROUP: ENABLE/DISABLE] ------------------------------------------>
-		
+		<!-- [] ENABLE/DISABLE -->		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
@@ -17,7 +16,7 @@
 			<string>⚠️ SpringBoard must be restarted to enable or disable this tweak.</string>
 		</dict>
 		
-		<!-- SWITCH: Enabled (YES) ----->
+		<!-- Enabled (YES) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -31,7 +30,7 @@
 			<string>com.sticktron.ahahah</string>
 		</dict>
 		
-		<!-- BUTTON: Respring ----->
+		<!-- Respring -->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
@@ -55,9 +54,7 @@
 		</dict>
 		
 		
-		
-		<!-- GROUP: CUSTOMIZE ------------------------------------------------->
-		
+		<!-- [] CUSTOMIZE -->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
@@ -67,38 +64,17 @@
 			<string></string>
 		</dict>
 		
-		<!-- LINK: Media Controller ----->
+		<!-- Media Picker -->
 		<dict>
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Choose Video/Background</string>
+			<string>Choose Video or Background</string>
 			<key>detail</key>
 			<string>AhAhAhPrefsMediaController</string>
 		</dict>
 		
-		<!-- SWITCH: RepeatVideo (YES) -----
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>label</key>
-			<string>Loop Video</string>
-			
-			<key>id</key>
-			<string>RepeatVideo</string>
-			<key>key</key>
-			<string>RepeatVideo</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		-->
-		
-		<!-- SWITCH: FullScreenVideo (NO) ----->
+		<!-- FullScreenVideo (NO) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -114,12 +90,8 @@
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-
 		
-		
-		
-		<!-- GROUP: ACTIVATING ------------------------------------------------>
-		
+		<!-- [] ACTIVATING -->		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
@@ -127,7 +99,7 @@
 			<string>Activating</string>
 		</dict>
 		
-		<!-- LIST: MaxFailures (2) ----->
+		<!-- MaxFailures (2) -->
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
@@ -161,7 +133,7 @@
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		<!-- SWITCH: IgnoreBioFailure (YES) ----->
+		<!-- IgnoreBioFailure (YES) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -180,9 +152,7 @@
 		</dict>
 		
 		
-		
-		<!-- GROUP: DE-ACTIVATING --------------------------------------------->
-		
+		<!-- [] DE-ACTIVATING -->		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
@@ -192,7 +162,7 @@
 			<string>The alarm will automatically stop when the device goes to sleep.</string>
 		</dict>
 		
-		<!-- SWITCH: AllowBioRemoval (NO) ----->
+		<!-- AllowBioRemoval (NO) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -210,7 +180,7 @@
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		<!-- SWITCH: AllowLockRemoval (YES) ----->
+		<!-- AllowLockRemoval (YES) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -227,79 +197,94 @@
 		</dict>
 		
 		
-		
-		<!-- GROUP: CONTACT INFO ---------------------------------------------->
+		<!-- [] SUPPORT -->
 		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Contact</string>
+			<string>Support</string>
 		</dict>
-				
-		<!-- BUTTON: openEmail ----->
+			
+		<!-- Email -->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>sticktron@hotmail.com</string>
+			<string>Contact me</string>
 			<key>icon</key>
-			<string>Email.png</string>
+			<string>email.png</string>
 			<key>action</key>
 			<string>openEmail</string>
 		</dict>
 		
-		<!-- BUTTON: openTwitter ----->
+		<!-- Twitter -->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>@Sticktron</string>
+			<string>Follow me on Twitter</string>
 			<key>icon</key>
-			<string>Twitter.png</string>
+			<string>twitter.png</string>
 			<key>action</key>
 			<string>openTwitter</string>
 		</dict>
 		
-		<!-- BUTTON: openGitHub ----->
+		<!-- Source Code -->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
 			<string>Source code</string>
 			<key>icon</key>
-			<string>GitHub.png</string>
+			<string>github.png</string>
 			<key>action</key>
 			<string>openGitHub</string>
 		</dict>
-		
-		<!-- BUTTON: openPayPal ----->
+
+		<!-- Tip Me -->
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>Donate with PayPal</string>
+			<string>Tip me if you like this tweak :)</string>
 			<key>icon</key>
-			<string>PayPal.png</string>
+			<string>paypal.png</string>
 			<key>action</key>
 			<string>openPayPal</string>
 		</dict>
-		
-		
-		
-		<!-- GROUP: CREDITS --------------------------------------------------->
-		
+			
+			
+		<!-- [] Visit Website -->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Credits</string>
+			<string>Visit my website</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Sticktron's Lab</string>
+			<key>icon</key>
+			<string>web.png</string>
+			<key>action</key>
+			<string>openSticktronWeb</string>
+		</dict>
+			
+			
+		<!-- [] THANKS -->		
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>idea by /u/harrybond
-media by Universal Pictures
-built by Sticktron
+			<string>Thanks to /u/harrybond for the idea.
+Shoutout to milodarling for helping with the iOS 8 update.
 
-😈</string>
+Copyright (c) 2015 Sticktron.
+			
+			</string>
 		</dict>
 		
 	</array>
