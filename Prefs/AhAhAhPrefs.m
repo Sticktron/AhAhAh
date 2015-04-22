@@ -2,7 +2,7 @@
 //  AhAhAhPrefs.m
 //  Preferences for Ah! Ah! Ah!
 //
-//  Created by Sticktron in 2014.
+//  Copyright (c) 2014-2015 Sticktron. All rights reserved.
 //
 //
 
@@ -15,8 +15,8 @@
 #import <Preferences/PSViewController.h>
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
+#import <Social/Social.h>
 
-//#define DEBUG_MODE_ON
 #define DEBUG_PREFIX @"🌀 [Ah! Ah! Ah! Prefs]"
 #import "../DebugLog.h"
 
@@ -25,12 +25,6 @@
 //------------------------------//
 // Constants
 //------------------------------//
-
-#define URL_EMAIL			@"mailto:sticktron@hotmail.com"
-#define URL_GITHUB			@"http://github.com/Sticktron/AhAhAh"
-#define URL_PAYPAL			@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
-#define URL_TWITTER_WEB		@"http://twitter.com/Sticktron"
-#define URL_TWITTER_APP		@"twitter://user?screen_name=Sticktron"
 
 #define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
@@ -50,16 +44,16 @@
 #define TITLE_TAG					2
 #define SUBTITLE_TAG				3
 
-#define ID_DEFAULT			@"_default"
-#define ID_NONE				@"_none"
-#define FILE_KEY			@"file"
-#define SIZE_KEY			@"size"
+#define ID_DEFAULT					@"_default"
+#define ID_NONE						@"_none"
+#define FILE_KEY					@"file"
+#define SIZE_KEY					@"size"
 
 
 
-//------------------------------//
+//------------------------------------------------------------------------------
 // Private Interfaces
-//------------------------------//
+//------------------------------------------------------------------------------
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -79,16 +73,17 @@
 
 
 
-//------------------------------//
+//------------------------------------------------------------------------------
 // UIImage Helpers
-//------------------------------//
+//------------------------------------------------------------------------------
 
 @implementation UIImage (Private)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
 	BOOL opaque = YES;
 	
     if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
-		// In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+		// In next line, pass 0.0 to use the current device's pixel scaling factor
+		// (and thus account for Retina resolution).
 		// Pass 1.0 to force exact pixel size.
         //UIGraphicsBeginImageContextWithOptions(size, opaque, [[UIScreen mainScreen] scale]);
         UIGraphicsBeginImageContextWithOptions(size, opaque, 0.0f);
@@ -161,29 +156,19 @@
 }
 @end
 
-static NSString* getDeviceType() {
-	NSString *result = nil;
-	UIDevice *device = [UIDevice currentDevice];
-	
-	if ([device respondsToSelector:@selector(_deviceInfoForKey:)]) { // iOS 7
-		result = [device _deviceInfoForKey:@"ProductType"];
-	}
-	return result;
-}
-
 static BOOL hasTouchID() {
     if ([LAContext class]) {
         return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
+    } else {
+    	return NO;
     }
-    return [getDeviceType() hasPrefix:@"iPhone6"];
 }
 
 
 
-
-//------------------------------//
+//------------------------------------------------------------------------------
 // Settings Controller
-//------------------------------//
+//------------------------------------------------------------------------------
 
 @interface AhAhAhPrefsController : PSListController
 - (void)respring;
@@ -259,7 +244,7 @@ static BOOL hasTouchID() {
 										 true);
 }
 
--(id)readPreferenceValue:(PSSpecifier *)specifier {
+- (id)readPreferenceValue:(PSSpecifier *)specifier {
 	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 	return prefs[specifier.properties[@"key"]];
 }
@@ -273,38 +258,68 @@ static BOOL hasTouchID() {
 										 true);
 }
 
-- (void)openPayPal {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_PAYPAL]];
-}
-
 - (void)openEmail {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_EMAIL]];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto:sticktron@hotmail.com"]];
 }
 
 - (void)openTwitter {
-	// try the app first
-	if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter:"]]) {
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_TWITTER_APP]];
+	NSURL *url;
+	
+	if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot:"]]) {
+		url = [NSURL URLWithString:@"tweetbot:///user_profile/sticktron"];
+		
+	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific:"]]) {
+		url = [NSURL URLWithString:@"twitterrific:///profile?screen_name=sticktron"];
+		
+	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetings:"]]) {
+		url = [NSURL URLWithString:@"tweetings:///user?screen_name=sticktron"];
+		
+	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter:"]]) {
+		url = [NSURL URLWithString:@"twitter://user?screen_name=sticktron"];
+		
 	} else {
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_TWITTER_WEB]];
+		url = [NSURL URLWithString:@"http://twitter.com/sticktron"];
 	}
+	
+	[[UIApplication sharedApplication] openURL:url];
 }
 
 - (void)openGitHub {
-    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:URL_GITHUB]];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://github.com/Sticktron/AhAhAh"]];
+}
+
+- (void)openSticktronWeb {
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.sticktron.com"]];
+}
+
+- (void)openPayPal {
+	NSString *url = @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted";
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
+}
+
+- (void)showLove {
+	// send a nice tweet ;)
+	
+	SLComposeViewController *composeController = [SLComposeViewController
+												  composeViewControllerForServiceType:SLServiceTypeTwitter];
+	
+	[composeController setInitialText:@"I'm using #Ah!Ah!Ah! by @Sticktron to scare away nosey people!"];
+	
+	[self presentViewController:composeController
+					   animated:YES
+					 completion:nil];
 }
 
 @end
 
 
 
-//------------------------------//
-// Custom Media Controller
-//------------------------------//
+//------------------------------------------------------------------------------
+// Media List/Picker Controller
+//------------------------------------------------------------------------------
 
 @interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate,
 										UINavigationControllerDelegate, UIImagePickerControllerDelegate>
-
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *videos;
 @property (nonatomic, strong) NSMutableArray *backgrounds;
@@ -312,12 +327,10 @@ static BOOL hasTouchID() {
 @property (nonatomic, strong) NSString *selectedBackground;
 @property (nonatomic, strong) NSOperationQueue *queue;
 @property (nonatomic, strong) NSCache *imageCache;
-
 - (void)scanForMedia;
 - (UIImage *)thumbnailForVideo:(NSString *)filename withMaxSize:(CGSize)size;
 - (void)savePrefs:(BOOL)notificate;
 - (BOOL)startPicker;
-
 @end
 
 
@@ -419,7 +432,6 @@ static BOOL hasTouchID() {
 	[self.imageCache removeAllObjects];
 	[super viewWillDisappear:animated];
 }
-
 
 // helpers
 
@@ -557,7 +569,6 @@ static BOOL hasTouchID() {
 	}
 }
 
-
 // image picker
 
 - (BOOL)startPicker {
@@ -661,7 +672,6 @@ static BOOL hasTouchID() {
 - (void)imagePickerControllerDidCancel: (UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
-
 
 // tableview data
 
@@ -907,7 +917,6 @@ static BOOL hasTouchID() {
 		return nil;
 	}
 }
-
 
 // tableview selecting & deleting
 
