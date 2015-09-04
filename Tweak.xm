@@ -9,20 +9,27 @@
 //
 //
 
-#import <Foundation/Foundation.h>
+#define DEBUG_PREFIX @"😈 [Ah!Ah!Ah!]"
+#import "DebugLog.h"
+
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MPMoviePlayerController.h>
 #import <LocalAuthentication/LAContext.h>
 
-#define DEBUG_PREFIX @"😈 [Ah!Ah!Ah!]"
-#import "DebugLog.h"
 
+//------------------------------------------------------------------------------
+// Constants
+//------------------------------------------------------------------------------
 
 #define DEFAULT_BACKGROUND	@"/Library/Application Support/AhAhAh/BlueScreenError.png"
 #define DEFAULT_VIDEO		@"/Library/Application Support/AhAhAh/AhAhAh.mp4"
+#define KEVIN_VIDEO			@"/Library/Application Support/AhAhAh/MindYoDamnBusiness.m4v"
+#define DEX_VIDEO			@"/Library/Application Support/AhAhAh/IFeelLikeDying.m4v"
 
 #define ID_NONE				@"_none"
 #define ID_DEFAULT			@"_default"
+#define ID_KEVIN			@"_kevin"
+#define ID_DEX				@"_dex"
 
 #define iPad				(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 
@@ -48,6 +55,8 @@
 - (void)lockButtonUp:(id)arg1;
 - (void)_lockButtonUpFromSource:(int)arg1;
 - (void)_relaunchSpringBoardNow;
+- (void)_lockButtonDown:(id)arg1 fromSource:(int)arg2;
+- (void)_lockButtonUp:(id)arg1 fromSource:(int)arg2;
 @end
 
 @interface SBLockScreenViewController : UIViewController
@@ -96,7 +105,7 @@
 
 - (instancetype)init {
 	if (self = [super init]) {
-		DebugLog(@"AhAhAhController init'd");
+		DebugLog(@"AhAhAhController init'ing");
 		
 		_failedAttempts = 0;
 		_isShowing = NO;
@@ -248,6 +257,13 @@
 		
 		if ([self.videoFile isEqualToString:ID_DEFAULT]) {
 			videoPath = DEFAULT_VIDEO;
+			
+		} else if ([self.videoFile isEqualToString:ID_KEVIN]) {
+			videoPath = KEVIN_VIDEO;
+				
+		} else if ([self.videoFile isEqualToString:ID_DEX]) {
+			videoPath = DEX_VIDEO;
+			
 		} else {
 			videoPath = [USER_VIDEOS_PATH stringByAppendingPathComponent:self.videoFile];
 		}
@@ -267,7 +283,13 @@
 			self.player.view.frame = self.overlay.bounds;
 		} else {
 			// play in a centered window; double-sized on iPads
-			CGSize size = iPad ? CGSizeMake(540.0f, 540.0f) : CGSizeMake(270.0f, 270.0f);
+			
+			CGSize size;
+			if ([self.videoFile isEqualToString:ID_KEVIN]) {
+				size = iPad ? CGSizeMake(540.0f, 408.0f) : CGSizeMake(270.0f, 204.0f);
+			} else {
+				size = iPad ? CGSizeMake(540.0f, 540.0f) : CGSizeMake(270.0f, 270.0f);
+			}
 			self.player.view.frame = (CGRect){{0,0}, size};
 			self.player.view.center = self.overlay.center;
 		}
@@ -305,6 +327,8 @@
 
 
 //------------------------------------------------------------------------------
+// Functions and Globals
+//------------------------------------------------------------------------------
 
 static AhAhAhController *newman = nil;
 
@@ -339,15 +363,7 @@ static void respring() {
 
 %hook SpringBoard
 
-- (void)_lockButtonDownFromSource:(int)arg1 {
-	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
-	if (newman.isShowing && !newman.allowLockRemoval) {
-		// no-op
-	} else {
-		%orig;
-	}
-}
-
+// iOS 7 & 8
 - (void)lockButtonDown:(id)arg1 {
 	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
@@ -356,7 +372,6 @@ static void respring() {
 		%orig;
 	}
 }
-
 - (void)lockButtonUp:(id)arg1 {
 	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
@@ -366,7 +381,34 @@ static void respring() {
 	}
 }
 
+// iOS 7
+- (void)_lockButtonDownFromSource:(int)arg1 {
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
+	if (newman.isShowing && !newman.allowLockRemoval) {
+		// no-op
+	} else {
+		%orig;
+	}
+}
 - (void)_lockButtonUpFromSource:(int)arg1 {
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
+	if (newman.isShowing && !newman.allowLockRemoval) {
+		// no-op
+	} else {
+		%orig;
+	}
+}
+
+// iOS 8
+- (void)_lockButtonDown:(id)arg1 fromSource:(int)arg2 {
+	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
+	if (newman.isShowing && !newman.allowLockRemoval) {
+		// no-op
+	} else {
+		%orig;
+	}
+}
+- (void)_lockButtonUp:(id)arg1 fromSource:(int)arg2 {
 	DebugLog(@"isShowing=%@; allowLockButton=%@", newman.isShowing?@"YES":@"NO", newman.allowLockRemoval?@"YES":@"NO");
 	if (newman.isShowing && !newman.allowLockRemoval) {
 		// no-op
@@ -465,6 +507,8 @@ static void respring() {
 
 
 //------------------------------------------------------------------------------
+// Init
+//------------------------------------------------------------------------------
 
 %ctor {
 	@autoreleasepool {
@@ -476,18 +520,17 @@ static void respring() {
 			
 		} else {
 			newman = [[AhAhAhController alloc] init];
+			
 			%init(Main);
-			
-			
+						
 			// init TouchID hooks if supported...
 			if (hasTouchID()) {
-				NSLog(@" [Ah! Ah! Ah!] TouchID supported");
+				DebugLogC(@" [Ah! Ah! Ah!] TouchID supported");
 				newman.hasTouchID = YES;
 				%init(BioSupport);
 			} else {
-				NSLog(@" [Ah! Ah! Ah!] TouchID not supported");
+				DebugLogC(@" [Ah! Ah! Ah!] TouchID not supported");
 			}
-			
 			
 			// listen for notifications from Settings
 			CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
@@ -496,6 +539,7 @@ static void respring() {
 											CFSTR("com.sticktron.ahahah.prefschanged"),
 											NULL,
 											CFNotificationSuspensionBehaviorDeliverImmediately);
+											
 			// listen for notifications for respring from Settings
 			CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
 											NULL,
@@ -508,4 +552,3 @@ static void respring() {
 		NSLog(@" [Ah!Ah!Ah!] Loaded. I'm %@.", enabled?@"Enabled":@"Disabled");
 	}
 }
-

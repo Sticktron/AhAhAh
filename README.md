@@ -18,5 +18,5 @@ A customizable unlock error alarm inspired by that scene in Jurassic Park.
 ### Thanks
 
 * /r/jailbreak community for the idea
-* milodarling for the iOS 8 update!
 * Steven Spielberg for Jurassic Park
+* milodarling for the iOS 8 update

@@ -6,7 +6,10 @@
 //
 //
 
-#import <Foundation/Foundation.h>
+#define DEBUG_PREFIX @"🌀 [Ah! Ah! Ah! Prefs]"
+#import "../DebugLog.h"
+
+
 #import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <AVFoundation/AVFoundation.h>
@@ -15,26 +18,36 @@
 #import <Preferences/PSViewController.h>
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
+#import <Preferences/PSTableCell.h>
+#import <Preferences/PSSwitchTableCell.h>
 #import <Social/Social.h>
 
-#define DEBUG_PREFIX @"🌀 [Ah! Ah! Ah! Prefs]"
-#import "../DebugLog.h"
 
 
-
-//------------------------------//
+//------------------------------------------------------------------------------
 // Constants
-//------------------------------//
+//------------------------------------------------------------------------------
+
+#define BUNDLE_PATH			@"/Library/PreferenceBundles/AhAhAhPrefs.bundle"
 
 #define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
+
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
 #define DEFAULT_PATH				@"/Library/Application Support/AhAhAh"
-#define DEFAULT_VIDEO_TITLE			@"Ah! Ah! Ah!"
-#define DEFAULT_VIDEO_THUMB			@"thumb_AhAhAh.png"
+
 #define DEFAULT_BG_TITLE			@"BlueScreen Error"
 #define DEFAULT_BG_THUMB			@"thumb_BlueScreenError.png"
+
+#define DEFAULT_VIDEO_TITLE			@"Ah! Ah! Ah!"
+#define DEFAULT_VIDEO_THUMB			@"thumb_AhAhAh.png"
+
+#define KEVIN_VIDEO_TITLE			@"Mind your damn business!"
+#define KEVIN_VIDEO_THUMB			@"thumb_MindYoDamnBusiness.png"
+
+#define DEX_VIDEO_TITLE				@"I feel like dying"
+#define DEX_VIDEO_THUMB				@"thumb_IFeelLikeDying.png"
 
 #define IMPORT_SECTION				0
 #define VIDEO_SECTION				1
@@ -44,8 +57,11 @@
 #define TITLE_TAG					2
 #define SUBTITLE_TAG				3
 
-#define ID_DEFAULT					@"_default"
 #define ID_NONE						@"_none"
+#define ID_DEFAULT					@"_default"
+#define ID_KEVIN					@"_kevin"
+#define ID_DEX						@"_dex"
+
 #define FILE_KEY					@"file"
 #define SIZE_KEY					@"size"
 
@@ -74,10 +90,10 @@
 
 
 //------------------------------------------------------------------------------
-// UIImage Helpers
+// Helpers
 //------------------------------------------------------------------------------
 
-@implementation UIImage (Private)
+@implementation UIImage (AhAhAh)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
 	BOOL opaque = YES;
 	
@@ -188,37 +204,40 @@ static BOOL hasTouchID() {
 		NSMutableArray *specs = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
 		
 		// hide some settings from non-TouchID devices...
-		/*
-		BOOL hasTouchID = NO;
-		NSString *deviceType = getDeviceType();
-		DebugLog(@"device type is: %@", deviceType);
-		
-		if ([deviceType isEqualToString:@"iPhone6,1"]) {		// iPhone 5s
-			hasTouchID = YES;
-		} else if ([deviceType isEqualToString:@"iPhone6,2"]) { // iPhone 5s (world?)
-			hasTouchID = YES;
-		}
-		*/	
 		if (!hasTouchID()) {
-			DebugLog(@"Not an iPhone 5S, disabling some preferences...");
+			DebugLog(@"No TouchID on this device, disabling some preferences...");
 			
 			for (PSSpecifier *spec in specs) {
 				NSMutableDictionary *props = [spec properties];
+				NSString *specID = props[@"id"];
 				
-				if ([props[@"id"] isEqualToString:@"IgnoreBioFailure"]) {
-					props[@"default"] = @NO;
-					props[@"enabled"] = @NO;
-				} else if ([props[@"id"] isEqualToString:@"AllowBioRemoval"]) {
+				if ([specID isEqualToString:@"IgnoreBioFailure"] || [specID isEqualToString:@"AllowBioRemoval"]) {
 					props[@"default"] = @NO;
 					props[@"enabled"] = @NO;
 				}
-			}
-			
+			}			
 		}
 		_specifiers = [specs copy];
 	}
 	
 	return _specifiers;
+}
+
+- (void)viewDidLoad {
+	[super viewDidLoad];
+	
+	// add a heart button to the navbar
+	NSString *path = [BUNDLE_PATH stringByAppendingPathComponent:@"Heart.png"];
+	UIImage *heartImage = [[UIImage alloc] initWithContentsOfFile:path];
+	
+	UIBarButtonItem *heartButton = [[UIBarButtonItem alloc] initWithImage:heartImage
+																	style:UIBarButtonItemStylePlain
+																   target:self
+																   action:@selector(showLove)];
+	heartButton.imageInsets = (UIEdgeInsets){2, 0, -2, 0};
+	heartButton.tintColor = UIColor.redColor;
+	
+	[self.navigationItem setRightBarButtonItem:heartButton];
 }
 
 - (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
@@ -288,10 +307,6 @@ static BOOL hasTouchID() {
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://github.com/Sticktron/AhAhAh"]];
 }
 
-- (void)openSticktronWeb {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.sticktron.com"]];
-}
-
 - (void)openPayPal {
 	NSString *url = @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted";
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
@@ -299,11 +314,10 @@ static BOOL hasTouchID() {
 
 - (void)showLove {
 	// send a nice tweet ;)
-	
 	SLComposeViewController *composeController = [SLComposeViewController
 												  composeViewControllerForServiceType:SLServiceTypeTwitter];
 	
-	[composeController setInitialText:@"I'm using #Ah!Ah!Ah! by @Sticktron to scare away nosey people!"];
+	[composeController setInitialText:@"I'm using Ah! Ah! Ah! by @Sticktron to scare away nosey people!"];
 	
 	[self presentViewController:composeController
 					   animated:YES
@@ -318,8 +332,7 @@ static BOOL hasTouchID() {
 // Media List/Picker Controller
 //------------------------------------------------------------------------------
 
-@interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate,
-										UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *videos;
 @property (nonatomic, strong) NSMutableArray *backgrounds;
@@ -327,6 +340,7 @@ static BOOL hasTouchID() {
 @property (nonatomic, strong) NSString *selectedBackground;
 @property (nonatomic, strong) NSOperationQueue *queue;
 @property (nonatomic, strong) NSCache *imageCache;
+@property (nonatomic, strong) UIPopoverController *popover;
 - (void)scanForMedia;
 - (UIImage *)thumbnailForVideo:(NSString *)filename withMaxSize:(CGSize)size;
 - (void)savePrefs:(BOOL)notificate;
@@ -350,8 +364,8 @@ static BOOL hasTouchID() {
 		
 		
 		// init lists with default items
-		_videos = [NSMutableArray arrayWithObject:@{FILE_KEY: ID_DEFAULT}];
 		_backgrounds = [NSMutableArray arrayWithObject:@{FILE_KEY: ID_DEFAULT}];
+		_videos = [NSMutableArray arrayWithObjects:@{FILE_KEY: ID_DEFAULT}, @{FILE_KEY: ID_KEVIN}, @{FILE_KEY: ID_DEX}, nil];
 		
 		
 		// set selected items
@@ -386,39 +400,14 @@ static BOOL hasTouchID() {
 	self.tableView.delegate = self;
 	self.tableView.dataSource = self;
 	self.tableView.rowHeight = 44.0f;
+	self.tableView.tintColor = UIColor.redColor;
 	
 	self.view = self.tableView;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	[super viewWillAppear:animated];
-	
+	[super viewWillAppear:animated];	
 	[self scanForMedia];
-	
-//	// does the selected media exist?
-//	
-//	BOOL foundSelectedVideo = NO;
-//	for (NSDictionary *video in self.videos) {
-//		if ([video[FILE_KEY] isEqualToString:self.selectedVideo]) {
-//			foundSelectedVideo = YES;
-//			break;
-//		}
-//	}
-//	if (!foundSelectedVideo) self.selectedVideo = ID_DEFAULT;
-//	
-//	BOOL foundSelectedBackground = NO;
-//	for (NSDictionary *background in self.backgrounds) {
-//		if ([background[FILE_KEY] isEqualToString:self.selectedBackground]) {
-//			foundSelectedBackground = YES;
-//			break;
-//		}
-//	}
-//	if (!foundSelectedBackground) self.selectedBackground = ID_DEFAULT;
-
-//	// show edit button if there are custom videos
-//	if (self.videos.count > 1 || self.backgrounds.count > 1) {
-//		self.navigationItem.rightBarButtonItem = self.editButtonItem;
-//	}
 }
 
 - (void)didReceiveMemoryWarning {
@@ -439,7 +428,7 @@ static BOOL hasTouchID() {
 	DebugLog0;
 	
 	// reset the lists (keep default entries)
-	[self.videos removeObjectsInRange:NSMakeRange(1, self.videos.count - 1)];
+	[self.videos removeObjectsInRange:NSMakeRange(3, self.videos.count - 3)];
 	[self.backgrounds removeObjectsInRange:NSMakeRange(1, self.backgrounds.count - 1)];
 	
 	
@@ -449,7 +438,8 @@ static BOOL hasTouchID() {
 	NSArray *keys = @[ NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLNameKey ];
 	NSURL *url;
 	
-	// backgrounds ...
+	
+	// background images ...
 	
 	url = [NSURL fileURLWithPath:USER_BGS_PATH isDirectory:YES];
 	NSMutableArray *backgrounds = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
@@ -483,6 +473,7 @@ static BOOL hasTouchID() {
 		}
 	}
 	
+	
 	// videos ...
 	
 	url = [NSURL fileURLWithPath:USER_VIDEOS_PATH isDirectory:YES];
@@ -501,10 +492,7 @@ static BOOL hasTouchID() {
 	
 	// add to list
 	for (NSURL *videoURL in videos) {
-		//NSString *path = [videoURL path];
-		//NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-		
-		// (todo:) check if video format is valid
+		// TODO: check if video format is valid
 		
 		NSString *file = [videoURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
 		NSString *size = [videoURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
@@ -581,11 +569,18 @@ static BOOL hasTouchID() {
 	UIImagePickerController *picker = [[UIImagePickerController alloc] init];
 	picker.modalPresentationStyle = UIModalPresentationCurrentContext;
 	picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-	picker.mediaTypes = @[ (NSString *)kUTTypeMovie, (NSString *)kUTTypeImage ];
-	picker.allowsEditing = NO;
+	picker.mediaTypes = @[ (NSString *)kUTTypeMovie, (NSString *)kUTTypeImage ];	
+	picker.allowsEditing = YES;	
+	picker.navigationBar.barStyle = UIBarStyleDefault;
 	picker.delegate = self;
 	
-	[[self parentController] presentViewController:picker animated:YES completion:NULL];
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+		[self presentViewController:picker animated:YES completion:NULL];
+		
+	} else {
+		self.popover = [[UIPopoverController alloc] initWithContentViewController:picker];
+		[self.popover presentPopoverFromRect:CGRectZero inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	}
 	
 	return YES;
 }
@@ -659,7 +654,12 @@ static BOOL hasTouchID() {
 		[self scanForMedia];
 		[self.tableView reloadData];
 		
-		[picker dismissViewControllerAnimated:YES completion:NULL];
+		
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+			[picker dismissViewControllerAnimated:YES completion:NULL];
+		} else {
+			[self.popover dismissPopoverAnimated:YES];
+		}
 	};
 	
 	
@@ -670,7 +670,11 @@ static BOOL hasTouchID() {
 }
 
 - (void)imagePickerControllerDidCancel: (UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:YES completion:NULL];
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+		[picker dismissViewControllerAnimated:YES completion:NULL];
+	} else {
+		[self.popover dismissPopoverAnimated:YES];
+	}
 }
 
 // tableview data
@@ -687,7 +691,7 @@ static BOOL hasTouchID() {
 			break;
 		case BACKGROUND_SECTION: title = @"Background Images";
 			break;
-		case IMPORT_SECTION: title = @"Import";
+		case IMPORT_SECTION: title = @"Import Media";
 			break;
 	}
 	
@@ -728,7 +732,7 @@ static BOOL hasTouchID() {
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		}
 		
-		cell.textLabel.text = @"Add a new video or background image";
+		cell.textLabel.text = @"Add new video or image from Camera Roll";
 		
 	} else {
 		//
@@ -791,6 +795,40 @@ static BOOL hasTouchID() {
 				} else {
 					cell.accessoryType = UITableViewCellAccessoryNone;
 				}
+				
+			} else if (indexPath.row == 1) {
+				//
+				// Kevin Hart video
+				//
+				titleLabel.text = KEVIN_VIDEO_TITLE;
+				subtitleLabel.text = @"???";
+				NSString *path = [NSString stringWithFormat:@"%@/%@", DEFAULT_PATH, KEVIN_VIDEO_THUMB];
+				imageView.image = [UIImage imageWithContentsOfFile:path];
+				
+				// checked ?
+				if ([self.selectedVideo isEqualToString:ID_KEVIN]) {
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				}
+				
+				
+			} else if (indexPath.row == 2) {
+				//
+				// Dexter video
+				//
+				titleLabel.text = DEX_VIDEO_TITLE;
+				subtitleLabel.text = @"???";
+				NSString *path = [NSString stringWithFormat:@"%@/%@", DEFAULT_PATH, DEX_VIDEO_THUMB];
+				imageView.image = [UIImage imageWithContentsOfFile:path];
+				
+				// checked ?
+				if ([self.selectedVideo isEqualToString:ID_DEX]) {
+					cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				} else {
+					cell.accessoryType = UITableViewCellAccessoryNone;
+				}
+				
 				
 			} else {
 				//
@@ -912,7 +950,7 @@ static BOOL hasTouchID() {
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
 	if (section == IMPORT_SECTION) {
-		return @"Content can also be added manually to /User/Library/AhAhAh/";
+		return @"Media can also be copied to /User/Library/AhAhAh/ and will appear in the lists automatically.";
 	} else {
 		return nil;
 	}
@@ -963,6 +1001,10 @@ static BOOL hasTouchID() {
 			if (indexPath.section == VIDEO_SECTION) {
 				if (indexPath.row == 0) {
 					self.selectedVideo = ID_DEFAULT;
+				} else if (indexPath.row == 1) {
+					self.selectedVideo = ID_KEVIN;
+				} else if (indexPath.row == 2) {
+					self.selectedVideo = ID_DEX;
 				} else {
 					self.selectedVideo = titleLabel.text;
 				}
@@ -984,7 +1026,7 @@ static BOOL hasTouchID() {
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-	if (indexPath.row == 0) {
+	if (indexPath.row <= 2) {
 		return NO;
 	} else {
 		return YES;
@@ -996,8 +1038,7 @@ static BOOL hasTouchID() {
     [self.tableView setEditing:editing animated:YES];
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
-											forRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
 	DebugLog(@"User wants to delete media");
 	
     if (editingStyle == UITableViewCellEditingStyleDelete) {
@@ -1043,4 +1084,69 @@ static BOOL hasTouchID() {
 }
 
 @end
+
+
+
+//------------------------------------------------------------------------------
+// Custom Cells
+//------------------------------------------------------------------------------
+
+@interface AAASwitchCell : PSSwitchTableCell
+@end
+
+@implementation AAASwitchCell
+- (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
+	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
+	if (self) {
+		[((UISwitch *)[self control]) setOnTintColor:UIColor.redColor];
+	}
+	return self;
+}
+@end
+
+
+@interface AAAButtonCell : PSTableCell
+@end
+
+@implementation AAAButtonCell
+- (void)layoutSubviews {
+	[super layoutSubviews];
+	
+	// if I do this at init it doesn't stick :(
+	[self.textLabel setTextColor:UIColor.redColor];
+}
+@end
+
+
+@interface AAALogoCell : PSTableCell
+@end
+
+@implementation AAALogoCell
+- (id)initWithSpecifier:(PSSpecifier *)specifier {
+	self = [super initWithStyle:UITableViewCellStyleDefault
+				reuseIdentifier:@"LogoCell"
+					  specifier:specifier];
+	
+	if (self) {
+		self.backgroundColor = UIColor.clearColor;
+		
+		CGRect frame = self.contentView.bounds;
+		frame.origin.y += 10;
+		frame.size.height -= 10;
+		
+		UILabel *label = [[UILabel alloc] initWithFrame:frame];
+		label.text = @"a Sticktron joint";
+		label.font = [UIFont boldSystemFontOfSize:10];
+		label.textColor = UIColor.darkGrayColor;
+		label.textAlignment = NSTextAlignmentCenter;
+		
+		[self.contentView addSubview:label];
+	}
+	return self;
+}
+- (CGFloat)preferredHeightForWidth:(CGFloat)height {
+	return 22.0f;
+}
+@end
+
 

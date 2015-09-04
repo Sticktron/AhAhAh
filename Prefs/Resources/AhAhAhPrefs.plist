@@ -8,18 +8,29 @@
 	<key>items</key>
 	<array>
 
+		<!-- [] Header -->
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>headerCellClass</key>
+			<string>AAALogoCell</string>
+		</dict>
+		
+		
 		<!-- [] ENABLE/DISABLE -->		
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>⚠️ SpringBoard must be restarted to enable or disable this tweak.</string>
+			<string>SpringBoard must be restarted to enable or disable this tweak. All other settings take effect immediately.</string>
 		</dict>
 		
 		<!-- Enabled (YES) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
+			<key>cellClass</key>
+			<string>AAASwitchCell</string>
 			<key>label</key>
 			<string>Enabled</string>
 			<key>key</key>
@@ -34,6 +45,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AAAButtonCell</string>
 			<key>label</key>
 			<string>Respring</string>
 			<key>action</key>
@@ -61,7 +74,7 @@
 			<key>label</key>
 			<string>Customize</string>
 			<key>footerText</key>
-			<string></string>
+			<string>Selecting fullscreen mode will automatically hide the background image and scale the video to fit the screen.</string>
 		</dict>
 		
 		<!-- Media Picker -->
@@ -69,7 +82,7 @@
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>Choose Video or Background</string>
+			<string>Choose Video and Background</string>
 			<key>detail</key>
 			<string>AhAhAhPrefsMediaController</string>
 		</dict>
@@ -78,6 +91,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
+			<key>cellClass</key>
+			<string>AAASwitchCell</string>
 			<key>label</key>
 			<string>FullScreen Video</string>
 			<key>key</key>
@@ -137,6 +152,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
+			<key>cellClass</key>
+			<string>AAASwitchCell</string>
 			<key>id</key>
 			<string>IgnoreBioFailure</string>
 			<key>label</key>
@@ -159,13 +176,15 @@
 			<key>label</key>
 			<string>Deactivating</string>
 			<key>footerText</key>
-			<string>The alarm will automatically stop when the device goes to sleep.</string>
+			<string>The alarm automatically stops after about 30 seconds to prevent draining your battery.</string>
 		</dict>
 		
 		<!-- AllowBioRemoval (NO) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
+			<key>cellClass</key>
+			<string>AAASwitchCell</string>
 			<key>id</key>
 			<string>AllowBioRemoval</string>
 			<key>label</key>
@@ -184,6 +203,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
+			<key>cellClass</key>
+			<string>AAASwitchCell</string>
 			<key>label</key>
 			<string>Remove using Lock Button</string>
 			<key>key</key>
@@ -210,10 +231,12 @@
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AAAButtonCell</string>
 			<key>label</key>
 			<string>Contact me</string>
 			<key>icon</key>
-			<string>email.png</string>
+			<string>Email.png</string>
 			<key>action</key>
 			<string>openEmail</string>
 		</dict>
@@ -222,10 +245,12 @@
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AAAButtonCell</string>
 			<key>label</key>
 			<string>Follow me on Twitter</string>
 			<key>icon</key>
-			<string>twitter.png</string>
+			<string>Twitter.png</string>
 			<key>action</key>
 			<string>openTwitter</string>
 		</dict>
@@ -234,10 +259,12 @@
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AAAButtonCell</string>
 			<key>label</key>
 			<string>Source code</string>
 			<key>icon</key>
-			<string>github.png</string>
+			<string>Github.png</string>
 			<key>action</key>
 			<string>openGitHub</string>
 		</dict>
@@ -246,31 +273,14 @@
 		<dict>
 			<key>cell</key>
 			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AAAButtonCell</string>
 			<key>label</key>
-			<string>Tip me if you like this tweak :)</string>
+			<string>Tip via PayPal</string>
 			<key>icon</key>
-			<string>paypal.png</string>
+			<string>Paypal.png</string>
 			<key>action</key>
 			<string>openPayPal</string>
-		</dict>
-			
-			
-		<!-- [] Visit Website -->
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Visit my website</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>Sticktron's Lab</string>
-			<key>icon</key>
-			<string>web.png</string>
-			<key>action</key>
-			<string>openSticktronWeb</string>
 		</dict>
 			
 			
@@ -280,10 +290,11 @@
 			<string>PSGroupCell</string>
 			<key>footerText</key>
 			<string>Thanks to /u/harrybond for the idea.
-Shoutout to milodarling for helping with the iOS 8 update.
+Thanks to milodarling for helping with the iOS 8 update.
 
-Copyright (c) 2015 Sticktron.
-			
+Copyright (c) 2014-2015 Sticktron.
+
+😈
 			</string>
 		</dict>
 		
