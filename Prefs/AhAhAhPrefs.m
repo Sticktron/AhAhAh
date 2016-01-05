@@ -240,32 +240,24 @@ static BOOL hasTouchID() {
 	[self.navigationItem setRightBarButtonItem:heartButton];
 }
 
-- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
-	NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
-	
-	if (!prefs) {
-		prefs = [NSMutableDictionary dictionary];
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
+	NSMutableDictionary *settings = [NSMutableDictionary dictionary];
+	[settings addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH]];
+	[settings setObject:value forKey:specifier.properties[@"key"]];
+	[settings writeToFile:PREFS_PLIST_PATH atomically:NO]; //sandbox issue if atomic
+
+	NSString *notificationValue = specifier.properties[@"PostNotification"];
+	if (notificationValue) {
+		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFStringRef(notificationValue), NULL, NULL, YES);
 	}
-	
-	// new settings
-	prefs[specifier.properties[@"key"]] = value;
-	
-	DebugLog(@"##### Writing Preferences: %@", prefs);
-	[prefs writeToFile:PREFS_PLIST_PATH atomically:YES];
-	
-	// apply settings to tweak
-	DebugLog(@"notified tweak");
-		
-	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
-										 CFSTR("com.sticktron.ahahah.prefschanged"),
-										 NULL,
-										 NULL,
-										 true);
 }
 
-- (id)readPreferenceValue:(PSSpecifier *)specifier {
-	NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
-	return prefs[specifier.properties[@"key"]];
+- (id)readPreferenceValue:(PSSpecifier*)specifier {
+	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
+	if (!settings[specifier.properties[@"key"]]) {
+		return specifier.properties[@"default"];
+	}
+	return settings[specifier.properties[@"key"]];
 }
 
 - (void)respring {
