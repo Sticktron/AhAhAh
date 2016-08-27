@@ -5,5 +5,5 @@ Architecture: iphoneos-arm
 Depends: firmware (>= 7.0), mobilesubstrate, preferenceloader
 Description: A customizable unlock error alarm inspired by Jurassic Park.
 Author: Sticktron <sticktron@hotmail.com>
-Icon: file:///Library/PreferenceBundles/AhAhAhPrefs.bundle/Icon-Cydia.png
+Icon: file:///Library/PreferenceBundles/AhAhAhPrefs.bundle/Icon.png
 Section: Tweaks
