@@ -1,9 +1,7 @@
 ARCHS = armv7 arm64
-TARGET = iphone:clang:latest:7.0
+TARGET = iphone:clang:9.2:7.0
 
-THEOS_BUILD_DIR = Packages
-
-include theos/makefiles/common.mk
+include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = AhAhAhPrefs
 AhAhAhPrefs_CFLAGS = -fobjc-arc
