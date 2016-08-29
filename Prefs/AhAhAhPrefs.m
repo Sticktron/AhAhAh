@@ -197,27 +197,25 @@ static BOOL hasTouchID() {
 
 @implementation AhAhAhPrefsController
 
-- (id)specifiers {
-	
+- (id)specifiers {	
 	if (_specifiers == nil) {
 		DebugLog(@"Loading specifiers...");
-		NSMutableArray *specs = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
-		
-		// hide some settings from non-TouchID devices...
-		if (!hasTouchID()) {
-			DebugLog(@"No TouchID on this device, disabling some preferences...");
-			
-			for (PSSpecifier *spec in specs) {
-				NSMutableDictionary *props = [spec properties];
-				NSString *specID = props[@"id"];
 				
-				if ([specID isEqualToString:@"IgnoreBioFailure"] || [specID isEqualToString:@"AllowBioRemoval"]) {
-					props[@"default"] = @NO;
-					props[@"enabled"] = @NO;
-				}
-			}			
+		_specifiers = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
+		
+		// Alter the specefier list, removing some settings if we aren't
+		// running on a device with TouchID.
+		if (hasTouchID() == NO) {
+			DebugLog(@"No TouchID on this device, disabling some settings...");
+			
+			PSSpecifier *specifier = [self specifierForID:@"IgnoreBioFailure"];
+			[specifier setProperty:@NO forKey:@"enabled"];
+			[specifier setProperty:@NO forKey:@"default"];
+			
+			specifier = [self specifierForID:@"AllowBioRemoval"];
+			[specifier setProperty:@NO forKey:@"enabled"];
+			[specifier setProperty:@NO forKey:@"default"];
 		}
-		_specifiers = [specs copy];
 	}
 	
 	return _specifiers;
