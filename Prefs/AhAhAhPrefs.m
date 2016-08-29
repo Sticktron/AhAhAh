@@ -1,32 +1,25 @@
 //
 //  AhAhAhPrefs.m
-//  Preferences for Ah! Ah! Ah!
+//  Preferences for Ah!Ah!Ah!
 //
-//  Copyright (c) 2014-2015 Sticktron. All rights reserved.
+//  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#define DEBUG_PREFIX @"🌀 [Ah! Ah! Ah! Prefs]"
+#define DEBUG_PREFIX @"⚠️ [AhAhAhPrefs]"
 #import "../DebugLog.h"
 
-
-#import <UIKit/UIKit.h>
-#import <AssetsLibrary/AssetsLibrary.h>
-#import <AVFoundation/AVFoundation.h>
-#import <MobileCoreServices/MobileCoreServices.h>
-#import <LocalAuthentication/LAContext.h>
 #import <Preferences/PSViewController.h>
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
 #import <Preferences/PSTableCell.h>
 #import <Preferences/PSSwitchTableCell.h>
+#import <AssetsLibrary/AssetsLibrary.h>
+#import <AVFoundation/AVFoundation.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <LocalAuthentication/LAContext.h>
 #import <Social/Social.h>
 
-
-
-//------------------------------------------------------------------------------
-// Constants
-//------------------------------------------------------------------------------
 
 #define BUNDLE_PATH			@"/Library/PreferenceBundles/AhAhAhPrefs.bundle"
 
@@ -49,27 +42,24 @@
 #define DEX_VIDEO_TITLE				@"I feel like dying"
 #define DEX_VIDEO_THUMB				@"thumb_IFeelLikeDying.png"
 
-#define IMPORT_SECTION				0
-#define VIDEO_SECTION				1
-#define BACKGROUND_SECTION			2
+#define IMPORT_SECTION			0
+#define VIDEO_SECTION			1
+#define BACKGROUND_SECTION		2
 
-#define THUMBNAIL_TAG				1
-#define TITLE_TAG					2
-#define SUBTITLE_TAG				3
+#define THUMBNAIL_TAG			1
+#define TITLE_TAG				2
+#define SUBTITLE_TAG			3
 
-#define ID_NONE						@"_none"
-#define ID_DEFAULT					@"_default"
-#define ID_KEVIN					@"_kevin"
-#define ID_DEX						@"_dex"
+#define ID_NONE				@"_none"
+#define ID_DEFAULT			@"_default"
+#define ID_KEVIN			@"_kevin"
+#define ID_DEX				@"_dex"
 
-#define FILE_KEY					@"file"
-#define SIZE_KEY					@"size"
+#define FILE_KEY			@"file"
+#define SIZE_KEY			@"size"
 
 
-
-//------------------------------------------------------------------------------
-// Private Interfaces
-//------------------------------------------------------------------------------
+// Private APIs.
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
@@ -88,10 +78,7 @@
 @end
 
 
-
-//------------------------------------------------------------------------------
-// Helpers
-//------------------------------------------------------------------------------
+// Helpers.
 
 @implementation UIImage (AhAhAh)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
@@ -172,6 +159,7 @@
 }
 @end
 
+
 static BOOL hasTouchID() {
     if ([LAContext class]) {
         return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
@@ -181,10 +169,10 @@ static BOOL hasTouchID() {
 }
 
 
+//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Settings Controller
-//------------------------------------------------------------------------------
+
+// Root Controller.
 
 @interface AhAhAhPrefsController : PSListController
 - (void)respring;
@@ -317,10 +305,10 @@ static BOOL hasTouchID() {
 @end
 
 
+//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Media List/Picker Controller
-//------------------------------------------------------------------------------
+
+// Media List Controller
 
 @interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
@@ -1076,10 +1064,10 @@ static BOOL hasTouchID() {
 @end
 
 
+//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
+
 // Custom Cells
-//------------------------------------------------------------------------------
 
 @interface AAASwitchCell : PSSwitchTableCell
 @end
