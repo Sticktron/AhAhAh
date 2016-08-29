@@ -226,24 +226,24 @@ static BOOL hasTouchID() {
 	[self.navigationItem setRightBarButtonItem:heartButton];
 }
 
-- (void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
-	NSMutableDictionary *settings = [NSMutableDictionary dictionary];
-	[settings addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH]];
-	[settings setObject:value forKey:specifier.properties[@"key"]];
-	[settings writeToFile:PREFS_PLIST_PATH atomically:NO]; //sandbox issue if atomic
-
-	NSString *notificationValue = specifier.properties[@"PostNotification"];
-	if (notificationValue) {
-		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFStringRef(notificationValue), NULL, NULL, YES);
-	}
-}
-
 - (id)readPreferenceValue:(PSSpecifier*)specifier {
 	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 	if (!settings[specifier.properties[@"key"]]) {
 		return specifier.properties[@"default"];
 	}
 	return settings[specifier.properties[@"key"]];
+}
+
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
+	NSMutableDictionary *settings = [NSMutableDictionary dictionary];
+	[settings addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH]];
+	[settings setObject:value forKey:specifier.properties[@"key"]];
+	[settings writeToFile:PREFS_PLIST_PATH atomically:YES];
+	
+	CFStringRef notificationValue = (__bridge CFStringRef)specifier.properties[@"PostNotification"];
+	if (notificationValue) {
+		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationValue, NULL, NULL, YES);
+	}
 }
 
 - (void)respring {
