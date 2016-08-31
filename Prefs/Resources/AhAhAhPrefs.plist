@@ -1,303 +1,150 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>title</key>
-	<string>Ah! Ah! Ah!</string>
-	
-	<key>items</key>
-	<array>
-
-		<!-- [] Header -->
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>headerCellClass</key>
-			<string>AAALogoCell</string>
-		</dict>
-		
-		
-		<!-- [] ENABLE/DISABLE -->		
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>SpringBoard must be restarted to enable or disable this tweak. All other settings take effect immediately.</string>
-		</dict>
-		
-		<!-- Enabled (YES) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>label</key>
-			<string>Enabled</string>
-			<key>key</key>
-			<string>Enabled</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-		</dict>
-		
-		<!-- Respring -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Respring</string>
-			<key>action</key>
-			<string>respring</string>
-			<key>confirmation</key>
-			<dict>
-				<key>title</key>
-				<string>Respring?</string>
-				<key>prompt</key>
-				<string>Restart SpringBoard?</string>
-				<key>cancelTitle</key>
-				<string>Not Now</string>
-				<key>okTitle</key>
-				<string>OK</string>
-			</dict>
-			<key>isDestructive</key>
-			<true/>
-		</dict>
-		
-		
-		<!-- [] CUSTOMIZE -->
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Customize</string>
-			<key>footerText</key>
-			<string>Selecting fullscreen mode will automatically hide the background image and scale the video to fit the screen.</string>
-		</dict>
-		
-		<!-- Media Picker -->
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>label</key>
-			<string>Choose Video and Background</string>
-			<key>detail</key>
-			<string>AhAhAhPrefsMediaController</string>
-		</dict>
-		
-		<!-- FullScreenVideo (NO) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>label</key>
-			<string>FullScreen Video</string>
-			<key>key</key>
-			<string>FullScreenVideo</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		
-		<!-- [] ACTIVATING -->		
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Activating</string>
-		</dict>
-		
-		<!-- MaxFailures (2) -->
-		<dict>
-			<key>cell</key>
-			<string>PSLinkListCell</string>
-			<key>label</key>
-			<string>Max Failed Attempts</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>validTitles</key>
-			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
-			</array>
-			<key>validValues</key>
-			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
-			</array>
-			<key>key</key>
-			<string>MaxFailures</string>
-			<key>default</key>
-			<string>2</string>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		<!-- IgnoreBioFailure (YES) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>id</key>
-			<string>IgnoreBioFailure</string>
-			<key>label</key>
-			<string>Don't count TouchID fails</string>
-			<key>key</key>
-			<string>IgnoreBioFailure</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		
-		<!-- [] DE-ACTIVATING -->		
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Deactivating</string>
-			<key>footerText</key>
-			<string>The alarm automatically stops after about 30 seconds to prevent draining your battery.</string>
-		</dict>
-		
-		<!-- AllowBioRemoval (NO) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>id</key>
-			<string>AllowBioRemoval</string>
-			<key>label</key>
-			<string>Remove using TouchID</string>
-			<key>key</key>
-			<string>AllowBioRemoval</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		<!-- AllowLockRemoval (YES) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>label</key>
-			<string>Remove using Lock Button</string>
-			<key>key</key>
-			<string>AllowLockRemoval</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		
-		<!-- [] SUPPORT -->
-		
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Support</string>
-		</dict>
-			
-		<!-- Email -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Contact me</string>
-			<key>icon</key>
-			<string>Email.png</string>
-			<key>action</key>
-			<string>openEmail</string>
-		</dict>
-		
-		<!-- Twitter -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Follow me on Twitter</string>
-			<key>icon</key>
-			<string>Twitter.png</string>
-			<key>action</key>
-			<string>openTwitter</string>
-		</dict>
-		
-		<!-- Source Code -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Source code</string>
-			<key>icon</key>
-			<string>Github.png</string>
-			<key>action</key>
-			<string>openGitHub</string>
-		</dict>
-
-		<!-- Tip Me -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Tip via PayPal</string>
-			<key>icon</key>
-			<string>Paypal.png</string>
-			<key>action</key>
-			<string>openPayPal</string>
-		</dict>
-			
-			
-		<!-- [] THANKS -->		
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Thanks to /u/harrybond for the idea.
-Thanks to milodarling for helping with the iOS 8 update.
-
-Copyright (c) 2014-2015 Sticktron.
-
-😈
-			</string>
-		</dict>
-		
-	</array>
-</dict>
-</plist>
+{
+	title = "Ah!Ah!Ah!";
+	items = (
+		{
+			cell = PSGroupCell;
+			headerCellClass = AAALogoCell;
+		},
+		{
+			cell = PSGroupCell;
+			footerText = "SpringBoard must be restarted to enable or disable this tweak. All other settings take effect immediately.";
+		},
+		{
+			cell = PSSwitchCell;
+			cellClass = AAASwitchCell;
+			label = Enabled;
+			key = Enabled;
+			default = YES;
+			defaults = "com.sticktron.ahahah";
+		},
+		{
+			cell = PSButtonCell;
+			cellClass = AAAButtonCell;
+			label = Respring;
+			action = respring;
+			confirmation = {
+				title = "Respring?";
+				prompt = "Restart SpringBoard?";
+				cancelTitle = "Not Now";
+				okTitle = OK;
+			};
+			isDestructive = YES;
+		},
+		{
+			cell = PSGroupCell;
+			label = Customize;
+			footerText = "Selecting fullscreen mode will automatically hide the background image and scale the video to fit the screen.";
+		},
+		{
+			cell = PSLinkCell;
+			label = "Choose Video and Background";
+			detail = "AhAhAhPrefsMediaController";
+		},
+		{
+			cell = PSSwitchCell;
+			cellClass = AAASwitchCell;
+			label = "FullScreen Video";
+			key = FullScreenVideo;
+			default = NO;
+			defaults = "com.sticktron.ahahah";
+			PostNotification = "com.sticktron.ahahah.prefschanged";
+		},
+		{
+			cell = PSGroupCell;
+			label = Activating;
+		},
+		{
+			cell = PSLinkListCell;
+			label = "Max Failed Attempts";
+			detail = "PSListItemsController";
+			validTitles = (
+				1,
+				2,
+				3,
+				4,
+				5,
+			);
+			validValues = (
+				1,
+				2,
+				3,
+				4,
+				5,
+			);
+			key = MaxFailures;
+			default = 2;
+			defaults = "com.sticktron.ahahah";
+			PostNotification = "com.sticktron.ahahah.prefschanged";
+		},
+		{
+			cell = PSSwitchCell;
+			cellClass = AAASwitchCell;
+			id = IgnoreBioFailure;
+			label = "Don't count TouchID fails";
+			key = IgnoreBioFailure;
+			default = YES;
+			defaults = "com.sticktron.ahahah";
+			PostNotification = "com.sticktron.ahahah.prefschanged";
+		},
+		{
+			cell = PSGroupCell;
+			label = Deactivating;
+			footerText = "The alarm automatically stops after about 30 seconds to prevent draining your battery.";
+		},
+		{
+			cell = PSSwitchCell;
+			cellClass = AAASwitchCell;
+			id = AllowBioRemoval;
+			label = "Remove using TouchID";
+			key = AllowBioRemoval;
+			default = NO;
+			defaults = "com.sticktron.ahahah";
+			PostNotification = "com.sticktron.ahahah.prefschanged";
+		},
+		{
+			cell = PSSwitchCell;
+			cellClass = AAASwitchCell;
+			label = "Remove using Lock Button";
+			key = AllowLockRemoval;
+			default = YES;
+			defaults = "com.sticktron.ahahah";
+			PostNotification = "com.sticktron.ahahah.prefschanged";
+		},
+		{
+			cell = PSGroupCell;
+			label = Support;
+		},
+		{
+			cell = PSButtonCell;
+			cellClass = AAAButtonCell;
+			label = "Contact me";
+			icon = "Email.png";
+			action = openEmail;
+		},
+		{
+			cell = PSButtonCell;
+			cellClass = AAAButtonCell;
+			label = "Follow me on Twitter";
+			icon = "Twitter.png";
+			action = openTwitter;
+		},
+		{
+			cell = PSButtonCell;
+			cellClass = AAAButtonCell;
+			label = "Source code";
+			icon = "Github.png";
+			action = openGitHub;
+		},
+		{
+			cell = PSButtonCell;
+			cellClass = AAAButtonCell;
+			label = "Tip via PayPal";
+			icon = "Paypal.png";
+			action = openPayPal;
+		},
+		{
+			cell = PSGroupCell;
+			footerText = "Thanks to /u/harrybond for the idea.\nThanks to milodarling for helping with the iOS 8 update.\n\nCopyright (c) 2014-2015 Sticktron.\n\n\Ud83d\Ude08\n\t\t\t";
+		},
+	);
+}
