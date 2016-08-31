@@ -3,7 +3,7 @@
 	items = (
 		{
 			cell = PSGroupCell;
-			headerCellClass = AAALogoCell;
+			headerCellClass = AhAhAhLogoCell;
 		},
 		{
 			cell = PSGroupCell;
@@ -11,7 +11,7 @@
 		},
 		{
 			cell = PSSwitchCell;
-			cellClass = AAASwitchCell;
+			cellClass = AhAhAhSwitchCell;
 			label = Enabled;
 			key = Enabled;
 			default = YES;
@@ -19,7 +19,7 @@
 		},
 		{
 			cell = PSButtonCell;
-			cellClass = AAAButtonCell;
+			cellClass = AhAhAhButtonCell;
 			label = Respring;
 			action = respring;
 			confirmation = {
@@ -42,7 +42,7 @@
 		},
 		{
 			cell = PSSwitchCell;
-			cellClass = AAASwitchCell;
+			cellClass = AhAhAhSwitchCell;
 			label = "FullScreen Video";
 			key = FullScreenVideo;
 			default = NO;
@@ -78,7 +78,7 @@
 		},
 		{
 			cell = PSSwitchCell;
-			cellClass = AAASwitchCell;
+			cellClass = AhAhAhSwitchCell;
 			id = IgnoreBioFailure;
 			label = "Don't count TouchID fails";
 			key = IgnoreBioFailure;
@@ -93,7 +93,7 @@
 		},
 		{
 			cell = PSSwitchCell;
-			cellClass = AAASwitchCell;
+			cellClass = AhAhAhSwitchCell;
 			id = AllowBioRemoval;
 			label = "Remove using TouchID";
 			key = AllowBioRemoval;
@@ -103,7 +103,7 @@
 		},
 		{
 			cell = PSSwitchCell;
-			cellClass = AAASwitchCell;
+			cellClass = AhAhAhSwitchCell;
 			label = "Remove using Lock Button";
 			key = AllowLockRemoval;
 			default = YES;
@@ -116,28 +116,28 @@
 		},
 		{
 			cell = PSButtonCell;
-			cellClass = AAAButtonCell;
+			cellClass = AhAhAhButtonCell;
 			label = "Contact me";
 			icon = "Email.png";
 			action = openEmail;
 		},
 		{
 			cell = PSButtonCell;
-			cellClass = AAAButtonCell;
+			cellClass = AhAhAhButtonCell;
 			label = "Follow me on Twitter";
 			icon = "Twitter.png";
 			action = openTwitter;
 		},
 		{
 			cell = PSButtonCell;
-			cellClass = AAAButtonCell;
+			cellClass = AhAhAhButtonCell;
 			label = "Source code";
 			icon = "Github.png";
 			action = openGitHub;
 		},
 		{
 			cell = PSButtonCell;
-			cellClass = AAAButtonCell;
+			cellClass = AhAhAhButtonCell;
 			label = "Tip via PayPal";
 			icon = "Paypal.png";
 			action = openPayPal;

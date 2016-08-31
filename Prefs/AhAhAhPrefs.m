@@ -1069,10 +1069,10 @@ static BOOL hasTouchID() {
 
 // Custom Cells
 
-@interface AAASwitchCell : PSSwitchTableCell
+@interface AhAhAhSwitchCell : PSSwitchTableCell
 @end
 
-@implementation AAASwitchCell
+@implementation AhAhAhSwitchCell
 - (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
 	if (self) {
@@ -1083,10 +1083,10 @@ static BOOL hasTouchID() {
 @end
 
 
-@interface AAAButtonCell : PSTableCell
+@interface AhAhAhButtonCell : PSTableCell
 @end
 
-@implementation AAAButtonCell
+@implementation AhAhAhButtonCell
 - (void)layoutSubviews {
 	[super layoutSubviews];
 	
@@ -1096,10 +1096,10 @@ static BOOL hasTouchID() {
 @end
 
 
-@interface AAALogoCell : PSTableCell
+@interface AhAhAhLogoCell : PSTableCell
 @end
 
-@implementation AAALogoCell
+@implementation AhAhAhLogoCell
 - (id)initWithSpecifier:(PSSpecifier *)specifier {
 	self = [super initWithStyle:UITableViewCellStyleDefault
 				reuseIdentifier:@"LogoCell"
