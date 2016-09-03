@@ -58,21 +58,15 @@
 #define FILE_KEY		@"file"
 #define SIZE_KEY		@"size"
 
-// #F00000
-#define TINT_COLOR		[UIColor colorWithRed:0.941 green:0 blue:0 alpha:1]
+#define TINT_COLOR		[UIColor colorWithRed:0.941 green:0 blue:0 alpha:1] // #F00000
+#define LINK_COLOR		[UIColor colorWithWhite:0.5 alpha:1] // #808080
 
-// #808080
-#define LINK_COLOR		[UIColor colorWithWhite:0.5 alpha:1]
-
-
-
-// Private APIs.
 
 @interface UIDevice (Private)
 - (id)_deviceInfoForKey:(NSString *)key;
 @end
 
-@interface UIColor (SystemColorsPending)
+@interface UIColor (Private)
 + (id)systemMidGrayColor;
 + (id)systemGrayColor;
 + (id)systemPinkColor;
@@ -84,10 +78,10 @@
 + (id)systemRedColor;
 @end
 
-
-
-// Helpers.
-
+ 
+//
+// UIImage Helpers
+//
 @implementation UIImage (AhAhAh)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
 	BOOL opaque = YES;
@@ -168,6 +162,9 @@
 @end
 
 
+//
+// Checks if Touch ID is available.
+//
 static BOOL hasTouchID() {
     if ([LAContext class]) {
         return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
@@ -177,12 +174,12 @@ static BOOL hasTouchID() {
 }
 
 
-
 //------------------------------------------------------------------------------
 
 
-
-// Root Controller.
+//
+// Root View Controller
+//
 
 @interface AhAhAhPrefsController : PSListController
 - (void)respring;
@@ -319,12 +316,12 @@ static BOOL hasTouchID() {
 @end
 
 
-
 //------------------------------------------------------------------------------
 
 
-
+//
 // Media List Controller
+//
 
 @interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
@@ -1080,12 +1077,12 @@ static BOOL hasTouchID() {
 @end
 
 
-
 //------------------------------------------------------------------------------
 
 
-
-// Custom Cells.
+//
+// Tinted Switch Cell
+//
 
 @interface AhAhAhSwitchCell : PSSwitchTableCell
 @end
@@ -1101,6 +1098,12 @@ static BOOL hasTouchID() {
 @end
 
 
+//------------------------------------------------------------------------------
+
+
+//
+// Tinted Button Cell
+//
 @interface AhAhAhButtonCell : PSTableCell
 @end
 
@@ -1113,6 +1116,13 @@ static BOOL hasTouchID() {
 }
 @end
 
+
+//------------------------------------------------------------------------------
+
+
+//
+// Logo Cell
+//
 
 @interface AhAhAhLogoCell : PSTableCell
 @property (nonatomic, strong) UIImageView *logoView;
@@ -1142,5 +1152,4 @@ static BOOL hasTouchID() {
 	return 100.0f;
 }
 @end
-
 

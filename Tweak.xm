@@ -1,15 +1,15 @@
 //
 //  Tweak.xm
-//  Ah! Ah! Ah! You didn't say the magic word!
+//  Ah!Ah!Ah! (You didn't say the magic word)
 //
 //  Custom Unlock Error Alarm.
 //  Inspired by Jurassic Park.
 //
-//  Copyright (c) 2014-2015 Sticktron. All rights reserved.
+//  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#define DEBUG_PREFIX @"😈 [Ah!Ah!Ah!]"
+#define DEBUG_PREFIX @"🦄 [Ah!Ah!Ah!]"
 #import "DebugLog.h"
 
 #import <UIKit/UIKit.h>
