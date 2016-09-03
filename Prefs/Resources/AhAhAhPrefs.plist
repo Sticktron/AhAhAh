@@ -6,10 +6,6 @@
 			headerCellClass = AhAhAhLogoCell;
 		},
 		{
-			cell = PSGroupCell;
-			footerText = "SpringBoard must be restarted to enable or disable this tweak. All other settings take effect immediately.";
-		},
-		{
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
 			label = Enabled;
@@ -17,38 +13,34 @@
 			default = YES;
 			defaults = "com.sticktron.ahahah";
 		},
-		{
-			cell = PSButtonCell;
-			cellClass = AhAhAhButtonCell;
-			label = Respring;
-			action = respring;
-			confirmation = {
-				title = "Respring?";
-				prompt = "Restart SpringBoard?";
-				cancelTitle = "Not Now";
-				okTitle = OK;
-			};
-			isDestructive = YES;
-		},
+		
+		
 		{
 			cell = PSGroupCell;
-			label = Customize;
-			footerText = "Selecting fullscreen mode will automatically hide the background image and scale the video to fit the screen.";
+			footerText = "Choose a theme for the alarm.";
 		},
 		{
 			cell = PSLinkCell;
-			label = "Choose Video and Background";
-			detail = "AhAhAhPrefsMediaController";
+			label = "Choose Theme";
+			detail = AhAhAhPrefsMediaController;
+		},
+		
+		
+		{
+			cell = PSGroupCell;
+			footerText = "Stretch the video to fill the screen. Background image will be hidden.";
 		},
 		{
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
-			label = "FullScreen Video";
+			label = "Full Screen Video";
 			key = FullScreenVideo;
 			default = NO;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
+		
+		
 		{
 			cell = PSGroupCell;
 			label = Activating;
@@ -80,36 +72,39 @@
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
 			id = IgnoreBioFailure;
-			label = "Don't count TouchID fails";
+			label = "Ignore TouchID";
 			key = IgnoreBioFailure;
 			default = YES;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
+		
+		
 		{
 			cell = PSGroupCell;
 			label = Deactivating;
-			footerText = "The alarm automatically stops after about 30 seconds to prevent draining your battery.";
 		},
 		{
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
 			id = AllowBioRemoval;
-			label = "Remove using TouchID";
+			label = "Allow TouchID";
 			key = AllowBioRemoval;
-			default = NO;
+			default = YES;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
 		{
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
-			label = "Remove using Lock Button";
+			label = "Allow Lock Button";
 			key = AllowLockRemoval;
-			default = YES;
+			default = NO;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
+		
+		
 		{
 			cell = PSGroupCell;
 			label = Support;
@@ -117,34 +112,44 @@
 		{
 			cell = PSButtonCell;
 			cellClass = AhAhAhButtonCell;
-			label = "Contact me";
+			label = "Send an Email";
 			icon = "Email.png";
 			action = openEmail;
 		},
 		{
 			cell = PSButtonCell;
 			cellClass = AhAhAhButtonCell;
-			label = "Follow me on Twitter";
+			label = "Send a Tweet";
 			icon = "Twitter.png";
 			action = openTwitter;
 		},
 		{
 			cell = PSButtonCell;
 			cellClass = AhAhAhButtonCell;
-			label = "Source code";
-			icon = "Github.png";
+			label = "Find me on Reddit";
+			icon = "Reddit.png";
+			action = openTwitter;
+		},
+		{
+			cell = PSButtonCell;
+			cellClass = AhAhAhButtonCell;
+			label = "Contribute to Source Code";
+			icon = "GitHub.png";
 			action = openGitHub;
 		},
 		{
 			cell = PSButtonCell;
 			cellClass = AhAhAhButtonCell;
-			label = "Tip via PayPal";
-			icon = "Paypal.png";
+			label = "Contribute via PayPal";
+			icon = "PayPal.png";
 			action = openPayPal;
 		},
+		
+		
 		{
 			cell = PSGroupCell;
 			footerText = "Thanks to /u/harrybond for the idea.\nThanks to milodarling for helping with the iOS 8 update.\n\nCopyright (c) 2014-2015 Sticktron.\n\n\Ud83d\Ude08\n\t\t\t";
+			footerAlignment = 1;
 		},
 	);
 }

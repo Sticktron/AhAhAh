@@ -6,7 +6,7 @@
 //
 //
 
-#define DEBUG_PREFIX @"⚠️ [AhAhAhPrefs]"
+#define DEBUG_PREFIX @"🦄 [AhAhAhPrefs]"
 #import "../DebugLog.h"
 
 #import <Preferences/PSViewController.h>
@@ -28,35 +28,42 @@
 #define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
-#define DEFAULT_PATH				@"/Library/Application Support/AhAhAh"
+#define DEFAULT_PATH			@"/Library/Application Support/AhAhAh"
 
-#define DEFAULT_BG_TITLE			@"BlueScreen Error"
-#define DEFAULT_BG_THUMB			@"thumb_BlueScreenError.png"
+#define DEFAULT_BG_TITLE		@"BlueScreen Error"
+#define DEFAULT_BG_THUMB		@"thumb_BlueScreenError.png"
 
-#define DEFAULT_VIDEO_TITLE			@"Ah! Ah! Ah!"
-#define DEFAULT_VIDEO_THUMB			@"thumb_AhAhAh.png"
+#define DEFAULT_VIDEO_TITLE		@"Ah! Ah! Ah!"
+#define DEFAULT_VIDEO_THUMB		@"thumb_AhAhAh.png"
 
-#define KEVIN_VIDEO_TITLE			@"Mind your damn business!"
-#define KEVIN_VIDEO_THUMB			@"thumb_MindYoDamnBusiness.png"
+#define KEVIN_VIDEO_TITLE		@"Mind your damn business!"
+#define KEVIN_VIDEO_THUMB		@"thumb_MindYoDamnBusiness.png"
 
-#define DEX_VIDEO_TITLE				@"I feel like dying"
-#define DEX_VIDEO_THUMB				@"thumb_IFeelLikeDying.png"
+#define DEX_VIDEO_TITLE			@"I feel like dying"
+#define DEX_VIDEO_THUMB			@"thumb_IFeelLikeDying.png"
 
-#define IMPORT_SECTION			0
-#define VIDEO_SECTION			1
-#define BACKGROUND_SECTION		2
+#define IMPORT_SECTION		0
+#define VIDEO_SECTION		1
+#define BACKGROUND_SECTION	2
 
-#define THUMBNAIL_TAG			1
-#define TITLE_TAG				2
-#define SUBTITLE_TAG			3
+#define THUMBNAIL_TAG		1
+#define TITLE_TAG			2
+#define SUBTITLE_TAG		3
 
-#define ID_NONE				@"_none"
-#define ID_DEFAULT			@"_default"
-#define ID_KEVIN			@"_kevin"
-#define ID_DEX				@"_dex"
+#define ID_NONE			@"_none"
+#define ID_DEFAULT		@"_default"
+#define ID_KEVIN		@"_kevin"
+#define ID_DEX			@"_dex"
 
-#define FILE_KEY			@"file"
-#define SIZE_KEY			@"size"
+#define FILE_KEY		@"file"
+#define SIZE_KEY		@"size"
+
+// #F00000
+#define TINT_COLOR		[UIColor colorWithRed:0.941 green:0 blue:0 alpha:1]
+
+// #808080
+#define LINK_COLOR		[UIColor colorWithWhite:0.5 alpha:1]
+
 
 
 // Private APIs.
@@ -76,6 +83,7 @@
 + (id)systemGreenColor;
 + (id)systemRedColor;
 @end
+
 
 
 // Helpers.
@@ -169,7 +177,9 @@ static BOOL hasTouchID() {
 }
 
 
+
 //------------------------------------------------------------------------------
+
 
 
 // Root Controller.
@@ -221,9 +231,13 @@ static BOOL hasTouchID() {
 																   target:self
 																   action:@selector(showLove)];
 	heartButton.imageInsets = (UIEdgeInsets){2, 0, -2, 0};
-	heartButton.tintColor = UIColor.redColor;
+	heartButton.tintColor = TINT_COLOR;
 	
 	[self.navigationItem setRightBarButtonItem:heartButton];
+}
+
+- (void)setTitle:(id)title {
+	// no thanks
 }
 
 - (id)readPreferenceValue:(PSSpecifier*)specifier {
@@ -305,7 +319,9 @@ static BOOL hasTouchID() {
 @end
 
 
+
 //------------------------------------------------------------------------------
+
 
 
 // Media List Controller
@@ -378,7 +394,7 @@ static BOOL hasTouchID() {
 	self.tableView.delegate = self;
 	self.tableView.dataSource = self;
 	self.tableView.rowHeight = 44.0f;
-	self.tableView.tintColor = UIColor.redColor;
+	self.tableView.tintColor = TINT_COLOR;
 	
 	self.view = self.tableView;
 }
@@ -1064,10 +1080,12 @@ static BOOL hasTouchID() {
 @end
 
 
+
 //------------------------------------------------------------------------------
 
 
-// Custom Cells
+
+// Custom Cells.
 
 @interface AhAhAhSwitchCell : PSSwitchTableCell
 @end
@@ -1076,7 +1094,7 @@ static BOOL hasTouchID() {
 - (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
 	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
 	if (self) {
-		[((UISwitch *)[self control]) setOnTintColor:UIColor.redColor];
+		[((UISwitch *)[self control]) setOnTintColor:TINT_COLOR];
 	}
 	return self;
 }
@@ -1091,12 +1109,13 @@ static BOOL hasTouchID() {
 	[super layoutSubviews];
 	
 	// if I do this at init it doesn't stick :(
-	[self.textLabel setTextColor:UIColor.redColor];
+	[self.textLabel setTextColor:LINK_COLOR];
 }
 @end
 
 
 @interface AhAhAhLogoCell : PSTableCell
+@property (nonatomic, strong) UIImageView *logoView;
 @end
 
 @implementation AhAhAhLogoCell
@@ -1108,22 +1127,19 @@ static BOOL hasTouchID() {
 	if (self) {
 		self.backgroundColor = UIColor.clearColor;
 		
-		CGRect frame = self.contentView.bounds;
-		frame.origin.y += 10;
-		frame.size.height -= 10;
+		NSString *path = [NSString stringWithFormat:@"%@/Logo.png", BUNDLE_PATH];
+		UIImage *logo = [UIImage imageWithContentsOfFile:path];
+		UIImageView *logoView = [[UIImageView alloc] initWithImage:logo];
+		logoView.center = self.contentView.center;
+		logoView.contentMode = UIViewContentModeCenter;
+		logoView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
 		
-		UILabel *label = [[UILabel alloc] initWithFrame:frame];
-		label.text = @"a Sticktron joint";
-		label.font = [UIFont boldSystemFontOfSize:10];
-		label.textColor = UIColor.darkGrayColor;
-		label.textAlignment = NSTextAlignmentCenter;
-		
-		[self.contentView addSubview:label];
+		[self.contentView addSubview:logoView];
 	}
 	return self;
 }
 - (CGFloat)preferredHeightForWidth:(CGFloat)height {
-	return 22.0f;
+	return 100.0f;
 }
 @end
 
