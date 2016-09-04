@@ -10,7 +10,7 @@
 			cellClass = AhAhAhSwitchCell;
 			label = Enabled;
 			key = Enabled;
-			default = YES;
+			default = 1;
 			defaults = "com.sticktron.ahahah";
 		},
 		
@@ -35,7 +35,7 @@
 			cellClass = AhAhAhSwitchCell;
 			label = "Full Screen Video";
 			key = FullScreenVideo;
-			default = NO;
+			default = 0;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
@@ -74,7 +74,7 @@
 			id = IgnoreBioFailure;
 			label = "Ignore TouchID";
 			key = IgnoreBioFailure;
-			default = YES;
+			default = 1;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
@@ -90,7 +90,7 @@
 			id = AllowBioRemoval;
 			label = "Allow TouchID";
 			key = AllowBioRemoval;
-			default = YES;
+			default = 1;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
@@ -99,7 +99,7 @@
 			cellClass = AhAhAhSwitchCell;
 			label = "Allow Lock Button";
 			key = AllowLockRemoval;
-			default = NO;
+			default = 0;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},

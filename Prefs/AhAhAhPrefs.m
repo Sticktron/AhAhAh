@@ -6,7 +6,7 @@
 //
 //
 
-#define DEBUG_PREFIX @"🦄 [AhAhAhPrefs]"
+#define DEBUG_PREFIX @"☮️  [AhAhAhPrefs]"
 #import "../DebugLog.h"
 
 #import <Preferences/PSViewController.h>
@@ -21,28 +21,13 @@
 #import <Social/Social.h>
 
 
-#define BUNDLE_PATH			@"/Library/PreferenceBundles/AhAhAhPrefs.bundle"
+#define PREFS_PLIST_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
+#define BUNDLE_PATH				@"/Library/PreferenceBundles/AhAhAhPrefs.bundle"
+#define THEME_PATH				@"/Library/AhAhAh/Themes"
+#define USER_VIDEOS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
+#define USER_BACKGROUNDS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
 
-#define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
-
-#define USER_VIDEOS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
-#define USER_BGS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
-
-#define DEFAULT_PATH			@"/Library/Application Support/AhAhAh"
-
-#define DEFAULT_BG_TITLE		@"BlueScreen Error"
-#define DEFAULT_BG_THUMB		@"thumb_BlueScreenError.png"
-
-#define DEFAULT_VIDEO_TITLE		@"Ah! Ah! Ah!"
-#define DEFAULT_VIDEO_THUMB		@"thumb_AhAhAh.png"
-
-#define KEVIN_VIDEO_TITLE		@"Mind your damn business!"
-#define KEVIN_VIDEO_THUMB		@"thumb_MindYoDamnBusiness.png"
-
-#define DEX_VIDEO_TITLE			@"I feel like dying"
-#define DEX_VIDEO_THUMB			@"thumb_IFeelLikeDying.png"
-
-#define IMPORT_SECTION		0
+#define THEME_SECTION		0
 #define VIDEO_SECTION		1
 #define BACKGROUND_SECTION	2
 
@@ -79,9 +64,7 @@
 @end
 
  
-//
 // UIImage Helpers
-//
 @implementation UIImage (AhAhAh)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
 	BOOL opaque = YES;
@@ -162,9 +145,7 @@
 @end
 
 
-//
-// Checks if Touch ID is available.
-//
+// Checks if Touch ID is available
 static BOOL hasTouchID() {
     if ([LAContext class]) {
         return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
@@ -177,9 +158,7 @@ static BOOL hasTouchID() {
 //------------------------------------------------------------------------------
 
 
-//
-// Root View Controller
-//
+/* Root View Controller */
 
 @interface AhAhAhPrefsController : PSListController
 - (void)respring;
@@ -194,8 +173,6 @@ static BOOL hasTouchID() {
 
 - (id)specifiers {	
 	if (_specifiers == nil) {
-		DebugLog(@"Loading specifiers...");
-				
 		_specifiers = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
 		
 		// Alter the specefier list, removing some settings if we aren't
@@ -239,6 +216,7 @@ static BOOL hasTouchID() {
 
 - (id)readPreferenceValue:(PSSpecifier*)specifier {
 	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
+	
 	if (!settings[specifier.properties[@"key"]]) {
 		return specifier.properties[@"default"];
 	}
@@ -319,14 +297,14 @@ static BOOL hasTouchID() {
 //------------------------------------------------------------------------------
 
 
-//
-// Media List Controller
-//
+/* Media List Controller */
 
 @interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) NSMutableArray *themes;
 @property (nonatomic, strong) NSMutableArray *videos;
 @property (nonatomic, strong) NSMutableArray *backgrounds;
+@property (nonatomic, strong) NSString *selectedTheme;
 @property (nonatomic, strong) NSString *selectedVideo;
 @property (nonatomic, strong) NSString *selectedBackground;
 @property (nonatomic, strong) NSOperationQueue *queue;
@@ -345,30 +323,26 @@ static BOOL hasTouchID() {
 	self = [super init];
 	
 	if (self) {
-		DebugLog(@"AhAhAhPrefsMediaController init'd");
-		
 		[self setTitle:@"Customize"];
 		
 		_queue = [[NSOperationQueue alloc] init];
 		_queue.maxConcurrentOperationCount = 4;
 		_imageCache = [[NSCache alloc] init];
 		
+		_themes =
+		_backgrounds = nil;
+		_videos = nil;
 		
-		// init lists with default items
-		_backgrounds = [NSMutableArray arrayWithObject:@{FILE_KEY: ID_DEFAULT}];
-		_videos = [NSMutableArray arrayWithObjects:@{FILE_KEY: ID_DEFAULT}, @{FILE_KEY: ID_KEVIN}, @{FILE_KEY: ID_DEX}, nil];
+		// load user prefs...
 		
-		
-		// set selected items
 		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 		DebugLog(@"Read user prefs: %@", prefs);
-		_selectedVideo = prefs[@"VideoFile"] ?: ID_DEFAULT;
-		_selectedBackground = prefs[@"BackgroundFile"] ?: ID_DEFAULT;
+		_selectedVideo = prefs[@"VideoFile"] ?: nil;
+		_selectedBackground = prefs[@"BackgroundFile"] ?: nil;
+				
+		// create directories for user media (if needed)...
 		
-		
-		// create directories for user media if needed...
-		
-		[[NSFileManager defaultManager] createDirectoryAtPath:USER_BGS_PATH
+		[[NSFileManager defaultManager] createDirectoryAtPath:USER_BACKGROUNDS_PATH
 								  withIntermediateDirectories:YES
 												   attributes:nil
 														error:nil];
@@ -413,84 +387,410 @@ static BOOL hasTouchID() {
 	[super viewWillDisappear:animated];
 }
 
+// tableview data
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+	return 3;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+	NSString *title = nil;
+	
+	switch (section) {
+		case THEME_SECTION: title = @"Themes";
+		break;
+		
+		case VIDEO_SECTION: title = @"Your Videos";
+		break;
+		
+		case BACKGROUND_SECTION: title = @"Your Backgrounds";
+		break;
+	}
+	
+	return title;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	NSInteger num = 0;
+	
+	switch (section) {
+		case THEME_SECTION: num = self.themes.count;
+			break;
+		case VIDEO_SECTION: num = self.videos.count;
+			break;
+		case BACKGROUND_SECTION: num = self.backgrounds.count;
+			break;
+	}
+	
+	return num;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	UITableViewCell *cell;
+	
+	// make the last row in Video or Background sections an Import Cell...
+	
+	if (indexPath.row == [self.tableView numberOfRowsInSection:indexPath.section] - 1) {		
+		if (indexPath.section == VIDEO_SECTION || indexPath.section == BACKGROUND_SECTION) {
+			static NSString *ImportCellIdentifier = @"ImportCell";
+			cell = [tableView dequeueReusableCellWithIdentifier:ImportCellIdentifier];
+			
+			if (!cell) {
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+											  reuseIdentifier:ImportCellIdentifier];
+				cell.opaque = YES;
+				cell.textLabel.font = [UIFont boldSystemFontOfSize:14.0];
+				cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+			}
+			
+			if (indexPath.section == VIDEO_SECTION) {
+				cell.textLabel.text = @"Import Video From Camera Roll";
+			} else {
+				cell.textLabel.text = @"Import Image From Camera Roll";
+			}
+			
+			return cell;
+		}
+	}
+	
+	// make a Media Item Cell...
+	
+	static NSString *CustomCellIdentifier = @"MediaItemCell";
+	cell = [tableView dequeueReusableCellWithIdentifier:CustomCellIdentifier];
+	
+	if (!cell) {
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+									  reuseIdentifier:CustomCellIdentifier];
+		cell.opaque = YES;
+		cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.accessoryType = UITableViewCellAccessoryNone;
+		
+		// thumbnail
+		UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(15.0f, 2.0f, 40.0f, 40.0f)];
+		imageView.opaque = YES;
+		imageView.contentMode = UIViewContentModeScaleAspectFit;
+		imageView.tag = THUMBNAIL_TAG;
+		[cell.contentView addSubview:imageView];
+		
+		// title
+		UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 10.0f, 215.0f, 16.0f)];
+		titleLabel.opaque = YES;
+		titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
+		titleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
+		titleLabel.tag = TITLE_TAG;
+		[cell.contentView addSubview:titleLabel];
+		
+		// subtitle
+		UILabel *subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 28.0f, 215.0f, 12.0f)];
+		subtitleLabel.opaque = YES;
+		subtitleLabel.font = [UIFont italicSystemFontOfSize:10.0];
+		subtitleLabel.textColor = [UIColor grayColor];
+		subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
+		subtitleLabel.tag = SUBTITLE_TAG;
+		[cell.contentView addSubview:subtitleLabel];
+	}
+	
+	UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:THUMBNAIL_TAG];
+	UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:TITLE_TAG];
+	UILabel *subtitleLabel = (UILabel *)[cell.contentView viewWithTag:SUBTITLE_TAG];
+	
+	if (indexPath.section == VIDEO_SECTION) {
+		
+		// User Video...
+		
+		NSDictionary *video = self.videos[indexPath.row];		
+		NSString *filename = video[FILE_KEY];
+		titleLabel.text = filename;
+		subtitleLabel.text = video[SIZE_KEY];
+		
+		// get thumbnail from cache, or else load and cache it in the background
+		UIImage *thumbnail = [self.imageCache objectForKey:filename];
+		if (thumbnail) {
+			imageView.image = thumbnail;			
+		} else {
+			[self.queue addOperationWithBlock:^{
+				// load
+				UIImage *image = [self thumbnailForVideo:filename withMaxSize:imageView.bounds.size];
+				
+				if (image) {
+					// add to cache
+					[self.imageCache setObject:image forKey:filename];
+					
+					// update UI on the main thread
+					[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+						UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+						
+						if (cell) {
+							UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:THUMBNAIL_TAG];
+							imageView.image = image;
+						}
+					}];
+				}
+			}];
+		}
+		
+		// check if checked
+		if ([self.selectedVideo isEqualToString:video[FILE_KEY]]) {
+			cell.accessoryType = UITableViewCellAccessoryCheckmark;
+		} else {
+			cell.accessoryType = UITableViewCellAccessoryNone;
+		}
+		
+		
+	} else if (indexPath.section == BACKGROUND_SECTION) {
+		
+		// User Background...
+		
+		NSDictionary *background = self.backgrounds[indexPath.row];		
+		NSString *filename = background[FILE_KEY];
+		titleLabel.text = filename;
+		subtitleLabel.text = background[SIZE_KEY];
+		
+		// get thumbnail from cache, or else load and cache it in the background...		
+		UIImage *thumbnail = [self.imageCache objectForKey:filename];
+		if (thumbnail) {
+			imageView.image = thumbnail;			
+		} else {
+			[self.queue addOperationWithBlock:^{
+				// load
+				NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, filename];
+				UIImage *image = [UIImage imageWithContentsOfFile:path];
+				
+				if (image) {
+					image = [UIImage imageWithImage:image scaledToMaxWidth:imageView.bounds.size.height
+										  maxHeight:imageView.bounds.size.height];
+					
+					// add to cache
+					[self.imageCache setObject:image forKey:filename];
+					
+					// update UI on main thread
+					[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+						UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+						
+						if (cell) {
+							UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:THUMBNAIL_TAG];
+							imageView.image = image;
+						}
+					}];
+				}
+			}];
+		}
+		
+		// check if checked
+		if ([self.selectedBackground isEqualToString:background[FILE_KEY]]) {
+			cell.accessoryType = UITableViewCellAccessoryCheckmark;
+		} else {
+			cell.accessoryType = UITableViewCellAccessoryNone;
+		}
+		
+		
+	} else if (indexPath.section == THEME_SECTION) {
+		
+		// Theme (TODO)...
+		
+		titleLabel.text = @"Theme";
+		subtitleLabel.text = @"Author";
+	}
+			
+	return cell;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+	if (section == THEME_SECTION) {
+		return @"Themes can be found in Cydia, or copied to /Library/AhAhAh/Themes.";
+	} else {
+		return nil;
+	}
+}
+
+// tableview selecting & deleting
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	DebugLog(@"User selected row: %ld, section: %ld", (long)indexPath.row, (long)indexPath.section);
+	
+	if (indexPath.row == [self.tableView numberOfRowsInSection:indexPath.section]) {		
+		if (indexPath.section == VIDEO_SECTION || indexPath.section == BACKGROUND_SECTION) {
+			[self startPicker];
+		}
+			
+	} else {
+		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+		
+		if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
+			
+			// uncheck cell...
+			
+			cell.accessoryType = UITableViewCellAccessoryNone;
+			
+			if (indexPath.section == VIDEO_SECTION) {
+				self.selectedVideo = ID_NONE;
+			} else {
+				self.selectedBackground = ID_NONE;
+			}
+			
+		} else {
+			
+			// check cell...
+			
+			// uncheck old selection
+			for (NSInteger i = 0; i < [tableView numberOfRowsInSection:indexPath.section]; i++) {
+				NSIndexPath	 *path = [NSIndexPath indexPathForRow:i inSection:indexPath.section];
+				UITableViewCell *cell = [tableView cellForRowAtIndexPath:path];
+				cell.accessoryType = UITableViewCellAccessoryNone;
+			}
+			
+			// check new selection
+			cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			
+			// get the file name
+			UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:TITLE_TAG];
+			
+			// save selection
+			if (indexPath.section == VIDEO_SECTION) {
+				if (indexPath.row == 0) {
+					self.selectedVideo = ID_DEFAULT;
+				} else if (indexPath.row == 1) {
+					self.selectedVideo = ID_KEVIN;
+				} else if (indexPath.row == 2) {
+					self.selectedVideo = ID_DEX;
+				} else {
+					self.selectedVideo = titleLabel.text;
+				}
+				DebugLog(@"selected video: %@", self.selectedVideo);
+				
+			} else if (indexPath.section == BACKGROUND_SECTION) {
+				if (indexPath.row == 0) {
+					self.selectedBackground = ID_DEFAULT;
+				} else {
+					self.selectedBackground = titleLabel.text;
+				}
+				DebugLog(@" selected background: %@", self.selectedBackground);
+			}
+		}
+			
+		[self savePrefs:YES];
+		[tableView reloadData];
+	}
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (indexPath.row <= 2) {
+		return NO;
+	} else {
+		return YES;
+	}
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    [self.tableView setEditing:editing animated:YES];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+	DebugLog(@"User wants to delete media");
+	
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+		
+		if (indexPath.section == VIDEO_SECTION) {
+			//
+			// delete video
+			//
+			NSString *file = self.videos[indexPath.row][FILE_KEY];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, file];
+			DebugLog(@"deleting video at path: %@", path);
+			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+			
+			// if row was checked, check the default row instead
+			if ([file isEqualToString:self.selectedVideo]) {
+				self.selectedVideo = ID_DEFAULT;
+			}
+			
+			[self.videos removeObjectAtIndex:indexPath.row];
+			
+		} else if (indexPath.section == BACKGROUND_SECTION) {
+			//
+			// delete image
+			//
+			NSString *file = self.backgrounds[indexPath.row][FILE_KEY];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, file];
+			DebugLog(@"deleting image at path: %@", path);
+			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+			
+			// if image was selected, select default after deletion
+			if ([file isEqualToString:self.selectedBackground]) {
+				self.selectedBackground = ID_DEFAULT;
+			}
+			
+			[self.backgrounds removeObjectAtIndex:indexPath.row];
+		}
+		
+		[self savePrefs:YES];
+		
+		[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationTop];
+		[tableView reloadData];
+    }
+}
+
 // helpers
 
 - (void)scanForMedia {
 	DebugLog0;
 	
-	// reset the lists (keep default entries)
-	[self.videos removeObjectsInRange:NSMakeRange(3, self.videos.count - 3)];
-	[self.backgrounds removeObjectsInRange:NSMakeRange(1, self.backgrounds.count - 1)];
+	// look for Themes...
+	
+	self.themes = nil;
 	
 	
-	// scan filesystem for custom media...
+	// look for Imported Assets...
 	
-	NSFileManager *fm = [NSFileManager defaultManager];
+	self.videos = [self loadMediaAtPath:USER_VIDEOS_PATH];
+	DebugLog(@"self.videos = %@", self.videos);
+	
+	self.backgrounds = [self loadMediaAtPath:USER_BACKGROUNDS_PATH];
+	DebugLog(@"self.backgrounds = %@", self.backgrounds);
+}
+
+- (NSMutableArray *)loadMediaAtPath:(NSString *)path {
 	NSArray *keys = @[ NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLNameKey ];
-	NSURL *url;
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
 	
-	
-	// background images ...
-	
-	url = [NSURL fileURLWithPath:USER_BGS_PATH isDirectory:YES];
-	NSMutableArray *backgrounds = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
+	NSMutableArray *files = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
 									includingPropertiesForKeys:keys
 													   options:NSDirectoryEnumerationSkipsHiddenFiles
 														 error:nil];
-	DebugLog(@"Contents of (%@): %@", url, backgrounds);
+	DebugLog(@"Contents of (%@): %@", url, files);
 	
-	// sort by creation date (newest first)
-	[backgrounds sortUsingComparator:^(NSURL *a, NSURL *b) {
+	if (!files) {
+		DebugLog(@"No files.");
+		return nil;
+	}
+	
+	// sort files by creation date, newest first
+	[files sortUsingComparator:^(NSURL *a, NSURL *b) {
 		NSDate *date1 = [[a resourceValuesForKeys:keys error:nil] objectForKey:NSURLContentModificationDateKey];
 		NSDate *date2 = [[b resourceValuesForKeys:keys error:nil] objectForKey:NSURLContentModificationDateKey];
 		return [date2 compare:date1];
 	}];
 	
-	// add files to list
-	for (NSURL *bgURL in backgrounds) {
-		if ([UIImage imageWithContentsOfFile:[bgURL path]]) {
-			NSString *file = [bgURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
-			NSString *size = [bgURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
-			
-			if ([size floatValue] < 1024*1024) { // < 1MB
-				size = [NSString stringWithFormat:@"%.0f KB", [size floatValue] / 1024.0f];
-			} else {
-				size = [NSString stringWithFormat:@"%.1f MB", [size floatValue] / 1024.0f / 1024.f];
-			}
-			
-			[self.backgrounds addObject:@{ FILE_KEY: file, SIZE_KEY: size }];
+	NSMutableArray *media = [NSMutableArray array];
+	
+	// add files to array
+	for (NSURL *fileURL in files) {
+		NSString *file = [fileURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
+		NSString *size = [fileURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
+		
+		if ([size floatValue] < 1024*1024) {
+			size = [NSString stringWithFormat:@"%.0f KB", [size floatValue] / 1024.0f];
 		} else {
-			// unsupported image
+			size = [NSString stringWithFormat:@"%.1f MB", [size floatValue] / 1024.0f / 1024.f];
 		}
-	}
-	
-	
-	// videos ...
-	
-	url = [NSURL fileURLWithPath:USER_VIDEOS_PATH isDirectory:YES];
-	NSMutableArray *videos = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
-										  includingPropertiesForKeys:keys
-															 options:NSDirectoryEnumerationSkipsHiddenFiles
-															   error:nil];
-	DebugLog(@"Contents of (%@): %@", url, videos);
-	
-	// sort by creation date (newest first)
-	[videos sortUsingComparator:^(NSURL *a, NSURL *b) {
-		NSDate *date1 = [[a resourceValuesForKeys:keys error:nil] objectForKey:NSURLCreationDateKey];
-		NSDate *date2 = [[b resourceValuesForKeys:keys error:nil] objectForKey:NSURLCreationDateKey];
-		return [date1 compare:date2];
-	}];
-	
-	// add to list
-	for (NSURL *videoURL in videos) {
-		// TODO: check if video format is valid
 		
-		NSString *file = [videoURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
-		NSString *size = [videoURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
-		size = [NSString stringWithFormat:@"%.1f MB", [size floatValue] / 1024.0f / 1024.0f]; // B->MB
-		
-		[self.videos addObject:@{ FILE_KEY: file, SIZE_KEY: size }];
+		[media addObject:@{ FILE_KEY: file, SIZE_KEY: size }];
 	}
+	DebugLog(@"Results: %@", media);
+	return media;
 }
 
 - (UIImage *)thumbnailForVideo:(NSString *)filename withMaxSize:(CGSize)size {
@@ -607,7 +907,7 @@ static BOOL hasTouchID() {
 			DebugLog(@"Picked image asset with representation: %@", imageRep);
 			
 			NSString *filename = [imageRep filename];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BGS_PATH, filename];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, filename];
 			
 			UIImage *image = (UIImage *)info[UIImagePickerControllerOriginalImage];
 			DebugLog(@"image size=%@", NSStringFromCGSize(image.size));
@@ -668,421 +968,13 @@ static BOOL hasTouchID() {
 	}
 }
 
-// tableview data
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 3;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	NSString *title = nil;
-	
-	switch (section) {
-		case VIDEO_SECTION: title = @"Videos";
-			break;
-		case BACKGROUND_SECTION: title = @"Background Images";
-			break;
-		case IMPORT_SECTION: title = @"Import Media";
-			break;
-	}
-	
-	return title;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	NSInteger num = 0;
-	
-	switch (section) {
-		case VIDEO_SECTION: num = self.videos.count;
-			break;
-		case BACKGROUND_SECTION: num = self.backgrounds.count;
-			break;
-		case IMPORT_SECTION: num = 1;
-			break;
-	}
-	
-	return num;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	UITableViewCell *cell;
-	
-	if (indexPath.section == IMPORT_SECTION) {
-		//
-		// media picker cell
-		//
-		static NSString *ImportCellIdentifier = @"ImportCell";
-		cell = [tableView dequeueReusableCellWithIdentifier:ImportCellIdentifier];
-		
-		if (!cell) {
-			cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
-										  reuseIdentifier:ImportCellIdentifier];
-			cell.opaque = YES;
-			cell.textLabel.font = [UIFont boldSystemFontOfSize:14.0];
-			cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-		}
-		
-		cell.textLabel.text = @"Add new video or image from Camera Roll";
-		
-	} else {
-		//
-		// media item cell
-		//
-		static NSString *CustomCellIdentifier = @"CustomCell";
-		cell = [tableView dequeueReusableCellWithIdentifier:CustomCellIdentifier];
-		
-		if (!cell) {
-			cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-										  reuseIdentifier:CustomCellIdentifier];
-			cell.opaque = YES;
-			cell.selectionStyle = UITableViewCellSelectionStyleNone;
-			cell.accessoryType = UITableViewCellAccessoryNone;
-			
-			// thumbnail
-			UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(15.0f, 2.0f, 40.0f, 40.0f)];
-			imageView.opaque = YES;
-			imageView.contentMode = UIViewContentModeScaleAspectFit;
-			imageView.tag = THUMBNAIL_TAG;
-			[cell.contentView addSubview:imageView];
-			
-			// title
-			UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 10.0f, 215.0f, 16.0f)];
-			titleLabel.opaque = YES;
-			titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
-			titleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
-			titleLabel.tag = TITLE_TAG;
-			[cell.contentView addSubview:titleLabel];
-			
-			// subtitle
-			UILabel *subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 28.0f, 215.0f, 12.0f)];
-			subtitleLabel.opaque = YES;
-			subtitleLabel.font = [UIFont italicSystemFontOfSize:10.0];
-			subtitleLabel.textColor = [UIColor grayColor];
-			subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
-			subtitleLabel.tag = SUBTITLE_TAG;
-			[cell.contentView addSubview:subtitleLabel];
-		}
-		
-		UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:THUMBNAIL_TAG];
-		UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:TITLE_TAG];
-		UILabel *subtitleLabel = (UILabel *)[cell.contentView viewWithTag:SUBTITLE_TAG];
-		
-		if (indexPath.section == VIDEO_SECTION) {
-			NSDictionary *video = self.videos[indexPath.row];
-			
-			if (indexPath.row == 0) {
-				//
-				// Default video
-				//
-				titleLabel.text = DEFAULT_VIDEO_TITLE;
-				subtitleLabel.text = @"*Default";
-				NSString *path = [NSString stringWithFormat:@"%@/%@", DEFAULT_PATH, DEFAULT_VIDEO_THUMB];
-				imageView.image = [UIImage imageWithContentsOfFile:path];
-				
-				// checked ?
-				if ([self.selectedVideo isEqualToString:ID_DEFAULT]) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				}
-				
-			} else if (indexPath.row == 1) {
-				//
-				// Kevin Hart video
-				//
-				titleLabel.text = KEVIN_VIDEO_TITLE;
-				subtitleLabel.text = @"???";
-				NSString *path = [NSString stringWithFormat:@"%@/%@", DEFAULT_PATH, KEVIN_VIDEO_THUMB];
-				imageView.image = [UIImage imageWithContentsOfFile:path];
-				
-				// checked ?
-				if ([self.selectedVideo isEqualToString:ID_KEVIN]) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				}
-				
-				
-			} else if (indexPath.row == 2) {
-				//
-				// Dexter video
-				//
-				titleLabel.text = DEX_VIDEO_TITLE;
-				subtitleLabel.text = @"???";
-				NSString *path = [NSString stringWithFormat:@"%@/%@", DEFAULT_PATH, DEX_VIDEO_THUMB];
-				imageView.image = [UIImage imageWithContentsOfFile:path];
-				
-				// checked ?
-				if ([self.selectedVideo isEqualToString:ID_DEX]) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				}
-				
-				
-			} else {
-				//
-				// User video
-				//
-				NSString *filename = video[FILE_KEY];
-				titleLabel.text = filename;
-				subtitleLabel.text = video[SIZE_KEY];
-				
-				// get thumbnail from cache, or else load and cache it in the background...
-				
-				UIImage *thumbnail = [self.imageCache objectForKey:filename];
-				
-				if (thumbnail) {
-					imageView.image = thumbnail;
-					
-				} else {
-					[self.queue addOperationWithBlock:^{
-						// load
-						UIImage *image = [self thumbnailForVideo:filename withMaxSize:imageView.bounds.size];
-						
-						if (image) {
-							// add to cache
-							[self.imageCache setObject:image forKey:filename];
-							
-							// update UI on the main thread
-							[[NSOperationQueue mainQueue] addOperationWithBlock:^{
-								UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-								
-								if (cell) {
-									UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:THUMBNAIL_TAG];
-									imageView.image = image;
-								}
-							}];
-						}
-					}];
-				}
-				
-				// checked ?
-				if ([self.selectedVideo isEqualToString:video[FILE_KEY]]) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				}
-			}
-			
-		} else if (indexPath.section == BACKGROUND_SECTION) {
-			NSDictionary *background = self.backgrounds[indexPath.row];
-			
-			if (indexPath.row == 0) {
-				//
-				// Default background
-				//
-				titleLabel.text = DEFAULT_BG_TITLE;
-				subtitleLabel.text = @"*Default";
-				NSString *path = [NSString stringWithFormat:@"%@/%@", DEFAULT_PATH, DEFAULT_BG_THUMB];
-				imageView.image = [UIImage imageWithContentsOfFile:path];
-				
-				// checked ?
-				if ([self.selectedBackground isEqualToString:ID_DEFAULT]) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				}
-				
-			} else {
-				//
-				// Custom background
-				//
-				NSString *filename = background[FILE_KEY];
-				titleLabel.text = filename;
-				subtitleLabel.text = background[SIZE_KEY];
-				
-				// get thumbnail from cache, or else load and cache it in the background...
-				
-				UIImage *thumbnail = [self.imageCache objectForKey:filename];
-				
-				if (thumbnail) {
-					imageView.image = thumbnail;
-					
-				} else {
-					[self.queue addOperationWithBlock:^{
-						// load
-						NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BGS_PATH, filename];
-						UIImage *image = [UIImage imageWithContentsOfFile:path];
-						
-						if (image) {
-							image = [UIImage imageWithImage:image scaledToMaxWidth:imageView.bounds.size.height
-												  maxHeight:imageView.bounds.size.height];
-							
-							// add to cache
-							[self.imageCache setObject:image forKey:filename];
-							
-							// update UI on main thread
-							[[NSOperationQueue mainQueue] addOperationWithBlock:^{
-								UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-								
-								if (cell) {
-									UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:THUMBNAIL_TAG];
-									imageView.image = image;
-								}
-							}];
-						}
-					}];
-				}
-				
-				// is checked ?
-				if ([self.selectedBackground isEqualToString:background[FILE_KEY]]) {
-					cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				} else {
-					cell.accessoryType = UITableViewCellAccessoryNone;
-				}
-			}
-		}
-	}
-	
-	return cell;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-	if (section == IMPORT_SECTION) {
-		return @"Media can also be copied to /User/Library/AhAhAh/ and will appear in the lists automatically.";
-	} else {
-		return nil;
-	}
-}
-
-// tableview selecting & deleting
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	DebugLog(@"User selected row: %ld, section: %ld", (long)indexPath.row, (long)indexPath.section);
-	
-	if (indexPath.section == IMPORT_SECTION) {
-		[self startPicker];
-		
-	} else {
-		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-		
-		if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
-			//
-			// de-selected the selected row
-			//
-			cell.accessoryType = UITableViewCellAccessoryNone;
-			
-			if (indexPath.section == VIDEO_SECTION) {
-				self.selectedVideo = ID_NONE;
-			} else {
-				self.selectedBackground = ID_NONE;
-			}
-			
-		} else {
-			//
-			// selected a new row
-			//
-			
-			// uncheck old selection
-			for (NSInteger i = 0; i < [tableView numberOfRowsInSection:indexPath.section]; i++) {
-				NSIndexPath	 *path = [NSIndexPath indexPathForRow:i inSection:indexPath.section];
-				UITableViewCell *cell = [tableView cellForRowAtIndexPath:path];
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			}
-			
-			// check new selection
-			cell.accessoryType = UITableViewCellAccessoryCheckmark;
-			
-			// get the file name
-			UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:TITLE_TAG];
-			
-			// save selection
-			if (indexPath.section == VIDEO_SECTION) {
-				if (indexPath.row == 0) {
-					self.selectedVideo = ID_DEFAULT;
-				} else if (indexPath.row == 1) {
-					self.selectedVideo = ID_KEVIN;
-				} else if (indexPath.row == 2) {
-					self.selectedVideo = ID_DEX;
-				} else {
-					self.selectedVideo = titleLabel.text;
-				}
-				DebugLog(@"selected video: %@", self.selectedVideo);
-				
-			} else if (indexPath.section == BACKGROUND_SECTION) {
-				if (indexPath.row == 0) {
-					self.selectedBackground = ID_DEFAULT;
-				} else {
-					self.selectedBackground = titleLabel.text;
-				}
-				DebugLog(@" selected background: %@", self.selectedBackground);
-			}
-		}
-			
-		[self savePrefs:YES];
-		[tableView reloadData];
-	}
-}
-
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-	if (indexPath.row <= 2) {
-		return NO;
-	} else {
-		return YES;
-	}
-}
-
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    [super setEditing:editing animated:animated];
-    [self.tableView setEditing:editing animated:YES];
-}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-	DebugLog(@"User wants to delete media");
-	
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-		
-		if (indexPath.section == VIDEO_SECTION) {
-			//
-			// delete video
-			//
-			NSString *file = self.videos[indexPath.row][FILE_KEY];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, file];
-			DebugLog(@"deleting video at path: %@", path);
-			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-			
-			// if row was checked, check the default row instead
-			if ([file isEqualToString:self.selectedVideo]) {
-				self.selectedVideo = ID_DEFAULT;
-			}
-			
-			[self.videos removeObjectAtIndex:indexPath.row];
-			
-		} else if (indexPath.section == BACKGROUND_SECTION) {
-			//
-			// delete image
-			//
-			NSString *file = self.backgrounds[indexPath.row][FILE_KEY];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BGS_PATH, file];
-			DebugLog(@"deleting image at path: %@", path);
-			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-			
-			// if image was selected, select default after deletion
-			if ([file isEqualToString:self.selectedBackground]) {
-				self.selectedBackground = ID_DEFAULT;
-			}
-			
-			[self.backgrounds removeObjectAtIndex:indexPath.row];
-		}
-		
-		[self savePrefs:YES];
-		
-		[tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationTop];
-		[tableView reloadData];
-    }
-}
-
 @end
 
 
 //------------------------------------------------------------------------------
 
 
-//
-// Tinted Switch Cell
-//
+/* Tinted Switch Cell */
 
 @interface AhAhAhSwitchCell : PSSwitchTableCell
 @end
@@ -1101,9 +993,8 @@ static BOOL hasTouchID() {
 //------------------------------------------------------------------------------
 
 
-//
-// Tinted Button Cell
-//
+/* Tinted Button Cell */
+
 @interface AhAhAhButtonCell : PSTableCell
 @end
 
@@ -1120,9 +1011,7 @@ static BOOL hasTouchID() {
 //------------------------------------------------------------------------------
 
 
-//
-// Logo Cell
-//
+/* Logo Cell */
 
 @interface AhAhAhLogoCell : PSTableCell
 @property (nonatomic, strong) UIImageView *logoView;
