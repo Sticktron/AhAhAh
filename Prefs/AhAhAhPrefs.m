@@ -411,17 +411,15 @@ static BOOL hasTouchID() {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	NSInteger num = 0;
-	
+	NSInteger num = 0;	
 	switch (section) {
 		case THEME_SECTION: num = self.themes.count;
 			break;
-		case VIDEO_SECTION: num = self.videos.count;
+		case VIDEO_SECTION: num = self.videos.count + 1; // add extra row for Import Cell
 			break;
-		case BACKGROUND_SECTION: num = self.backgrounds.count;
+		case BACKGROUND_SECTION: num = self.backgrounds.count + 1; // add extra row for Import Cell
 			break;
 	}
-	
 	return num;
 }
 
