@@ -1,15 +1,15 @@
 //
 //  Tweak.xm
-//  Ah!Ah!Ah! (You didn't say the magic word)
+//  Ah!Ah!Ah!
 //
-//  Custom Unlock Error Alarm.
-//  Inspired by Jurassic Park.
+//  Themable Unlock Alarm for iOS.
+//  Supports iOS 7-9.3.3 on all devices.
 //
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#define DEBUG_PREFIX @"🦄 [Ah!Ah!Ah!]"
+#define DEBUG_PREFIX @"🦄  [AhAhAh]"
 #import "DebugLog.h"
 
 #import <UIKit/UIKit.h>
@@ -506,12 +506,17 @@ static void respring() {
 
 
 
-//------------------------------------------------------------------------------
-// Init
-//------------------------------------------------------------------------------
+/* Init */
 
 %ctor {
 	@autoreleasepool {
+		DebugLogC(@"initing tweak...");
+		
+		if (1==2) { %init(Main); }
+		if (1==3) { %init(BioSupport); }
+		
+		
+		/*
 		BOOL enabled = YES;
 		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 		
@@ -548,7 +553,8 @@ static void respring() {
 											NULL,
 											CFNotificationSuspensionBehaviorDeliverImmediately);
 		}
-		
-		NSLog(@" [Ah!Ah!Ah!] Loaded. I'm %@.", enabled?@"Enabled":@"Disabled");
+		NSLog(@"[Ah!Ah!Ah!] Loaded and %@.", enabled?@"Enabled":@"Disabled");
+		*/
 	}
 }
+
