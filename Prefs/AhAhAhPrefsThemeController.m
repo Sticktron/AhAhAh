@@ -1,28 +1,19 @@
 //
-//  AhAhAhPrefs.m
+//  AhAhAhPrefsThemeController.m
 //  Preferences for Ah!Ah!Ah!
 //
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#define DEBUG_PREFIX @"☮️  [AhAhAhPrefs]"
-#import "../DebugLog.h"
+#import "Common.h"
 
 #import <Preferences/PSViewController.h>
-#import <Preferences/PSListController.h>
-#import <Preferences/PSSpecifier.h>
-#import <Preferences/PSTableCell.h>
-#import <Preferences/PSSwitchTableCell.h>
-#import <AssetsLibrary/AssetsLibrary.h>
 #import <AVFoundation/AVFoundation.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/MobileCoreServices.h>
-#import <LocalAuthentication/LAContext.h>
-#import <Social/Social.h>
 
 
-#define PREFS_PLIST_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
-#define BUNDLE_PATH				@"/Library/PreferenceBundles/AhAhAhPrefs.bundle"
 #define THEME_PATH				@"/Library/AhAhAh/Themes"
 #define USER_VIDEOS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
 #define USER_BACKGROUNDS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
@@ -43,28 +34,9 @@
 #define FILE_KEY		@"file"
 #define SIZE_KEY		@"size"
 
-#define TINT_COLOR		[UIColor colorWithRed:0.941 green:0 blue:0 alpha:1] // #F00000
-#define LINK_COLOR		[UIColor colorWithWhite:0.5 alpha:1] // #808080
-
-
-@interface UIDevice (Private)
-- (id)_deviceInfoForKey:(NSString *)key;
-@end
-
-@interface UIColor (Private)
-+ (id)systemMidGrayColor;
-+ (id)systemGrayColor;
-+ (id)systemPinkColor;
-+ (id)systemTealColor;
-+ (id)systemYellowColor;
-+ (id)systemOrangeColor;
-+ (id)systemBlueColor;
-+ (id)systemGreenColor;
-+ (id)systemRedColor;
-@end
-
  
-// UIImage Helpers
+/* UIImage Helpers */
+
 @implementation UIImage (AhAhAh)
 + (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)size {
 	BOOL opaque = YES;
@@ -145,161 +117,9 @@
 @end
 
 
-// Checks if Touch ID is available
-static BOOL hasTouchID() {
-    if ([LAContext class]) {
-        return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
-    } else {
-    	return NO;
-    }
-}
+/* Theme Controller */
 
-
-//------------------------------------------------------------------------------
-
-
-/* Root View Controller */
-
-@interface AhAhAhPrefsController : PSListController
-- (void)respring;
-- (void)openPayPal;
-- (void)openEmail;
-- (void)openTwitter;
-- (void)openGitHub;
-@end
-
-
-@implementation AhAhAhPrefsController
-
-- (id)specifiers {	
-	if (_specifiers == nil) {
-		_specifiers = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
-		
-		// Alter the specefier list, removing some settings if we aren't
-		// running on a device with TouchID.
-		if (hasTouchID() == NO) {
-			DebugLog(@"No TouchID on this device, disabling some settings...");
-			
-			PSSpecifier *specifier = [self specifierForID:@"IgnoreBioFailure"];
-			[specifier setProperty:@NO forKey:@"enabled"];
-			[specifier setProperty:@NO forKey:@"default"];
-			
-			specifier = [self specifierForID:@"AllowBioRemoval"];
-			[specifier setProperty:@NO forKey:@"enabled"];
-			[specifier setProperty:@NO forKey:@"default"];
-		}
-	}
-	
-	return _specifiers;
-}
-
-- (void)viewDidLoad {
-	[super viewDidLoad];
-	
-	// add a heart button to the navbar
-	NSString *path = [BUNDLE_PATH stringByAppendingPathComponent:@"Heart.png"];
-	UIImage *heartImage = [[UIImage alloc] initWithContentsOfFile:path];
-	
-	UIBarButtonItem *heartButton = [[UIBarButtonItem alloc] initWithImage:heartImage
-																	style:UIBarButtonItemStylePlain
-																   target:self
-																   action:@selector(showLove)];
-	heartButton.imageInsets = (UIEdgeInsets){2, 0, -2, 0};
-	heartButton.tintColor = TINT_COLOR;
-	
-	[self.navigationItem setRightBarButtonItem:heartButton];
-}
-
-- (void)setTitle:(id)title {
-	// no thanks
-}
-
-- (id)readPreferenceValue:(PSSpecifier*)specifier {
-	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
-	
-	if (!settings[specifier.properties[@"key"]]) {
-		return specifier.properties[@"default"];
-	}
-	return settings[specifier.properties[@"key"]];
-}
-
-- (void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
-	NSMutableDictionary *settings = [NSMutableDictionary dictionary];
-	[settings addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH]];
-	[settings setObject:value forKey:specifier.properties[@"key"]];
-	[settings writeToFile:PREFS_PLIST_PATH atomically:YES];
-	
-	CFStringRef notificationValue = (__bridge CFStringRef)specifier.properties[@"PostNotification"];
-	if (notificationValue) {
-		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationValue, NULL, NULL, YES);
-	}
-}
-
-- (void)respring {
-	NSLog(@"Ah!Ah!Ah! called for respring");
-	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
-										 CFSTR("com.sticktron.ahahah.respring"),
-										 NULL,
-										 NULL,
-										 true);
-}
-
-- (void)openEmail {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto:sticktron@hotmail.com"]];
-}
-
-- (void)openTwitter {
-	NSURL *url;
-	
-	if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot:"]]) {
-		url = [NSURL URLWithString:@"tweetbot:///user_profile/sticktron"];
-		
-	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific:"]]) {
-		url = [NSURL URLWithString:@"twitterrific:///profile?screen_name=sticktron"];
-		
-	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetings:"]]) {
-		url = [NSURL URLWithString:@"tweetings:///user?screen_name=sticktron"];
-		
-	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter:"]]) {
-		url = [NSURL URLWithString:@"twitter://user?screen_name=sticktron"];
-		
-	} else {
-		url = [NSURL URLWithString:@"http://twitter.com/sticktron"];
-	}
-	
-	[[UIApplication sharedApplication] openURL:url];
-}
-
-- (void)openGitHub {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://github.com/Sticktron/AhAhAh"]];
-}
-
-- (void)openPayPal {
-	NSString *url = @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted";
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
-}
-
-- (void)showLove {
-	// send a nice tweet ;)
-	SLComposeViewController *composeController = [SLComposeViewController
-												  composeViewControllerForServiceType:SLServiceTypeTwitter];
-	
-	[composeController setInitialText:@"I'm using Ah! Ah! Ah! by @Sticktron to scare away nosey people!"];
-	
-	[self presentViewController:composeController
-					   animated:YES
-					 completion:nil];
-}
-
-@end
-
-
-//------------------------------------------------------------------------------
-
-
-/* Media List Controller */
-
-@interface AhAhAhPrefsMediaController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface AhAhAhPrefsThemeController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *themes;
 @property (nonatomic, strong) NSMutableArray *videos;
@@ -317,7 +137,7 @@ static BOOL hasTouchID() {
 @end
 
 
-@implementation AhAhAhPrefsMediaController
+@implementation AhAhAhPrefsThemeController
 
 - (instancetype)init {
 	self = [super init];
@@ -966,77 +786,5 @@ static BOOL hasTouchID() {
 	}
 }
 
-@end
-
-
-//------------------------------------------------------------------------------
-
-
-/* Tinted Switch Cell */
-
-@interface AhAhAhSwitchCell : PSSwitchTableCell
-@end
-
-@implementation AhAhAhSwitchCell
-- (id)initWithStyle:(int)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
-	self = [super initWithStyle:arg1 reuseIdentifier:arg2 specifier:arg3];
-	if (self) {
-		[((UISwitch *)[self control]) setOnTintColor:TINT_COLOR];
-	}
-	return self;
-}
-@end
-
-
-//------------------------------------------------------------------------------
-
-
-/* Tinted Button Cell */
-
-@interface AhAhAhButtonCell : PSTableCell
-@end
-
-@implementation AhAhAhButtonCell
-- (void)layoutSubviews {
-	[super layoutSubviews];
-	
-	// if I do this at init it doesn't stick :(
-	[self.textLabel setTextColor:LINK_COLOR];
-}
-@end
-
-
-//------------------------------------------------------------------------------
-
-
-/* Logo Cell */
-
-@interface AhAhAhLogoCell : PSTableCell
-@property (nonatomic, strong) UIImageView *logoView;
-@end
-
-@implementation AhAhAhLogoCell
-- (id)initWithSpecifier:(PSSpecifier *)specifier {
-	self = [super initWithStyle:UITableViewCellStyleDefault
-				reuseIdentifier:@"LogoCell"
-					  specifier:specifier];
-	
-	if (self) {
-		self.backgroundColor = UIColor.clearColor;
-		
-		NSString *path = [NSString stringWithFormat:@"%@/Logo.png", BUNDLE_PATH];
-		UIImage *logo = [UIImage imageWithContentsOfFile:path];
-		UIImageView *logoView = [[UIImageView alloc] initWithImage:logo];
-		logoView.center = self.contentView.center;
-		logoView.contentMode = UIViewContentModeCenter;
-		logoView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-		
-		[self.contentView addSubview:logoView];
-	}
-	return self;
-}
-- (CGFloat)preferredHeightForWidth:(CGFloat)height {
-	return 100.0f;
-}
 @end
 

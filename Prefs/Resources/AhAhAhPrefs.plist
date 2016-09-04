@@ -17,12 +17,12 @@
 		
 		{
 			cell = PSGroupCell;
-			footerText = "Choose a theme for the alarm.";
+			footerText = "Choose a theme for the alarm, or create your own.";
 		},
 		{
 			cell = PSLinkCell;
-			label = "Choose Theme";
-			detail = AhAhAhPrefsMediaController;
+			label = "Customize";
+			detail = AhAhAhPrefsThemeController;
 		},
 		
 		
@@ -128,7 +128,7 @@
 			cellClass = AhAhAhButtonCell;
 			label = "Find me on Reddit";
 			icon = "Reddit.png";
-			action = openTwitter;
+			action = openReddit;
 		},
 		{
 			cell = PSButtonCell;
@@ -150,6 +150,11 @@
 			cell = PSGroupCell;
 			footerText = "Thanks to /u/harrybond for the idea.\nThanks to milodarling for helping with the iOS 8 update.\n\nCopyright (c) 2014-2015 Sticktron.\n\n\Ud83d\Ude08\n\t\t\t";
 			footerAlignment = 1;
+		},
+		{
+			cell = PSLinkCell;
+			label = "Credits";
+			detail = AhAhAhPrefsController;
 		},
 	);
 }
