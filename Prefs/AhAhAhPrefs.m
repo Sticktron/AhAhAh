@@ -1,5 +1,5 @@
 //
-//  AhAhAhPrefsController.m
+//  AhAhAhPrefs.m
 //  Preferences for Ah!Ah!Ah!
 //
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.

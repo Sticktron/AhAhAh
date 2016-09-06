@@ -5,7 +5,7 @@ include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = AhAhAhPrefs
 AhAhAhPrefs_CFLAGS = -fobjc-arc
-AhAhAhPrefs_FILES = AhAhAhPrefsController.m AhAhAhPrefsThemeController.m AhAhAhPrefsCustomCells.m
+AhAhAhPrefs_FILES = AhAhAhPrefs.m AhAhAhPrefsThemes.m AhAhAhPrefsCredits.m AhAhAhPrefsCustomCells.m
 AhAhAhPrefs_INSTALL_PATH = /Library/PreferenceBundles
 AhAhAhPrefs_FRAMEWORKS = UIKit MobileCoreServices AssetsLibrary CoreGraphics CoreMedia AVFoundation LocalAuthentication Social
 AhAhAhPrefs_PRIVATE_FRAMEWORKS = Preferences

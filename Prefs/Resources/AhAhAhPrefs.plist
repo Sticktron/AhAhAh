@@ -17,37 +17,21 @@
 		
 		{
 			cell = PSGroupCell;
-			footerText = "Choose a theme for the alarm, or create your own.";
 		},
 		{
 			cell = PSLinkCell;
-			label = "Customize";
+			label = "Customize Alarm";
 			detail = AhAhAhPrefsThemeController;
 		},
 		
 		
 		{
 			cell = PSGroupCell;
-			footerText = "Stretch the video to fill the screen. Background image will be hidden.";
-		},
-		{
-			cell = PSSwitchCell;
-			cellClass = AhAhAhSwitchCell;
-			label = "Full Screen Video";
-			key = FullScreenVideo;
-			default = 0;
-			defaults = "com.sticktron.ahahah";
-			PostNotification = "com.sticktron.ahahah.prefschanged";
-		},
-		
-		
-		{
-			cell = PSGroupCell;
-			label = Activating;
+			label = "ACTIVATING";
 		},
 		{
 			cell = PSLinkListCell;
-			label = "Max Failed Attempts";
+			label = "Max Failed Unlocks";
 			detail = "PSListItemsController";
 			validTitles = (
 				1,
@@ -72,9 +56,9 @@
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
 			id = IgnoreBioFailure;
-			label = "Ignore TouchID";
+			label = "Ignore Touch ID Fails";
 			key = IgnoreBioFailure;
-			default = 1;
+			default = 0;
 			defaults = "com.sticktron.ahahah";
 			PostNotification = "com.sticktron.ahahah.prefschanged";
 		},
@@ -82,13 +66,14 @@
 		
 		{
 			cell = PSGroupCell;
-			label = Deactivating;
+			label = "DEACTIVATING";
+			footerText = "If neither option is selected the user will not be able to stop the alarm. The alarm will eventually stop on its own to avoid battery drain.";
 		},
 		{
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
 			id = AllowBioRemoval;
-			label = "Allow TouchID";
+			label = "Stop After Touch ID Match";
 			key = AllowBioRemoval;
 			default = 1;
 			defaults = "com.sticktron.ahahah";
@@ -97,7 +82,7 @@
 		{
 			cell = PSSwitchCell;
 			cellClass = AhAhAhSwitchCell;
-			label = "Allow Lock Button";
+			label = "Stop After Lock Button Press";
 			key = AllowLockRemoval;
 			default = 0;
 			defaults = "com.sticktron.ahahah";
@@ -107,7 +92,7 @@
 		
 		{
 			cell = PSGroupCell;
-			label = Support;
+			label = SUPPORT;
 		},
 		{
 			cell = PSButtonCell;
@@ -148,13 +133,13 @@
 		
 		{
 			cell = PSGroupCell;
-			footerText = "Thanks to /u/harrybond for the idea.\nThanks to milodarling for helping with the iOS 8 update.\n\nCopyright (c) 2014-2015 Sticktron.\n\n\Ud83d\Ude08\n\t\t\t";
+			footerText = "Copyright \U00a9 2014-2016 Sticktron\n\n\Ud83d\Ude08\n\n";
 			footerAlignment = 1;
 		},
 		{
 			cell = PSLinkCell;
 			label = "Credits";
-			detail = AhAhAhPrefsController;
+			detail = AhAhAhPrefsCreditsController;
 		},
 	);
 }

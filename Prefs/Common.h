@@ -19,5 +19,5 @@
 #define PREFS_PLIST_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/Preferences/com.sticktron.ahahah.plist"]
 
 #define TINT_COLOR			[UIColor colorWithRed:0.941 green:0 blue:0 alpha:1] // #F00000
-#define LINK_COLOR			[UIColor colorWithWhite:0.5 alpha:1] // #808080
+#define LINK_COLOR			[UIColor colorWithRed:0.427 green:0.427 blue:0.447 alpha:1] // #6D6D72
 
