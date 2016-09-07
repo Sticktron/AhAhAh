@@ -133,7 +133,7 @@
 		
 		{
 			cell = PSGroupCell;
-			footerText = "Copyright \U00a9 2014-2016 Sticktron\n\n\Ud83d\Ude08\n\n";
+			footerText = "\nCopyright \U00a9 2014-2016 Sticktron";
 			footerAlignment = 1;
 		},
 		{
