@@ -46,6 +46,23 @@
 //------------------------------------------------------------------------------
 
 
+/* Tinted List Cell */
+/*
+@interface AhAhAhListCell : PSTableCell
+@end
+
+@implementation AhAhAhListCell
+- (void)layoutSubviews {
+	[super layoutSubviews];
+	[self.textLabel setTextColor:LINK_COLOR];
+}
+@end
+*/
+
+
+//------------------------------------------------------------------------------
+
+
 /* Logo Cell */
 
 @interface AhAhAhLogoCell : PSTableCell

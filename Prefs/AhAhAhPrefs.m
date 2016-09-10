@@ -57,15 +57,13 @@ static BOOL hasTouchID() {
 	
 	// add a heart button to the navbar
 	NSString *path = [BUNDLE_PATH stringByAppendingPathComponent:@"Heart.png"];
-	UIImage *heartImage = [[UIImage alloc] initWithContentsOfFile:path];
-	
+	UIImage *heartImage = [[UIImage alloc] initWithContentsOfFile:path];	
 	UIBarButtonItem *heartButton = [[UIBarButtonItem alloc] initWithImage:heartImage
 																	style:UIBarButtonItemStylePlain
 																   target:self
 																   action:@selector(showLove)];
 	heartButton.imageInsets = (UIEdgeInsets){2, 0, -2, 0};
-	heartButton.tintColor = TINT_COLOR;
-	
+	heartButton.tintColor = TINT_COLOR;	
 	[self.navigationItem setRightBarButtonItem:heartButton];
 }
 
