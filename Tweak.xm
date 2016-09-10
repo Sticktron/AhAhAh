@@ -9,7 +9,7 @@
 //
 //
 
-#define DEBUG_PREFIX @"🦄  [AhAhAh]"
+#define DEBUG_PREFIX @"••• [AhAhAh]"
 #import "DebugLog.h"
 
 #import <UIKit/UIKit.h>

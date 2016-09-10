@@ -6,7 +6,7 @@
 //
 //
 
-#define DEBUG_PREFIX @"☮️  [AhAhAhPrefs]"
+#define DEBUG_PREFIX @"••• [AhAhAhPrefs]"
 #import "../DebugLog.h"
 
 #import <Preferences/PSViewController.h>
