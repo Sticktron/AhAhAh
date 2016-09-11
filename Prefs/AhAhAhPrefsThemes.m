@@ -23,13 +23,14 @@
 
 #define ID_NONE			@"_none"
 #define ID_DEFAULT		@"_default"
-#define ID_KEVIN		@"_kevin"
-#define ID_DEX			@"_dex"
 
 typedef NS_ENUM(NSInteger, AhAhAhSection) {
-    kAhAhAhThemeSection 	 = 0,
-    kAhAhAhVideoSection 	 = 1,
-    kAhAhAhBackgroundSection = 2
+    kAhAhAhThemeSection 			= 0,
+	kAhAhAhCustomThemeInfoSection 	= 1,
+	kAhAhAhImportSection	 		= 2,
+    kAhAhAhVideoSection				= 3,
+    kAhAhAhBackgroundSection 		= 4,
+	kAhAhAhSectionCount 			= 5
 };
 
 typedef NS_ENUM(NSInteger, AhAhAhTag) {
@@ -199,7 +200,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	[super viewWillAppear:animated];	
+	[super viewWillAppear:animated];
 	[self scanForMedia];
 }
 
@@ -221,7 +222,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	DebugLog0;
 		
 	self.videos = [self indexMediaAtPath:USER_VIDEOS_PATH];
-	DebugLog(@"self.videos = %@", self.videos);	
+	DebugLog(@"self.videos = %@", self.videos);
 	
 	self.backgrounds = [self indexMediaAtPath:USER_BACKGROUNDS_PATH];
 	DebugLog(@"self.backgrounds = %@", self.backgrounds);
@@ -235,7 +236,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	
 	NSArray *keys = @[ NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLNameKey ];
 	NSFileManager *fm = [NSFileManager defaultManager];
-	NSURL *url = [NSURL fileURLWithPath:THEMES_PATH isDirectory:YES];	
+	NSURL *url = [NSURL fileURLWithPath:THEMES_PATH isDirectory:YES];
 	NSMutableArray *folders = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
 												  includingPropertiesForKeys:keys
 													  				 options:NSDirectoryEnumerationSkipsHiddenFiles
@@ -314,14 +315,16 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 // tableview
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 3;
+	return kAhAhAhSectionCount;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
 	NSString *title = nil;
-	
 	switch (section) {
 		case kAhAhAhThemeSection: title = @"Themes";
+		break;
+		
+		case kAhAhAhCustomThemeInfoSection: title = @"Custom Theme";
 		break;
 		
 		case kAhAhAhVideoSection: title = @"Your Videos";
@@ -330,78 +333,96 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		case kAhAhAhBackgroundSection: title = @"Your Backgrounds";
 		break;
 	}
-	
+	return title;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+	NSString *title = nil;
+	switch (section) {
+		case kAhAhAhThemeSection:
+			//title = @"📂  /Library/AhAhAh/Themes/";
+		break;
+		
+		case kAhAhAhCustomThemeInfoSection: title = @"Theme the alarm using videos and images from your Camera Roll.\nNOTE: When both a video and background are chosen, the video is overlaid in a centered.";
+		break;
+		
+		case kAhAhAhVideoSection: title = @"📂  /User/Library/AhAhAh/Videos/";
+		break;
+		
+		case kAhAhAhBackgroundSection: title = @"📂 /User/Library/AhAhAh/Backgrounds/";
+		break;
+	}
 	return title;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	NSInteger num = 0;
-	
 	switch (section) {
 		case kAhAhAhThemeSection: num = self.themes.count;
-			break;
-		case kAhAhAhVideoSection: num = self.videos.count + 1; // add extra row for Import Cell
-			break;
-		case kAhAhAhBackgroundSection: num = self.backgrounds.count + 1; // add extra row for Import Cell
-			break;
+		break;
+		
+		case kAhAhAhCustomThemeInfoSection: num = 0;
+		break;
+		
+		case kAhAhAhImportSection: num = 1;
+		break;
+
+		case kAhAhAhVideoSection: num = self.videos.count;
+		break;
+		
+		case kAhAhAhBackgroundSection: num = self.backgrounds.count;
+		break;
 	}
-	
 	return num;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	// for the last row in the Video and Background sections,
-	// make Import cells...
-	if ([self isPathToLastRowInSection:indexPath]) {
-		if (indexPath.section == kAhAhAhVideoSection || indexPath.section == kAhAhAhBackgroundSection) {			
-			return [self createImportCell];
-		}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (indexPath.section == kAhAhAhImportSection) {
+		return 44.0f;
+	} else {
+		return ROW_HEIGHT;
 	}
-	
-	// for the rest, make Media Item cells...
-	return [self createMediaCellForIndexPath:indexPath];
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-	if (section == kAhAhAhThemeSection) {
-		return @"Themes can be found in Cydia, or copied to /Library/AhAhAh/Themes.";
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (indexPath.section == kAhAhAhImportSection) {
+		return [self createImportCell];
 	} else {
-		return nil;
+		return [self createMediaCellForIndexPath:indexPath];
 	}
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	DebugLog(@"User selected row: %ld, section: %ld", (long)indexPath.row, (long)indexPath.section);
 	
-	// Import Cell tapped, launch Media Picker...	
-	if ([self isPathToLastRowInSection:indexPath]) {
-		if (indexPath.section == kAhAhAhVideoSection || indexPath.section == kAhAhAhBackgroundSection) {
-			[self startPicker];
-		}
-	
-	// Media Cell tapped, select it...		
+	if (indexPath.section == kAhAhAhImportSection) {
+		// Import Cell tapped, launch Media Picker...
+		
+		[self startPicker];
+		[tableView deselectRowAtIndexPath:indexPath animated:NO];
+		
 	} else {
-		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];		
-		if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {			
-			
-			// was already selected, uncheck cell...
+		// Media Cell tapped...
+		
+		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+		if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
+			// cell was already selected, de-select it...
 			
 			cell.accessoryType = UITableViewCellAccessoryNone;
 			
 			switch (indexPath.section) {
+				case kAhAhAhThemeSection:
+					self.selectedTheme = ID_NONE;
 				case kAhAhAhVideoSection:
 					self.selectedVideo = ID_NONE;
 					break;
 				case kAhAhAhBackgroundSection:
 					self.selectedBackground = ID_NONE;
 					break;
-				case kAhAhAhThemeSection:
-					self.selectedTheme = ID_NONE;
 			}
 			
 		} else {
-			
-			// new selection, check cell...
+			// new selection...
 			
 			// uncheck old selection
 			for (NSInteger i = 0; i < [tableView numberOfRowsInSection:indexPath.section]; i++) {
@@ -418,18 +439,23 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			
 			// store selection
 			switch (indexPath.section) {
+				case kAhAhAhThemeSection:
+					self.selectedTheme = title;
+					self.selectedVideo = nil;
+					self.selectedBackground = nil;
+					break;
 				case kAhAhAhVideoSection:
 					self.selectedVideo = title;
-					DebugLog(@"selected video: %@", self.selectedVideo);
+					self.selectedTheme = nil;
 					break;
 				case kAhAhAhBackgroundSection:
 					self.selectedBackground = title;
-					DebugLog(@"selected background: %@", self.selectedBackground);
+					self.selectedTheme = nil;
 					break;
-				case kAhAhAhThemeSection:
-					self.selectedTheme = title;
-					DebugLog(@"selected theme: %@", self.selectedTheme);
 			}
+			DebugLog(@"self.selectedTheme: %@", self.selectedTheme);
+			DebugLog(@"self.selectedVideo: %@", self.selectedVideo);
+			DebugLog(@"self.selectedBackground: %@", self.selectedBackground);
 		}
 		
 		[self savePrefs:YES];
@@ -438,11 +464,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-	if (indexPath.section == kAhAhAhThemeSection) {
-		return NO;
-	}
-	
-	if ([self isPathToLastRowInSection:indexPath]) {
+	if (indexPath.section == kAhAhAhThemeSection || indexPath.section == kAhAhAhImportSection) {
 		return NO;
 	} else {
 		return YES;
@@ -528,16 +550,15 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (BOOL)isPathToLastRowInSection:(NSIndexPath *)indexPath {
-	if (indexPath.row == [self.tableView numberOfRowsInSection:indexPath.section] - 1) {		
+	if (indexPath.row == [self.tableView numberOfRowsInSection:indexPath.section] - 1) {
 		return YES;
 	}
 	return NO;
 }
 
 - (UITableViewCell *)createImportCell {
-	static NSString *ImportCellIdentifier = @"ImportCell";	
-	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:ImportCellIdentifier];	
-	
+	static NSString *ImportCellIdentifier = @"ImportCell";
+	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:ImportCellIdentifier];
 	if (!cell) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
 									  reuseIdentifier:ImportCellIdentifier];
@@ -545,33 +566,31 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		cell.selectionStyle = UITableViewCellSelectionStyleDefault;
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		
+		// icon
+		NSString *path = [NSString stringWithFormat:@"%@/Import.png", BUNDLE_PATH];
+		UIImage *icon = [UIImage imageWithContentsOfFile:path];
+		UIImageView *imageView = [[UIImageView alloc] initWithImage:icon];
+		CGRect frame = imageView.frame;
+		frame.origin = CGPointMake(15.0f, (44.0f - frame.size.height) / 2);
+		imageView.frame = frame;
+		imageView.opaque = YES;
+		[cell.contentView addSubview:imageView];
+		
+		
 		// title
-		UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 21.0f, 215.0f, 16.0f)];
+		UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(30.0f + imageView.frame.size.width, 0, 215.0f, 44.0f)];
 		titleLabel.text = @"Import From Camera Roll";
 		titleLabel.opaque = YES;
 		titleLabel.font = [UIFont boldSystemFontOfSize:14.0];
-		titleLabel.textColor = LINK_COLOR;
 		titleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
 		[cell.contentView addSubview:titleLabel];
-
-		// icon
-		CGSize size = (CGSize){ THUMBNAIL_SIZE, THUMBNAIL_SIZE };
-		CGPoint origin = (CGPoint){ 16.0f, (ROW_HEIGHT - THUMBNAIL_SIZE) / 2 };
-		UIImageView *imageView = [[UIImageView alloc] initWithFrame:(CGRect){origin, size}];
-		imageView.opaque = YES;
-		imageView.contentMode = UIViewContentModeCenter;
-		NSString *path = [NSString stringWithFormat:@"%@/Import.png", BUNDLE_PATH];
-		UIImage *icon = [UIImage imageWithContentsOfFile:path];
-		imageView.image = icon;
-		[cell.contentView addSubview:imageView];
 	}
-	
 	return cell;
 }
 
 - (UITableViewCell *)createMediaCellForIndexPath:(NSIndexPath *)indexPath {
 	static NSString *MediaCellIdentifier = @"MediaCell";
-	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:MediaCellIdentifier];		
+	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:MediaCellIdentifier];
 	
 	if (!cell) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
@@ -616,7 +635,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	
 	// ...for Video
 	if (indexPath.section == kAhAhAhVideoSection) {
-		NSDictionary *video = self.videos[indexPath.row];		
+		NSDictionary *video = self.videos[indexPath.row];
 		NSString *filename = video[@"file"];
 		titleLabel.text = filename;
 		subtitleLabel.text = video[@"size"];
@@ -624,16 +643,16 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		// get thumbnail from cache, or else load and cache it in the background
 		UIImage *thumbnail = [self.imageCache objectForKey:filename];
 		if (thumbnail) {
-			imageView.image = thumbnail;			
+			imageView.image = thumbnail;
 		} else {
 			[self.queue addOperationWithBlock:^{
-				UIImage *image = [self thumbnailForVideo:filename withMaxSize:imageView.bounds.size];				
+				UIImage *image = [self thumbnailForVideo:filename withMaxSize:imageView.bounds.size];
 				if (image) {
 					[self.imageCache setObject:image forKey:filename];
 					
 					// update UI on the main thread
 					[[NSOperationQueue mainQueue] addOperationWithBlock:^{
-						UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];						
+						UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
 						if (cell) {
 							UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:kAhAhAhThumbnailTag];
 							imageView.image = image;
@@ -650,20 +669,20 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		}
 		
 	// ...for Background
-	} else if (indexPath.section == kAhAhAhBackgroundSection) {		
-		NSDictionary *background = self.backgrounds[indexPath.row];		
+	} else if (indexPath.section == kAhAhAhBackgroundSection) {
+		NSDictionary *background = self.backgrounds[indexPath.row];
 		NSString *filename = background[@"file"];
 		titleLabel.text = filename;
 		subtitleLabel.text = background[@"size"];
 		
-		// get thumbnail from cache, or else load and cache it in the background...		
+		// get thumbnail from cache, or else load and cache it in the background...
 		UIImage *thumbnail = [self.imageCache objectForKey:filename];
 		if (thumbnail) {
-			imageView.image = thumbnail;			
+			imageView.image = thumbnail;
 		} else {
 			[self.queue addOperationWithBlock:^{
 				NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, filename];
-				UIImage *image = [UIImage imageWithContentsOfFile:path];				
+				UIImage *image = [UIImage imageWithContentsOfFile:path];
 				if (image) {
 					image = [UIImage imageWithImage:image scaledToMaxWidth:imageView.bounds.size.height
 										  maxHeight:imageView.bounds.size.height];
@@ -697,7 +716,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		
 		[self.queue addOperationWithBlock:^{
 			NSString *path = [NSString stringWithFormat:@"%@/%@/Thumbnail.png", THEMES_PATH, folderName];
-			UIImage *image = [UIImage imageWithContentsOfFile:path];				
+			UIImage *image = [UIImage imageWithContentsOfFile:path];
 			if (image) {
 				image = [UIImage imageWithImage:image scaledToMaxWidth:imageView.bounds.size.height
 									  maxHeight:imageView.bounds.size.height];
@@ -802,23 +821,23 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	DebugLog0;
 	
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] == NO) {
+		HBLogError(@"Snap! ImagePicker can't access Photo Library!");
 		return NO;
 	}
 	
 	UIImagePickerController *picker = [[UIImagePickerController alloc] init];
 	picker.modalPresentationStyle = UIModalPresentationCurrentContext;
 	picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-	picker.mediaTypes = @[ (NSString *)kUTTypeMovie, (NSString *)kUTTypeImage ];	
-	picker.allowsEditing = YES;	
+	picker.mediaTypes = @[ (NSString *)kUTTypeMovie, (NSString *)kUTTypeImage ];
+	picker.allowsEditing = NO;
 	picker.navigationBar.barStyle = UIBarStyleDefault;
 	picker.delegate = self;
 	
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-		[self presentViewController:picker animated:YES completion:NULL];
-		
-	} else {
+	if (IS_IPAD) {
 		self.popover = [[UIPopoverController alloc] initWithContentViewController:picker];
 		[self.popover presentPopoverFromRect:CGRectZero inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	} else {
+		[self presentViewController:picker animated:YES completion:NULL];
 	}
 	
 	return YES;
@@ -867,9 +886,6 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			NSData *imageData = UIImagePNGRepresentation(image);
 			[imageData writeToFile:path atomically:YES];
 			
-			// auto-select as new background
-			self.selectedBackground = filename;
-			
 		} else if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
 			
 			// handle video ...
@@ -884,20 +900,16 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			NSURL *videoURL = info[UIImagePickerControllerMediaURL];
 			NSData *videoData = [NSData dataWithContentsOfURL:videoURL];
 			[videoData writeToFile:path atomically:YES];
-			
-			// auto-select new video
-			self.selectedVideo = filename;
 		}
 		
-		[self savePrefs:YES];
+		// reload table data
 		[self scanForMedia];
 		[self.tableView reloadData];
 		
-		
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-			[picker dismissViewControllerAnimated:YES completion:NULL];
-		} else {
+		if (IS_IPAD) {
 			[self.popover dismissPopoverAnimated:YES];
+		} else {
+			[picker dismissViewControllerAnimated:YES completion:nil];
 		}
 	};
 	
@@ -909,12 +921,12 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (void)imagePickerControllerDidCancel: (UIImagePickerController *)picker {
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-		[picker dismissViewControllerAnimated:YES completion:NULL];
-	} else {
+	
+	if (IS_IPAD) {
 		[self.popover dismissPopoverAnimated:YES];
+	} else {
+		[picker dismissViewControllerAnimated:YES completion:nil];
 	}
 }
 
 @end
-
