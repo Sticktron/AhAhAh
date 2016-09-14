@@ -7,8 +7,8 @@
 //
 
 #import "Common.h"
+#import <version.h>
 
-#import <Preferences/PSViewController.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -21,8 +21,8 @@
 #define THUMBNAIL_SIZE			40.0f
 #define ROW_HEIGHT				60.0f
 
-#define ID_NONE			@"_none"
-#define ID_DEFAULT		@"_default"
+// #define ID_NONE					@"_none"
+// #define ID_DEFAULT				@"_default"
 
 typedef NS_ENUM(NSInteger, AhAhAhSection) {
     kAhAhAhThemeSection 			= 0,
@@ -154,39 +154,38 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		_queue.maxConcurrentOperationCount = 4;
 		_imageCache = [[NSCache alloc] init];
 		
-		// @[ @{ folder:abc, title:def, author:ghi }, ... ]
 		_themes = nil;
-		
-		// [( @{ file:abc, size:123 }, ... ]
 		_backgrounds = nil;
 		_videos = nil;
 		
-		// load user prefs...
-		
-		NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
-		DebugLog(@"Read user prefs: %@", prefs);
-		_selectedTheme = prefs[@"Theme"] ?: nil;
-		_selectedVideo = prefs[@"VideoFile"] ?: nil;
-		_selectedBackground = prefs[@"BackgroundFile"] ?: nil;
-				
-		// create directories for user media (if needed)...
-		
+		// create directories for user media (if needed)
 		[[NSFileManager defaultManager] createDirectoryAtPath:USER_BACKGROUNDS_PATH
 								  withIntermediateDirectories:YES
 												   attributes:nil
 														error:nil];
-		
 		[[NSFileManager defaultManager] createDirectoryAtPath:USER_VIDEOS_PATH
 								  withIntermediateDirectories:YES
 												   attributes:nil
 														error:nil];
+														
+		// load selected items from user prefs
+		NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
+		DebugLog(@"Read user prefs: %@", settings);
+		_selectedTheme = settings[@"Theme"] ?: nil;
+		_selectedVideo = settings[@"VideoFile"] ?: nil;
+		_selectedBackground = settings[@"BackgroundFile"] ?: nil;
+		
+		// auto-select default theme if nothing has been selected
+		if (!_selectedTheme && !_selectedVideo && !_selectedBackground) {
+			_selectedTheme = DEFAULT_THEME;
+		}
 	}
 	return self;
 }
 
 - (void)loadView {
 	DebugLog(@"loadView");
-
+	
 	self.navigationItem.rightBarButtonItem = self.editButtonItem;
 	
 	self.tableView = [[UITableView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]
@@ -201,19 +200,36 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
+	
+	// tint navbar
+	if (IS_IOS_OR_NEWER(iOS_8_0)) {
+		self.navigationController.navigationController.navigationBar.tintColor = TINT_COLOR;
+	} else {
+		self.navigationController.navigationBar.tintColor = TINT_COLOR;
+	}
+	
 	[self scanForMedia];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	// un-tint navbar
+	if (IS_IOS_OR_NEWER(iOS_8_0)) {
+		self.navigationController.navigationController.navigationBar.tintColor = nil;
+	} else {
+		self.navigationController.navigationBar.tintColor = nil;
+	}
+	
+	DebugLog(@"emptying image cache");
+	[self.imageCache removeAllObjects];
+			
+	[super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
 	DebugLog(@"emptying image cache");
 	[self.imageCache removeAllObjects];
+	
 	[super didReceiveMemoryWarning];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-	DebugLog(@"emptying image cache");
-	[self.imageCache removeAllObjects];
-	[super viewWillDisappear:animated];
 }
 
 // data model
@@ -253,16 +269,37 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		return [a.lastPathComponent compare:b.lastPathComponent];
 	}];
 		
+	
 	// build index...
 	
 	NSMutableArray *themes = [NSMutableArray array];
-	
 	for (NSURL *folderURL in folders) {
-		NSString *folder = [folderURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
-		//NSString *size = [folderURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
-		[themes addObject:@{ @"folder": folder, @"size": @"Video & Background" }];
+		NSString *folderName = [folderURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
+		NSString *size = nil;
+		
+		// get folder size
+		NSMutableArray *themeFiles = (NSMutableArray *)[fm contentsOfDirectoryAtURL:folderURL
+													  	 includingPropertiesForKeys:keys
+														  	 				options:NSDirectoryEnumerationSkipsHiddenFiles
+																		  	  error:nil];
+		DebugLog(@"Contents of (%@): %@", folderURL, themeFiles);
+
+		double bytes = 0;
+		
+		for (NSURL *fileURL in themeFiles) {
+			size = [fileURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
+			bytes += [size doubleValue];
+		}
+		
+		if (bytes < 1024*1024) {
+			size = [NSString stringWithFormat:@"%.0f KB", bytes / 1024.0f];
+		} else {
+			size = [NSString stringWithFormat:@"%.1f MB", bytes / 1024.0f / 1024.f];
+		}
+		
+		[themes addObject:@{ @"folder": folderName, @"size": size }];
 	}
-	DebugLog(@"Results: %@", themes);
+	//DebugLog(@"Results: %@", themes);
 	
 	return themes;
 }
@@ -307,7 +344,8 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		
 		[media addObject:@{ @"file": file, @"size": size }];
 	}
-	DebugLog(@"Results: %@", media);
+	// DebugLog(@"Results: %@", media);
+	
 	return media;
 }
 
@@ -343,7 +381,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			//title = @"📂  /Library/AhAhAh/Themes/";
 		break;
 		
-		case kAhAhAhCustomThemeInfoSection: title = @"Theme the alarm using videos and images from your Camera Roll.\nNOTE: When both a video and background are chosen, the video is overlaid in a centered.";
+		case kAhAhAhCustomThemeInfoSection: title = @"Theme the alarm using videos and images from your Camera Roll.\nNOTE: When both a video and background are chosen, the video is overlaid in a centered window.";
 		break;
 		
 		case kAhAhAhVideoSection: title = @"📂  /User/Library/AhAhAh/Videos/";
@@ -412,12 +450,12 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			
 			switch (indexPath.section) {
 				case kAhAhAhThemeSection:
-					self.selectedTheme = ID_NONE;
+					self.selectedTheme = nil;
 				case kAhAhAhVideoSection:
-					self.selectedVideo = ID_NONE;
+					self.selectedVideo = nil;
 					break;
 				case kAhAhAhBackgroundSection:
-					self.selectedBackground = ID_NONE;
+					self.selectedBackground = nil;
 					break;
 			}
 			
@@ -490,11 +528,10 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			DebugLog(@"deleting video at path: %@", path);
 			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 			
-			// if row was checked, check the default row instead
 			if ([file isEqualToString:self.selectedVideo]) {
-				self.selectedVideo = ID_DEFAULT;
+				self.selectedVideo = nil;
 			}
-			
+
 			[self.videos removeObjectAtIndex:indexPath.row];
 			
 		} else if (indexPath.section == kAhAhAhBackgroundSection) {
@@ -506,9 +543,8 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			DebugLog(@"deleting image at path: %@", path);
 			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 			
-			// if image was selected, select default after deletion
 			if ([file isEqualToString:self.selectedBackground]) {
-				self.selectedBackground = ID_DEFAULT;
+				self.selectedBackground = nil;
 			}
 			
 			[self.backgrounds removeObjectAtIndex:indexPath.row];
@@ -531,6 +567,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	}
 	
 	// new settings
+	prefs[@"Theme"] = self.selectedTheme;
 	prefs[@"VideoFile"] = self.selectedVideo;
 	prefs[@"BackgroundFile"] = self.selectedBackground;
 	
@@ -620,7 +657,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		UILabel *subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 34.0f, 215.0f, 12.0f)];
 		subtitleLabel.opaque = YES;
 		subtitleLabel.font = [UIFont italicSystemFontOfSize:10.0];
-		subtitleLabel.textColor = LINK_COLOR;
+		subtitleLabel.textColor = [UIColor colorWithRed:0.427 green:0.427 blue:0.447 alpha:1]; // #6D6D72
 		subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
 		subtitleLabel.tag = kAhAhAhSubtitleTag;
 		[cell.contentView addSubview:subtitleLabel];
@@ -744,48 +781,6 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	return cell;
 }
 
-- (NSMutableArray *)loadMediaAtPath:(NSString *)path {
-	NSArray *keys = @[ NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLNameKey ];
-	NSFileManager *fm = [NSFileManager defaultManager];
-	NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-	
-	NSMutableArray *files = (NSMutableArray *)[fm contentsOfDirectoryAtURL:url
-									includingPropertiesForKeys:keys
-													   options:NSDirectoryEnumerationSkipsHiddenFiles
-														 error:nil];
-	DebugLog(@"Contents of (%@): %@", url, files);
-	
-	if (!files) {
-		DebugLog(@"No files.");
-		return nil;
-	}
-	
-	// sort files by creation date, newest first
-	[files sortUsingComparator:^(NSURL *a, NSURL *b) {
-		NSDate *date1 = [[a resourceValuesForKeys:keys error:nil] objectForKey:NSURLContentModificationDateKey];
-		NSDate *date2 = [[b resourceValuesForKeys:keys error:nil] objectForKey:NSURLContentModificationDateKey];
-		return [date2 compare:date1];
-	}];
-	
-	NSMutableArray *media = [NSMutableArray array];
-	
-	// add files to array
-	for (NSURL *fileURL in files) {
-		NSString *file = [fileURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
-		NSString *size = [fileURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
-		
-		if ([size floatValue] < 1024*1024) {
-			size = [NSString stringWithFormat:@"%.0f KB", [size floatValue] / 1024.0f];
-		} else {
-			size = [NSString stringWithFormat:@"%.1f MB", [size floatValue] / 1024.0f / 1024.f];
-		}
-		
-		[media addObject:@{ @"file": file, @"size": size }];
-	}
-	DebugLog(@"Results: %@", media);
-	return media;
-}
-
 - (UIImage *)thumbnailForVideo:(NSString *)filename withMaxSize:(CGSize)size {
 	UIImage *thumbnail = nil;
 	
@@ -825,19 +820,30 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		return NO;
 	}
 	
+	// configure picker
 	UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-	picker.modalPresentationStyle = UIModalPresentationCurrentContext;
 	picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
 	picker.mediaTypes = @[ (NSString *)kUTTypeMovie, (NSString *)kUTTypeImage ];
 	picker.allowsEditing = NO;
 	picker.navigationBar.barStyle = UIBarStyleDefault;
 	picker.delegate = self;
 	
+	// present picker
 	if (IS_IPAD) {
-		self.popover = [[UIPopoverController alloc] initWithContentViewController:picker];
-		[self.popover presentPopoverFromRect:CGRectZero inView:self.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+		if (IS_IOS_OR_NEWER(iOS_8_0)) {
+			picker.modalPresentationStyle = UIModalPresentationPopover;
+			[self presentViewController:picker animated:YES completion:nil];
+			UIPopoverPresentationController *presentationController = [picker popoverPresentationController];
+			presentationController.permittedArrowDirections = UIPopoverArrowDirectionLeft | UIPopoverArrowDirectionRight;
+			presentationController.sourceView = self.tableView;
+			presentationController.sourceRect = CGRectZero;
+		} else {
+			self.popover = [[UIPopoverController alloc] initWithContentViewController:picker];
+			[self.popover presentPopoverFromRect:CGRectZero inView:self.tableView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+		}
 	} else {
-		[self presentViewController:picker animated:YES completion:NULL];
+		picker.modalPresentationStyle = UIModalPresentationCurrentContext;
+		[self presentViewController:picker animated:YES completion:nil];
 	}
 	
 	return YES;
@@ -921,8 +927,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (void)imagePickerControllerDidCancel: (UIImagePickerController *)picker {
-	
-	if (IS_IPAD) {
+	if (IS_IPAD && !IS_IOS_OR_NEWER(iOS_8_0)) {
 		[self.popover dismissPopoverAnimated:YES];
 	} else {
 		[picker dismissViewControllerAnimated:YES completion:nil];

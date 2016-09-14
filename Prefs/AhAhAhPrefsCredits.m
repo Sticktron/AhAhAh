@@ -7,6 +7,7 @@
 //
 
 #import "Common.h"
+#import <version.h>
 
 
 /* Credits Controller */
@@ -19,12 +20,12 @@
 
 - (instancetype)init {
 	if ((self = [super init])) {
-		[self setTitle:@"Credits"];		
+		[self setTitle:@"Credits"];
 	}
 	return self;
 }
 
-- (void)viewDidLoad {	
+- (void)viewDidLoad {
 	[super viewDidLoad];
 	
 	UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:self.view.bounds];
@@ -35,7 +36,6 @@
 	
 	UIImage *image = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/Credits.png", BUNDLE_PATH]];
 	UIImageView *creditView = [[UIImageView alloc] initWithImage:image];
-	//creditView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;	
 	creditView.center = CGPointMake(scrollview.center.x, creditView.center.y);
 	
 	scrollview.contentSize = creditView.bounds.size;
@@ -44,7 +44,24 @@
 	[self.view addSubview:scrollview];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	
+	if (IS_IOS_OR_NEWER(iOS_8_0)) {
+		self.navigationController.navigationController.navigationBar.tintColor = TINT_COLOR;
+	} else {
+		self.navigationController.navigationBar.tintColor = TINT_COLOR;
+	}
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	if (IS_IOS_OR_NEWER(iOS_8_0)) {
+		self.navigationController.navigationController.navigationBar.tintColor = nil;
+	} else {
+		self.navigationController.navigationBar.tintColor = nil;
+	}
+	
+	[super viewWillDisappear:animated];
+}
+
 @end
-
-
-
