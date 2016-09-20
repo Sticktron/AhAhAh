@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+# Delete old user preferences if they exist
+PREFSFILE=/private/var/mobile/Library/Preferences/com.sticktron.ahahah.plist
+if [[ -f "$PREFSFILE" ]]; then
+    echo "Removing old settings..."
+    rm -f $PREFSFILE
+fi
