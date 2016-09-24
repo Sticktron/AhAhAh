@@ -29,6 +29,8 @@
 			<true/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
 		
@@ -38,6 +40,8 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Appearance</string>
+			<key>footerText</key>
+			<string>Default is the mode defined by the selected Theme, or else AspectFit.</string>
 		</dict>
 		
 		<!-- Theme -->
@@ -52,6 +56,38 @@
 			<string>Theme</string>
 		</dict>
 		
+		<!-- Content Mode ("Default") -->
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>label</key>
+			<string>Resize Mode</string>
+			<key>detail</key>
+			<string>AhAhAhListItemsController</string>
+			<key>validTitles</key>
+			<array>
+				<string>Default</string>
+				<string>AspectFit</string>
+				<string>AspectFill</string>
+				<string>Fill</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<string>Default</string>
+				<string>AspectFit</string>
+				<string>AspectFill</string>
+				<string>Fill</string>
+			</array>
+			<key>key</key>
+			<string>ContentMode</string>
+			<key>default</key>
+			<string>Default</string>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
 		
 		<!--+ SOUND +-->
 		<dict>
@@ -61,7 +97,7 @@
 			<string>Sound</string>
 		</dict>
 		
-		<!-- Force Volume Override (YES) -->
+		<!-- Force Volume (YES) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -75,6 +111,8 @@
 			<true/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
 		<!-- Volume Slider (75%) -->
@@ -97,18 +135,19 @@
 			<real>75</real>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
 		
-		<!--+ ACTIVATING +-->
-		<dict>
+		<!--+ Max Failed Unlocks (2) +-->
+ 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Activating</string>
+			<key>footerText</key>
+			<string>Trigger the alarm after this many failed attempts to unlock the device.</string>
 		</dict>
-		
-		<!-- Max Failed Unlocks (2) -->
+
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
@@ -132,6 +171,8 @@
 				<integer>4</integer>
 				<integer>5</integer>
 			</array>
+			<key>staticTextMessage</key>
+			<string>* Default is 2</string>
 			<key>key</key>
 			<string>MaxFailures</string>
 			<key>default</key>
@@ -142,7 +183,15 @@
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		<!-- Ignore Bio Failures (NO)-->
+		
+		<!--+ Ignore Bio Failures (NO) +-->
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Don't count Touch ID mis-matches as attempts to unlock.</string>
+		</dict>
+		
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -162,48 +211,26 @@
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		<!--+ DEACTIVATING +-->
+		
+		<!--+ Disable Lock Button (YES) +-->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Deactivating</string>
 			<key>footerText</key>
-			<string>If neither option is selected the user will not be able to stop the alarm. The alarm will eventually stop on its own to avoid battery drain.</string>
+			<string>Don't let the Lock Button stop the alarm. The alarm will stop by itself after 30 seconds.</string>
 		</dict>
 		
-		<!-- Allow Touch ID Removal -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>cellClass</key>
 			<string>AhAhAhSwitchCell</string>
 			<key>label</key>
-			<string>Stop After Touch ID Match</string>
-			<key>id</key>
-			<string>AllowBioRemoval</string>
+			<string>Disable Lock Button</string>
 			<key>key</key>
-			<string>AllowBioRemoval</string>
+			<string>DisableLockButton</string>
 			<key>default</key>
 			<true/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		<!-- Allow Lock Button Removal -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AhAhAhSwitchCell</string>
-			<key>label</key>
-			<string>Stop After Lock Button Press</string>
-			<key>key</key>
-			<string>AllowLockRemoval</string>
-			<key>default</key>
-			<false/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
 			<key>PostNotification</key>

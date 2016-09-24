@@ -2,34 +2,28 @@
 //  AhAhAhPrefsTheme.m
 //  Preferences for Ah!Ah!Ah!
 //
+//  Theme selection controller.
+//
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#import "Common.h"
-#import <version.h>
-
-#import <AVFoundation/AVFoundation.h>
+#import "../Common.h"
+#import "Prefs.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
 
-#define THEMES_PATH				@"/Library/AhAhAh/Themes"
-#define USER_VIDEOS_PATH		[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Videos"]
-#define USER_BACKGROUNDS_PATH	[NSHomeDirectory() stringByAppendingPathComponent:@"Library/AhAhAh/Backgrounds"]
-
 #define THUMBNAIL_SIZE			40.0f
 #define ROW_HEIGHT				60.0f
-
-// #define ID_NONE					@"_none"
-// #define ID_DEFAULT				@"_default"
 
 typedef NS_ENUM(NSInteger, AhAhAhSection) {
     kAhAhAhThemeSection 			= 0,
 	kAhAhAhCustomThemeInfoSection 	= 1,
 	kAhAhAhImportSection	 		= 2,
     kAhAhAhVideoSection				= 3,
-    kAhAhAhBackgroundSection 		= 4,
+    kAhAhAhImageSection 			= 4,
 	kAhAhAhSectionCount 			= 5
 };
 
@@ -122,23 +116,18 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 @end
 
 
-/* Theme Controller */
-
 @interface AhAhAhPrefsThemeController : PSViewController <UITableViewDataSource, UITableViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *themes;
 @property (nonatomic, strong) NSMutableArray *videos;
-@property (nonatomic, strong) NSMutableArray *backgrounds;
+@property (nonatomic, strong) NSMutableArray *images;
 @property (nonatomic, strong) NSString *selectedTheme;
 @property (nonatomic, strong) NSString *selectedVideo;
-@property (nonatomic, strong) NSString *selectedBackground;
+@property (nonatomic, strong) NSString *selectedImage;
 @property (nonatomic, strong) NSOperationQueue *queue;
 @property (nonatomic, strong) NSCache *imageCache;
 @property (nonatomic, strong) UIPopoverController *popover;
-- (void)scanForMedia;
-- (UIImage *)thumbnailForVideo:(NSString *)filename withMaxSize:(CGSize)size;
-- (void)savePrefs:(BOOL)notificate;
-- (BOOL)startPicker;
+@property (nonatomic, strong) NSIndexPath *lastSelectedIndexPath;
 @end
 
 
@@ -155,37 +144,47 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		_imageCache = [[NSCache alloc] init];
 		
 		_themes = nil;
-		_backgrounds = nil;
+		_images = nil;
 		_videos = nil;
 		
-		// create directories for user media (if needed)
-		[[NSFileManager defaultManager] createDirectoryAtPath:USER_BACKGROUNDS_PATH
+		// Get the selected theme or video or image from prefs.
+		// If for some reason more than one thing is selected, choose
+		// which one to use in this order: Theme > Video > Image.
+		
+		NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
+		HBLogDebug(@"Read user prefs: %@", settings);
+		
+		if (settings[@"Theme"]) {
+			_selectedTheme = settings[@"Theme"];
+			
+		} else if (settings[@"VideoFile"]) {
+			_selectedVideo = settings[@"VideoFile"];
+			
+		} else if (settings[@"ImageFile"]) {
+			_selectedImage = settings[@"ImageFile"];
+		}
+		
+		// if nothing has been selected auto-select the default theme
+		if (!_selectedTheme && !_selectedVideo && !_selectedImage) {
+			_selectedTheme = DEFAULT_THEME;
+		}
+		
+		// create directories for user media (if needed) ...
+		
+		[[NSFileManager defaultManager] createDirectoryAtPath:USER_IMAGES_PATH
 								  withIntermediateDirectories:YES
 												   attributes:nil
 														error:nil];
+		
 		[[NSFileManager defaultManager] createDirectoryAtPath:USER_VIDEOS_PATH
 								  withIntermediateDirectories:YES
 												   attributes:nil
 														error:nil];
-														
-		// load selected items from user prefs
-		NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
-		DebugLog(@"Read user prefs: %@", settings);
-		_selectedTheme = settings[@"Theme"] ?: nil;
-		_selectedVideo = settings[@"VideoFile"] ?: nil;
-		_selectedBackground = settings[@"BackgroundFile"] ?: nil;
-		
-		// auto-select default theme if nothing has been selected
-		if (!_selectedTheme && !_selectedVideo && !_selectedBackground) {
-			_selectedTheme = DEFAULT_THEME;
-		}
 	}
 	return self;
 }
 
 - (void)loadView {
-	DebugLog(@"loadView");
-	
 	self.navigationItem.rightBarButtonItem = self.editButtonItem;
 	
 	self.tableView = [[UITableView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]
@@ -219,14 +218,14 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		self.navigationController.navigationBar.tintColor = nil;
 	}
 	
-	DebugLog(@"emptying image cache");
+	HBLogInfo(@"emptying image cache");
 	[self.imageCache removeAllObjects];
 			
 	[super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
-	DebugLog(@"emptying image cache");
+	HBLogInfo(@"emptying image cache");
 	[self.imageCache removeAllObjects];
 	
 	[super didReceiveMemoryWarning];
@@ -235,20 +234,20 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 // data model
 
 - (void)scanForMedia {
-	DebugLog0;
+	HBLogDebug(@"Scanning for media...");
 		
 	self.videos = [self indexMediaAtPath:USER_VIDEOS_PATH];
-	DebugLog(@"self.videos = %@", self.videos);
+	HBLogDebug(@"self.videos = %@", self.videos);
 	
-	self.backgrounds = [self indexMediaAtPath:USER_BACKGROUNDS_PATH];
-	DebugLog(@"self.backgrounds = %@", self.backgrounds);
+	self.images = [self indexMediaAtPath:USER_IMAGES_PATH];
+	HBLogDebug(@"self.images = %@", self.images);
 	
 	self.themes = [self indexThemes];
-	DebugLog(@"self.themes = %@", self.themes);
+	HBLogDebug(@"self.themes = %@", self.themes);
 }
 
 - (NSMutableArray *)indexThemes {
-	DebugLog0;
+	HBLogDebug(@"Indexing Themes...");
 	
 	NSArray *keys = @[ NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLNameKey ];
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -257,7 +256,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 												  includingPropertiesForKeys:keys
 													  				 options:NSDirectoryEnumerationSkipsHiddenFiles
 																	   error:nil];
-	DebugLog(@"Contents of (%@): %@", url, folders);
+	HBLogDebug(@"Contents of folder (%@): %@", url, folders);
 	
 	if (!folders) {
 		HBLogError(@"Default Themes are missing! Suggest re-installing the package.");
@@ -268,23 +267,47 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	[folders sortUsingComparator:^(NSURL *a, NSURL *b) {
 		return [a.lastPathComponent compare:b.lastPathComponent];
 	}];
-		
 	
-	// build index...
+		
+	// iterate through themes and build index of theme objects ...
 	
 	NSMutableArray *themes = [NSMutableArray array];
+	
 	for (NSURL *folderURL in folders) {
-		NSString *folderName = [folderURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
-		NSString *size = nil;
+		NSMutableDictionary *theme = [NSMutableDictionary dictionary];
 		
-		// get folder size
+		// store folder name
+		NSString *folderName = [folderURL resourceValuesForKeys:keys error:nil][NSURLNameKey];
+		theme[@"folder"] = folderName;
+		
+		
+		// get info from the its Info.plist ...
+		
+		NSString *themePath = [THEMES_PATH stringByAppendingPathComponent:folderName];
+		NSDictionary *themeDict = [NSDictionary dictionaryWithContentsOfFile:[themePath stringByAppendingPathComponent:@"Info.plist"]];
+		
+		// author name
+		if (themeDict[@"Author"]) {
+			theme[@"author"] = themeDict[@"Author"];
+		}
+		
+		// media type
+		if (themeDict[@"Video"]) {
+			theme[@"type"] = @"video";
+		} else if (themeDict[@"Image"]) {
+			theme[@"type"] = @"image";
+		}
+		
+		
+		// calculate the size of the theme ...
+		
+		double bytes = 0;
+		NSString *size = nil;
 		NSMutableArray *themeFiles = (NSMutableArray *)[fm contentsOfDirectoryAtURL:folderURL
 													  	 includingPropertiesForKeys:keys
 														  	 				options:NSDirectoryEnumerationSkipsHiddenFiles
 																		  	  error:nil];
-		DebugLog(@"Contents of (%@): %@", folderURL, themeFiles);
-
-		double bytes = 0;
+		HBLogDebug(@"Contents of folder (%@): %@", folderURL, themeFiles);
 		
 		for (NSURL *fileURL in themeFiles) {
 			size = [fileURL resourceValuesForKeys:keys error:nil][NSURLFileSizeKey];
@@ -297,15 +320,29 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			size = [NSString stringWithFormat:@"%.1f MB", bytes / 1024.0f / 1024.f];
 		}
 		
-		[themes addObject:@{ @"folder": folderName, @"size": size }];
+		theme[@"size"] = size;
+		
+		
+		// store finished theme object
+		[themes addObject:theme];
 	}
-	//DebugLog(@"Results: %@", themes);
+	HBLogDebug(@"Results: %@", themes);
+	
+	// move bundled themes to the front of the array
+	NSMutableArray *tempArray = [themes copy];
+	for (NSDictionary *theme in tempArray) {
+		if ([theme[@"folder"] isEqualToString:@"Jurassic"] || [theme[@"folder"] isEqualToString:@"Classic"]) {
+			[themes removeObject:theme];
+			[themes insertObject:theme atIndex:0];
+		}
+	}
+	HBLogDebug(@"Re-Sorted Results: %@", themes);
 	
 	return themes;
 }
 
 - (NSMutableArray *)indexMediaAtPath:(NSString *)path {
-	DebugLog0;
+	HBLogDebug(@"Indexing media at path (%@)...", path);
 	
 	NSArray *keys = @[ NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLNameKey ];
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -315,10 +352,10 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 									includingPropertiesForKeys:keys
 													   options:NSDirectoryEnumerationSkipsHiddenFiles
 														 error:nil];
-	DebugLog(@"Contents of (%@): %@", url, files);
+	HBLogDebug(@"Contents of folder (%@): %@", url, files);
 	
 	if (!files) {
-		DebugLog(@"No files.");
+		HBLogWarn(@"No files.");
 		return nil;
 	}
 	
@@ -344,11 +381,10 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		
 		[media addObject:@{ @"file": file, @"size": size }];
 	}
-	// DebugLog(@"Results: %@", media);
+	HBLogDebug(@"Results: %@", media);
 	
 	return media;
 }
-
 
 // tableview
 
@@ -362,13 +398,13 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		case kAhAhAhThemeSection: title = @"Themes";
 		break;
 		
-		case kAhAhAhCustomThemeInfoSection: title = @"Custom Theme";
+		case kAhAhAhCustomThemeInfoSection: title = @"Custom";
 		break;
 		
-		case kAhAhAhVideoSection: title = @"Your Videos";
+		case kAhAhAhVideoSection: title = @"Videos";
 		break;
 		
-		case kAhAhAhBackgroundSection: title = @"Your Backgrounds";
+		case kAhAhAhImageSection: title = @"Images";
 		break;
 	}
 	return title;
@@ -377,17 +413,13 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
 	NSString *title = nil;
 	switch (section) {
-		case kAhAhAhThemeSection:
-			//title = @"📂  /Library/AhAhAh/Themes/";
+		case kAhAhAhCustomThemeInfoSection: title = @"Use your own videos or images to customize the alarm. Import media from your Camera Roll, or copy it manually to the locations shown below each section.";
 		break;
 		
-		case kAhAhAhCustomThemeInfoSection: title = @"Theme the alarm using videos and images from your Camera Roll.\nNOTE: When both a video and background are chosen, the video is overlaid in a centered window.";
+		case kAhAhAhVideoSection: title = @"/User/Library/AhAhAh/Videos";
 		break;
 		
-		case kAhAhAhVideoSection: title = @"📂  /User/Library/AhAhAh/Videos/";
-		break;
-		
-		case kAhAhAhBackgroundSection: title = @"📂 /User/Library/AhAhAh/Backgrounds/";
+		case kAhAhAhImageSection: title = @"/User/Library/AhAhAh/Images";
 		break;
 	}
 	return title;
@@ -408,7 +440,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		case kAhAhAhVideoSection: num = self.videos.count;
 		break;
 		
-		case kAhAhAhBackgroundSection: num = self.backgrounds.count;
+		case kAhAhAhImageSection: num = self.images.count;
 		break;
 	}
 	return num;
@@ -431,73 +463,51 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	DebugLog(@"User selected row: %ld, section: %ld", (long)indexPath.row, (long)indexPath.section);
+	HBLogDebug(@"User selected row: %ld, section: %ld", (long)indexPath.row, (long)indexPath.section);
 	
-	if (indexPath.section == kAhAhAhImportSection) {
-		// Import Cell tapped, launch Media Picker...
-		
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];
+	
+	if (indexPath.section == kAhAhAhImportSection) { // Import Cell tapped ...
+		// launch Media Picker
 		[self startPicker];
-		[tableView deselectRowAtIndexPath:indexPath animated:NO];
 		
-	} else {
-		// Media Cell tapped...
+	} else { // Media Cell tapped...
 		
 		UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+		
 		if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
-			// cell was already selected, de-select it...
-			
-			cell.accessoryType = UITableViewCellAccessoryNone;
-			
-			switch (indexPath.section) {
-				case kAhAhAhThemeSection:
-					self.selectedTheme = nil;
-				case kAhAhAhVideoSection:
-					self.selectedVideo = nil;
-					break;
-				case kAhAhAhBackgroundSection:
-					self.selectedBackground = nil;
-					break;
-			}
-			
+			// already selected, do nothing
+			HBLogDebug(@"row is already selected");
 		} else {
-			// new selection...
 			
-			// uncheck old selection
-			for (NSInteger i = 0; i < [tableView numberOfRowsInSection:indexPath.section]; i++) {
-				NSIndexPath	 *path = [NSIndexPath indexPathForRow:i inSection:indexPath.section];
-				UITableViewCell *cell = [tableView cellForRowAtIndexPath:path];
-				cell.accessoryType = UITableViewCellAccessoryNone;
-			}
-			
-			cell.accessoryType = UITableViewCellAccessoryCheckmark;
-			
+			// clear old selection
+			self.selectedTheme = nil;
+			self.selectedVideo = nil;
+			self.selectedImage = nil;
+
 			// get the file/folder name from the cell title
 			UILabel *titleLabel = (UILabel *)[cell.contentView viewWithTag:kAhAhAhTitleTag];
 			NSString *title = titleLabel.text;
 			
-			// store selection
+			// store new selection
 			switch (indexPath.section) {
 				case kAhAhAhThemeSection:
 					self.selectedTheme = title;
-					self.selectedVideo = nil;
-					self.selectedBackground = nil;
 					break;
 				case kAhAhAhVideoSection:
 					self.selectedVideo = title;
-					self.selectedTheme = nil;
 					break;
-				case kAhAhAhBackgroundSection:
-					self.selectedBackground = title;
-					self.selectedTheme = nil;
+				case kAhAhAhImageSection:
+					self.selectedImage = title;
 					break;
 			}
-			DebugLog(@"self.selectedTheme: %@", self.selectedTheme);
-			DebugLog(@"self.selectedVideo: %@", self.selectedVideo);
-			DebugLog(@"self.selectedBackground: %@", self.selectedBackground);
+			HBLogDebug(@"self.selectedTheme: %@", self.selectedTheme);
+			HBLogDebug(@"self.selectedVideo: %@", self.selectedVideo);
+			HBLogDebug(@"self.selectedImage: %@", self.selectedImage);
+			
+			[self savePrefs:YES];
+			[tableView reloadData];
 		}
-		
-		[self savePrefs:YES];
-		[tableView reloadData];
 	}
 }
 
@@ -515,7 +525,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-	DebugLog(@"User wants to delete media");
+	HBLogDebug(@"User wants to delete media");
 	
     if (editingStyle == UITableViewCellEditingStyleDelete) {
 		
@@ -525,7 +535,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			//
 			NSString *file = self.videos[indexPath.row][@"file"];
 			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, file];
-			DebugLog(@"deleting video at path: %@", path);
+			HBLogDebug(@"deleting video at path: %@", path);
 			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 			
 			if ([file isEqualToString:self.selectedVideo]) {
@@ -534,20 +544,20 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 
 			[self.videos removeObjectAtIndex:indexPath.row];
 			
-		} else if (indexPath.section == kAhAhAhBackgroundSection) {
+		} else if (indexPath.section == kAhAhAhImageSection) {
 			//
 			// delete image
 			//
-			NSString *file = self.backgrounds[indexPath.row][@"file"];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, file];
-			DebugLog(@"deleting image at path: %@", path);
+			NSString *file = self.images[indexPath.row][@"file"];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_IMAGES_PATH, file];
+			HBLogDebug(@"deleting image at path: %@", path);
 			[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 			
-			if ([file isEqualToString:self.selectedBackground]) {
-				self.selectedBackground = nil;
+			if ([file isEqualToString:self.selectedImage]) {
+				self.selectedImage = nil;
 			}
 			
-			[self.backgrounds removeObjectAtIndex:indexPath.row];
+			[self.images removeObjectAtIndex:indexPath.row];
 		}
 		
 		[self savePrefs:YES];
@@ -566,17 +576,41 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		prefs = [NSMutableDictionary dictionary];
 	}
 	
-	// new settings
-	prefs[@"Theme"] = self.selectedTheme;
-	prefs[@"VideoFile"] = self.selectedVideo;
-	prefs[@"BackgroundFile"] = self.selectedBackground;
+	// only save one selection ...
 	
-	DebugLog(@"##### Writing Preferences: %@", prefs);
+	if (self.selectedTheme) {
+		prefs[@"Theme"] = self.selectedTheme;
+		prefs[@"VideoFile"] = nil;
+		prefs[@"ImageFile"] = nil;
+		
+		// check Info.plist for a ContentMode setting
+		// NSString *themePath = [THEMES_PATH stringByAppendingPathComponent:self.selectedTheme];
+		// NSDictionary *themeDict = [NSDictionary dictionaryWithContentsOfFile:[themePath stringByAppendingPathComponent:@"Info.plist"]];
+		// if (themeDict[@"ContentMode"]) {
+		// 	HBLogDebug(@"Setting content mode for theme (%@) to: %@", self.selectedTheme, themeDict[@"ContentMode"]);
+		// 	prefs[@"ContentMode"] = themeDict[@"ContentMode"];
+		// }
+		
+	} else if (self.selectedVideo) {
+		prefs[@"Theme"] = nil;
+		prefs[@"VideoFile"] = self.selectedVideo;
+		prefs[@"ImageFile"] = nil;
+		
+	} else if (self.selectedImage) {
+		prefs[@"Theme"] = nil;
+		prefs[@"VideoFile"] = nil;
+		prefs[@"ImageFile"] = self.selectedImage;
+	}
+	
+	// reset content mode
+	prefs[@"ContentMode"] = @"Default";
+	
+	HBLogDebug(@"##### Writing Preferences: %@", prefs);
 	[prefs writeToFile:PREFS_PLIST_PATH atomically:YES];
 	
 	// apply settings to tweak
 	if (notificate) {
-		DebugLog(@"notified tweak");
+		HBLogDebug(@"notified tweak");
 		
 		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
 											 CFSTR("com.sticktron.ahahah.prefschanged"),
@@ -656,7 +690,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		// subtitle
 		UILabel *subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(70.0f, 34.0f, 215.0f, 12.0f)];
 		subtitleLabel.opaque = YES;
-		subtitleLabel.font = [UIFont italicSystemFontOfSize:10.0];
+		subtitleLabel.font = [UIFont systemFontOfSize:10.0];
 		subtitleLabel.textColor = [UIColor colorWithRed:0.427 green:0.427 blue:0.447 alpha:1]; // #6D6D72
 		subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
 		subtitleLabel.tag = kAhAhAhSubtitleTag;
@@ -705,20 +739,20 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			cell.accessoryType = UITableViewCellAccessoryNone;
 		}
 		
-	// ...for Background
-	} else if (indexPath.section == kAhAhAhBackgroundSection) {
-		NSDictionary *background = self.backgrounds[indexPath.row];
-		NSString *filename = background[@"file"];
+	// ...for Image
+} else if (indexPath.section == kAhAhAhImageSection) {
+		NSDictionary *image = self.images[indexPath.row];
+		NSString *filename = image[@"file"];
 		titleLabel.text = filename;
-		subtitleLabel.text = background[@"size"];
+		subtitleLabel.text = image[@"size"];
 		
-		// get thumbnail from cache, or else load and cache it in the background...
+		// get thumbnail from cache, or else load and cache it in the background
 		UIImage *thumbnail = [self.imageCache objectForKey:filename];
 		if (thumbnail) {
 			imageView.image = thumbnail;
 		} else {
 			[self.queue addOperationWithBlock:^{
-				NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, filename];
+				NSString *path = [NSString stringWithFormat:@"%@/%@", USER_IMAGES_PATH, filename];
 				UIImage *image = [UIImage imageWithContentsOfFile:path];
 				if (image) {
 					image = [UIImage imageWithImage:image scaledToMaxWidth:imageView.bounds.size.height
@@ -738,7 +772,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			}];
 		}
 		
-		if ([self.selectedBackground isEqualToString:background[@"file"]]) {
+		if ([self.selectedImage isEqualToString:image[@"file"]]) {
 			cell.accessoryType = UITableViewCellAccessoryCheckmark;
 		} else {
 			cell.accessoryType = UITableViewCellAccessoryNone;
@@ -749,7 +783,11 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		NSDictionary *theme = self.themes[indexPath.row];
 		NSString *folderName = theme[@"folder"];
 		titleLabel.text = folderName;
-		subtitleLabel.text = theme[@"size"];
+		subtitleLabel.text = [NSString stringWithFormat:@"%@  |  %@", theme[@"type"], theme[@"size"]];
+		NSString *authorName = theme[@"author"];
+		if (authorName) {
+			subtitleLabel.text = [NSString stringWithFormat:@"%@  |  %@", authorName, subtitleLabel.text];
+		}
 		
 		[self.queue addOperationWithBlock:^{
 			NSString *path = [NSString stringWithFormat:@"%@/%@/Thumbnail.png", THEMES_PATH, folderName];
@@ -786,10 +824,10 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 	
 	NSString *path = [NSString stringWithFormat:@"%@/%@", USER_VIDEOS_PATH, filename];
 	NSURL *url = [NSURL fileURLWithPath:path];
-	DebugLog(@"Requested thumbnail for file at url: %@", url);
+	HBLogDebug(@"Requested thumbnail for file at url: %@", url);
 	
 	AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:url options:nil];
-	DebugLog(@"found asset (%@)", asset);
+	HBLogDebug(@"found asset (%@)", asset);
 	
 	if (asset) {
 		AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
@@ -799,10 +837,10 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 		CGImageRef imageRef = [generator copyCGImageAtTime:time actualTime:NULL error:NULL];
 		
 		UIImage *image = [UIImage imageWithCGImage:imageRef];
-		DebugLog(@"got thumbnail image (size=%@)", NSStringFromCGSize(image.size));
+		HBLogDebug(@"got thumbnail image (size=%@)", NSStringFromCGSize(image.size));
 		
 		thumbnail = [UIImage imageWithImage:image scaledToMaxWidth:size.width maxHeight:size.height];
-		DebugLog(@"scaled thumbnail to size: %@", NSStringFromCGSize(thumbnail.size));
+		HBLogDebug(@"scaled thumbnail to size: %@", NSStringFromCGSize(thumbnail.size));
 		
 		CFRelease(imageRef);
 	}
@@ -813,7 +851,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 // image picker
 
 - (BOOL)startPicker {
-	DebugLog0;
+	HBLogDebug(@"Starting UIImagePicker...");
 	
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] == NO) {
 		HBLogError(@"Snap! ImagePicker can't access Photo Library!");
@@ -865,7 +903,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			UIImagePickerControllerReferenceURL = "assets-library://asset/asset.mp4?id={GUID}&ext=mp4";
 		}
 	*/
-	DebugLog(@"picker returned with this: %@", info);
+	HBLogDebug(@"picker returned with this: %@", info);
 	
 	
 	// callback
@@ -877,17 +915,17 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			// handle image ...
 			
 			ALAssetRepresentation *imageRep = [asset defaultRepresentation];
-			DebugLog(@"Picked image asset with representation: %@", imageRep);
+			HBLogDebug(@"Picked image asset with representation: %@", imageRep);
 			
 			NSString *filename = [imageRep filename];
-			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_BACKGROUNDS_PATH, filename];
+			NSString *path = [NSString stringWithFormat:@"%@/%@", USER_IMAGES_PATH, filename];
 			
 			UIImage *image = (UIImage *)info[UIImagePickerControllerOriginalImage];
-			DebugLog(@"image size=%@", NSStringFromCGSize(image.size));
+			HBLogDebug(@"image size=%@", NSStringFromCGSize(image.size));
 			
-			DebugLog(@"image orientation=%@", [image orientation]);
+			HBLogDebug(@"image orientation=%@", [image orientation]);
 			image = [image normalizedImage];
-			DebugLog(@"normalized image orientation: %@", [image orientation]);
+			HBLogDebug(@"normalized image orientation: %@", [image orientation]);
 			
 			NSData *imageData = UIImagePNGRepresentation(image);
 			[imageData writeToFile:path atomically:YES];
@@ -897,7 +935,7 @@ typedef NS_ENUM(NSInteger, AhAhAhTag) {
 			// handle video ...
 			
 			ALAssetRepresentation *videoRep = [asset defaultRepresentation];
-			DebugLog(@"Picked video asset with representation: %@", videoRep);
+			HBLogDebug(@"Picked video asset with representation: %@", videoRep);
 			
 			NSString *filename = [videoRep filename];
 			

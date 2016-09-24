@@ -1,12 +1,15 @@
 //
-//  AhAhAhPrefsCustomCells.m
+//  AhAhAhPrefsCustom.m
 //  Preferences for Ah!Ah!Ah!
+//
+//  Custom cells and UI style overrides.
 //
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#import "Common.h"
+#import "../Common.h"
+#import "Prefs.h"
 
 
 /* Logo Cell */
@@ -109,29 +112,74 @@
 @end
 
 @implementation AhAhAhThemeLinkCell
-- (id)initWithStyle:(UITableViewCellStyle)arg1 reuseIdentifier:(id)arg2 specifier:(id)arg3 {
-	// overridde the cell style because we want a detail label on the right side
-	if (self = [super initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:arg2 specifier:arg3]) {
-		
-		// get the initial value for the label from settings...
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(id)identifier specifier:(PSSpecifier *)specifier {
+	
+	// overridde the cell style because we want a detail label on the right side ...
+	
+	if (self = [super initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier specifier:specifier]) {
+		HBLogDebug(@"getting value for detail label...");
 		
 		NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
 		NSString *selectedTheme = settings[@"Theme"] ?: nil;
+		HBLogDebug(@"selected theme is: %@", selectedTheme);
 		
 		if (!selectedTheme) {
-			// check for a selected video or background instead...
+			HBLogDebug(@"no selected theme, is there a custom selection instead?");
 			
 			NSString *selectedVideo = settings[@"VideoFile"] ?: nil;
-			NSString *selectedBackground = settings[@"BackgroundFile"] ?: nil;
+			NSString *selectedImage = settings[@"ImageFile"] ?: nil;
+			HBLogDebug(@"selectedVideo = %@", selectedVideo);
+			HBLogDebug(@"selectedImage = %@", selectedImage);
 			
-			if (!selectedVideo && !selectedBackground) {
-				// nothing has been selected, so auto-select default theme
+			if (!(selectedVideo || selectedImage)) {
+				HBLogDebug(@"no setting yet, setting to default theme: %@", DEFAULT_THEME);
 				selectedTheme = DEFAULT_THEME;
 			}
 		}
 		
-		self.detailTextLabel.text = selectedTheme ?: @"Custom Theme";
+		self.detailTextLabel.text = selectedTheme ?: @"Custom";
 	}
 	return self;
 }
+@end
+
+
+//------------------------------------------------------------------------------
+
+
+/* Tinted List Items Controller */
+
+@interface AhAhAhListItemsController : PSListItemsController
+@end
+
+@implementation AhAhAhListItemsController
+- (void)viewDidLoad {
+	[super viewDidLoad];
+	
+	// tint checkmarks
+	[[self table] setTintColor:TINT_COLOR];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	
+	// tint navbar
+	if (IS_IOS_OR_NEWER(iOS_8_0)) {
+		self.navigationController.navigationController.navigationBar.tintColor = TINT_COLOR;
+	} else {
+		self.navigationController.navigationBar.tintColor = TINT_COLOR;
+	}
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	// un-tint navbar
+	if (IS_IOS_OR_NEWER(iOS_8_0)) {
+		self.navigationController.navigationController.navigationBar.tintColor = nil;
+	} else {
+		self.navigationController.navigationBar.tintColor = nil;
+	}
+	
+	[super viewWillDisappear:animated];
+}
+
 @end

@@ -2,15 +2,15 @@
 //  AhAhAhPrefsCredits.m
 //  Preferences for Ah!Ah!Ah!
 //
+//  Credits controller.
+//
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#import "Common.h"
-#import <version.h>
+#import "../Common.h"
+#import "Prefs.h"
 
-
-/* Credits Controller */
 
 @interface AhAhAhPrefsCreditsController : PSViewController
 @end

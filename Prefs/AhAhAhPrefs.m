@@ -2,28 +2,16 @@
 //  AhAhAhPrefs.m
 //  Preferences for Ah!Ah!Ah!
 //
+//  Main controller.
+//
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
 //
 //
 
-#import "Common.h"
-#import <version.h>
-
-#import <LocalAuthentication/LAContext.h>
+#import "../Common.h"
+#import "Prefs.h"
 #import <Social/Social.h>
 
-
-/* Checks if Touch ID is available. */
-static BOOL hasTouchID() {
-    if ([LAContext class]) {
-        return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
-    } else {
-    	return NO;
-    }
-}
-
-
-/* Root Settings Controller */
 
 @interface AhAhAhPrefsController : PSListController
 @end
@@ -35,21 +23,13 @@ static BOOL hasTouchID() {
 	if (_specifiers == nil) {
 		_specifiers = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
 		
-		// Alter the specefier list, removing some settings if we aren't
-		// running on a device with TouchID.
+		// disable Touch ID settings for devices without Touch ID
 		if (hasTouchID() == NO) {
-			DebugLog(@"No TouchID on this device, disabling some settings...");
-			
 			PSSpecifier *specifier = [self specifierForID:@"IgnoreBioFailure"];
-			[specifier setProperty:@NO forKey:@"enabled"];
-			[specifier setProperty:@NO forKey:@"default"];
-			
-			specifier = [self specifierForID:@"AllowBioRemoval"];
 			[specifier setProperty:@NO forKey:@"enabled"];
 			[specifier setProperty:@NO forKey:@"default"];
 		}
 	}
-	
 	return _specifiers;
 }
 
@@ -126,7 +106,7 @@ static BOOL hasTouchID() {
 	SLComposeViewController *composeController = [SLComposeViewController
 												  composeViewControllerForServiceType:SLServiceTypeTwitter];
 	
-	[composeController setInitialText:@"I'm using Ah!Ah!Ah! (Themeable Unlock Alarm) by @Sticktron to scare away nosey people!"];
+	[composeController setInitialText:@"I'm using Ah!Ah!Ah! (Themeable Unlock Alarm) by @Sticktron to scare away nosey people."];
 	
 	[self presentViewController:composeController
 					   animated:YES
@@ -134,7 +114,7 @@ static BOOL hasTouchID() {
 }
 
 - (void)openEmail {
-	NSString *subject = @"Support for Ah!Ah!Ah!";
+	NSString *subject = @"Support for Ah!Ah!Ah! (beta)";
 	NSString *body = @"(Please type something here.)";
 	NSString *urlString = [NSString stringWithFormat:@"mailto:sticktron@hotmail.com?subject=%@&body=%@", subject, body];
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
@@ -173,47 +153,6 @@ static BOOL hasTouchID() {
 - (void)openPayPal {
 	NSString *url = @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BKGYMJNGXM424&lc=CA&item_name=Donation%20to%20Sticktron&item_number=AhAhAh2&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted";
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
-}
-
-@end
-
-
-//------------------------------------------------------------------------------
-
-
-/* Tinted List Items Controller */
-
-@interface AhAhAhListItemsController : PSListItemsController
-@end
-
-@implementation AhAhAhListItemsController
-- (void)viewDidLoad {
-	[super viewDidLoad];
-	
-	// tint checkmarks
-	[[self table] setTintColor:TINT_COLOR];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-	[super viewWillAppear:animated];
-	
-	// tint navbar
-	if (IS_IOS_OR_NEWER(iOS_8_0)) {
-		self.navigationController.navigationController.navigationBar.tintColor = TINT_COLOR;
-	} else {
-		self.navigationController.navigationBar.tintColor = TINT_COLOR;
-	}
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-	// un-tint navbar
-	if (IS_IOS_OR_NEWER(iOS_8_0)) {
-		self.navigationController.navigationController.navigationBar.tintColor = nil;
-	} else {
-		self.navigationController.navigationBar.tintColor = nil;
-	}
-	
-	[super viewWillDisappear:animated];
 }
 
 @end
