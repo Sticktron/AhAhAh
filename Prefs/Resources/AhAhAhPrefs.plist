@@ -3,102 +3,30 @@
 <plist version="1.0">
 <dict>
 	<key>title</key>
-	<string>Ah! Ah! Ah!</string>
-	
+	<string>Ah!Ah!Ah!</string>
 	<key>items</key>
 	<array>
-
-		<!-- [] Header -->
+		
+		<!--+ HEADER +-->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>headerCellClass</key>
-			<string>AAALogoCell</string>
+			<string>AhAhAhLogoCell</string>
 		</dict>
 		
-		
-		<!-- [] ENABLE/DISABLE -->		
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>SpringBoard must be restarted to enable or disable this tweak. All other settings take effect immediately.</string>
-		</dict>
-		
-		<!-- Enabled (YES) -->
+		<!-- Enabled Switch (YES) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>cellClass</key>
-			<string>AAASwitchCell</string>
+			<string>AhAhAhSwitchCell</string>
 			<key>label</key>
 			<string>Enabled</string>
 			<key>key</key>
 			<string>Enabled</string>
 			<key>default</key>
 			<true/>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-		</dict>
-		
-		<!-- Respring -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Respring</string>
-			<key>action</key>
-			<string>respring</string>
-			<key>confirmation</key>
-			<dict>
-				<key>title</key>
-				<string>Respring?</string>
-				<key>prompt</key>
-				<string>Restart SpringBoard?</string>
-				<key>cancelTitle</key>
-				<string>Not Now</string>
-				<key>okTitle</key>
-				<string>OK</string>
-			</dict>
-			<key>isDestructive</key>
-			<true/>
-		</dict>
-		
-		
-		<!-- [] CUSTOMIZE -->
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Customize</string>
-			<key>footerText</key>
-			<string>Selecting fullscreen mode will automatically hide the background image and scale the video to fit the screen.</string>
-		</dict>
-		
-		<!-- Media Picker -->
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>label</key>
-			<string>Choose Video and Background</string>
-			<key>detail</key>
-			<string>AhAhAhPrefsMediaController</string>
-		</dict>
-		
-		<!-- FullScreenVideo (NO) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>label</key>
-			<string>FullScreen Video</string>
-			<key>key</key>
-			<string>FullScreenVideo</string>
-			<key>default</key>
-			<false/>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
 			<key>PostNotification</key>
@@ -106,22 +34,127 @@
 		</dict>
 		
 		
-		<!-- [] ACTIVATING -->		
+		<!--+ APPEARANCE +-->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Activating</string>
+			<string>Appearance</string>
+			<key>footerText</key>
+			<string>Default is the mode defined by the selected Theme, or else AspectFit.</string>
 		</dict>
 		
-		<!-- MaxFailures (2) -->
+		<!-- Theme -->
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>cellClass</key>
+			<string>AhAhAhThemeLinkCell</string>
+			<key>detail</key>
+			<string>AhAhAhPrefsThemeController</string>
+			<key>label</key>
+			<string>Theme</string>
+		</dict>
+		
+		<!-- Content Mode ("Default") -->
 		<dict>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>label</key>
-			<string>Max Failed Attempts</string>
+			<string>Resize Mode</string>
 			<key>detail</key>
-			<string>PSListItemsController</string>
+			<string>AhAhAhListItemsController</string>
+			<key>validTitles</key>
+			<array>
+				<string>Default</string>
+				<string>AspectFit</string>
+				<string>AspectFill</string>
+				<string>Fill</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<string>Default</string>
+				<string>AspectFit</string>
+				<string>AspectFill</string>
+				<string>Fill</string>
+			</array>
+			<key>key</key>
+			<string>ContentMode</string>
+			<key>default</key>
+			<string>Default</string>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		
+		<!--+ SOUND +-->
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Sound</string>
+		</dict>
+		
+		<!-- Force Volume (YES) -->
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>cellClass</key>
+			<string>AhAhAhSwitchCell</string>
+			<key>label</key>
+			<string>Force Volume Level</string>
+			<key>key</key>
+			<string>ForceVolume</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		<!-- Volume Slider (75%) -->
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>cellClass</key>
+			<string>AhAhAhSliderCell</string>
+			<key>label</key>
+			<string>Volume</string>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>100</real>
+			<key>showValue</key>
+			<false/>
+			<key>key</key>
+			<string>VolumeLevel</string>
+			<key>default</key>
+			<real>75</real>
+			<key>defaults</key>
+			<string>com.sticktron.ahahah</string>
+			<key>PostNotification</key>
+			<string>com.sticktron.ahahah.prefschanged</string>
+		</dict>
+		
+		
+		<!--+ Max Failed Unlocks (2) +-->
+ 		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Trigger the alarm after this many failed attempts to unlock the device.</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>label</key>
+			<string>Max Failed Unlocks</string>
+			<key>detail</key>
+			<string>AhAhAhListItemsController</string>
 			<key>validTitles</key>
 			<array>
 				<string>1</string>
@@ -132,36 +165,18 @@
 			</array>
 			<key>validValues</key>
 			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
+				<integer>1</integer>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
 			</array>
+			<key>staticTextMessage</key>
+			<string>* Default is 2</string>
 			<key>key</key>
 			<string>MaxFailures</string>
 			<key>default</key>
-			<string>2</string>
-			<key>defaults</key>
-			<string>com.sticktron.ahahah</string>
-			<key>PostNotification</key>
-			<string>com.sticktron.ahahah.prefschanged</string>
-		</dict>
-		
-		<!-- IgnoreBioFailure (YES) -->
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>id</key>
-			<string>IgnoreBioFailure</string>
-			<key>label</key>
-			<string>Don't count TouchID fails</string>
-			<key>key</key>
-			<string>IgnoreBioFailure</string>
-			<key>default</key>
-			<true/>
+			<integer>2</integer>
 			<key>defaults</key>
 			<string>com.sticktron.ahahah</string>
 			<key>PostNotification</key>
@@ -169,28 +184,25 @@
 		</dict>
 		
 		
-		<!-- [] DE-ACTIVATING -->		
+		<!--+ Ignore Bio Failures (NO) +-->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Deactivating</string>
 			<key>footerText</key>
-			<string>The alarm automatically stops after about 30 seconds to prevent draining your battery.</string>
+			<string>Don't count Touch ID mis-matches as attempts to unlock.</string>
 		</dict>
 		
-		<!-- AllowBioRemoval (NO) -->
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>cellClass</key>
-			<string>AAASwitchCell</string>
-			<key>id</key>
-			<string>AllowBioRemoval</string>
+			<string>AhAhAhSwitchCell</string>
 			<key>label</key>
-			<string>Remove using TouchID</string>
+			<string>Ignore Touch ID Fails</string>
+			<key>id</key>
+			<string>IgnoreBioFailure</string>
 			<key>key</key>
-			<string>AllowBioRemoval</string>
+			<string>IgnoreBioFailure</string>
 			<key>default</key>
 			<false/>
 			<key>defaults</key>
@@ -199,16 +211,24 @@
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
 		
-		<!-- AllowLockRemoval (YES) -->
+		
+		<!--+ Disable Lock Button (YES) +-->
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Don't let the Lock Button stop the alarm. The alarm will stop by itself after 30 seconds.</string>
+		</dict>
+		
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>cellClass</key>
-			<string>AAASwitchCell</string>
+			<string>AhAhAhSwitchCell</string>
 			<key>label</key>
-			<string>Remove using Lock Button</string>
+			<string>Disable Lock Button</string>
 			<key>key</key>
-			<string>AllowLockRemoval</string>
+			<string>DisableLockButton</string>
 			<key>default</key>
 			<true/>
 			<key>defaults</key>
@@ -218,84 +238,113 @@
 		</dict>
 		
 		
-		<!-- [] SUPPORT -->
-		
+		<!--+ GET SUPPORT +-->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Support</string>
+			<string>Get Support</string>
 		</dict>
-			
+		
 		<!-- Email -->
 		<dict>
+			<key>action</key>
+			<string>openEmail</string>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Contact me</string>
+			<string>AhAhAhButtonCell</string>
 			<key>icon</key>
 			<string>Email.png</string>
-			<key>action</key>
-			<string>openEmail</string>
+			<key>label</key>
+			<string>Send an Email</string>
 		</dict>
 		
 		<!-- Twitter -->
 		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Follow me on Twitter</string>
-			<key>icon</key>
-			<string>Twitter.png</string>
 			<key>action</key>
 			<string>openTwitter</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AhAhAhButtonCell</string>
+			<key>icon</key>
+			<string>Twitter.png</string>
+			<key>label</key>
+			<string>Send a Tweet</string>
 		</dict>
 		
-		<!-- Source Code -->
+		<!-- Reddit -->
 		<dict>
+			<key>action</key>
+			<string>openReddit</string>
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>cellClass</key>
-			<string>AAAButtonCell</string>
-			<key>label</key>
-			<string>Source code</string>
+			<string>AhAhAhButtonCell</string>
 			<key>icon</key>
-			<string>Github.png</string>
-			<key>action</key>
-			<string>openGitHub</string>
-		</dict>
-
-		<!-- Tip Me -->
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AAAButtonCell</string>
+			<string>Reddit.png</string>
 			<key>label</key>
-			<string>Tip via PayPal</string>
-			<key>icon</key>
-			<string>Paypal.png</string>
-			<key>action</key>
-			<string>openPayPal</string>
+			<string>Get help at /r/jailbreak</string>
 		</dict>
-			
-			
-		<!-- [] THANKS -->		
+		
+		
+		<!-- GIVE SUPPORT -->
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Give Support</string>
+		</dict>
+		
+		<!-- GitHub -->
+		<dict>
+			<key>action</key>
+			<string>openGitHub</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AhAhAhButtonCell</string>
+			<key>icon</key>
+			<string>GitHub.png</string>
+			<key>label</key>
+			<string>Contribute to Source Code</string>
+		</dict>
+		
+		<!-- PayPal -->
+		<dict>
+			<key>action</key>
+			<string>openPayPal</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>cellClass</key>
+			<string>AhAhAhButtonCell</string>
+			<key>icon</key>
+			<string>PayPal.png</string>
+			<key>label</key>
+			<string>Contribute via PayPal</string>
+		</dict>
+		
+		
+		<!--+ CREDITS +-->
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerAlignment</key>
+			<string>1</string>
 			<key>footerText</key>
-			<string>Thanks to /u/harrybond for the idea.
-Thanks to milodarling for helping with the iOS 8 update.
-
-Copyright (c) 2014-2015 Sticktron.
-
-😈
-			</string>
+			<string>
+Copyright © 2014-2016 Sticktron</string>
+		</dict>
+		
+		<!-- Credits -->
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>detail</key>
+			<string>AhAhAhPrefsCreditsController</string>
+			<key>label</key>
+			<string>Credits</string>
 		</dict>
 		
 	</array>

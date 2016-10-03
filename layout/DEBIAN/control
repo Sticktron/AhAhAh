@@ -1,9 +1,10 @@
 Package: com.sticktron.ahahah
 Name: Ah! Ah! Ah!
-Version: 1.2
+Version: 2.0-beta
 Architecture: iphoneos-arm
 Depends: firmware (>= 7.0), mobilesubstrate, preferenceloader
-Description: A customizable unlock error alarm inspired by Jurassic Park.
+Description: A Themeable unlock error alarm inspired by Jurassic Park.
 Author: Sticktron <sticktron@hotmail.com>
-Icon: file:///Library/PreferenceBundles/AhAhAhPrefs.bundle/Icon-Cydia.png
+Maintainer: Sticktron
+Icon: file:///Library/PreferenceBundles/AhAhAhPrefs.bundle/Icon.png
 Section: Tweaks
