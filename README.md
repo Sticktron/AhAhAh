@@ -1,19 +1,23 @@
-## Ah! Ah! Ah! You didn't say the magic word!
-A customizable unlock error alarm inspired by that scene in Jurassic Park.
+## Ah!Ah!Ah! - You didn't say the magic word!
+A themeable unlock error alarm inspired by Jurassic Park.
+
+###New in 2.0 beta
+* Support for user-created themes (eg. from Cydia)
+* Overrides mute setting while alarm is playing
+* Set a volume level just for the alarm
+* New default theme!
+* All settings take affect instantly, so it's easy to test out different themes
 
 ###Features
-
-* Play video fullscreen or windowed with a background image
-* Import videos and images from your Camera Roll or add files manually (using iExplorer, iFunbox, etc.)
-* Stop the Lock button from turning off the alarm (have to wait until screen shuts off)
+* Import videos and images from your Camera Roll to create custom themes on-the-fly
 * Choose how many failed attempts at unlocking before the alarm is triggered
-* Supports Touch ID
-
+* Stop the Lock button from turning off the alarm (have to wait until screen shuts off)
+* Stop the alarm early using Touch ID
+* Ignore Touch ID mis-matches (in case you find yourself triggering the alarm accidentally)
 
 ### Device Compatibility
 
-* Supports all devices on iOS 7 or newer
-
+* Supports all devices on iOS 7 - 9.3.3
 
 ### Thanks
 
