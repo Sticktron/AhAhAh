@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo "*** Removing old preferences..."
-rm /User/Library/Preferences/com.sticktron.ahahah.plist
-echo "*** Done."
-
-exit 0
