@@ -2,7 +2,7 @@
 //  Tweak.xm
 //  Ah!Ah!Ah! - You Didn't Say The Magic Word!
 //
-//  Themable Unlock Alarm for iOS.
+//  A Themeable unlock error alarm inspired by Jurassic Park.
 //  Supports iOS 7-9.3.3 on all devices.
 //
 //  Copyright (c) 2014-2016 Sticktron. All rights reserved.
@@ -27,19 +27,6 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 /* Hooks */
 
 %group Main
-/*
-%hook SBBacklightController
-- (double)defaultLockScreenDimInterval {
-	if (newman.isEnabled && newman.isShowing) {
-		HBLogWarn(@"LockScreen sleep timeout paused for 30 seconds.");
-		return 30.0;
-	} else {
-		return %orig;
-	}
-}
-%end
-*/
-
 
 %hook SpringBoard
 
@@ -116,7 +103,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 	if (!newman.isEnabled) {
 		return %orig;
 	}
-	
+
 	BOOL didUnlock = %orig;
 	if (didUnlock) {
 		HBLogInfo(@"Passcode unlock successful.");
@@ -128,7 +115,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 		HBLogWarn(@"Passcode unlock failed.");
 		[newman unlockFailed];
 	}
-	
+
 	return didUnlock;
 }
 %end
@@ -152,14 +139,14 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 	// 4: success
 	// 9: fail (iOS 7.0.x)
 	// 10: fail (iOS >= 7.1.x)
-		
+
 	//HBLogDebug(@"Touch ID: event %llu", event);
-	
+
 	if (newman.isEnabled) {
 		if (event == 4) {
 			HBLogInfo(@"BioEvent 4: Touch ID match successful.");
 			[newman unlockSucceeded];
-			
+
 		} else if (event == 9 || event == 10) {
 			if (newman.isShowing == NO && newman.ignoreBioFailure == NO) {
 				HBLogWarn(@"BioEvent %llu: Touch ID match failed.", event);
@@ -167,7 +154,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 			}
 		}
 	}
-	
+
 	%orig;
 }
 %end
@@ -183,18 +170,18 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 %ctor {
 	@autoreleasepool {
 		HBLogDebug(@"initing tweak...");
-		
+
 		newman = [[AhAhAhController alloc] init];
-		
+
 		%init(Main);
-					
+
 		// init TouchID hooks if supported...
 		if (newman.hasTouchID) {
 			%init(BioSupport);
 		} else {
 			HBLogWarn(@"Touch ID is not supported on this device.");
 		}
-		
+
 		// listen for notifications about changes to Preferences
 		CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
 										NULL,
@@ -202,7 +189,7 @@ static void prefsChanged(CFNotificationCenterRef center, void *observer, CFStrin
 										CFSTR("com.sticktron.ahahah.prefschanged"),
 										NULL,
 										CFNotificationSuspensionBehaviorDeliverImmediately);
-		
+
 		HBLogInfo(@"Loaded and %@!", newman.isEnabled?@"enabled":@"disabled");
 	}
 }

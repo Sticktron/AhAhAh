@@ -22,7 +22,7 @@
 - (id)specifiers {
 	if (_specifiers == nil) {
 		_specifiers = [self loadSpecifiersFromPlistName:@"AhAhAhPrefs" target:self];
-		
+
 		// disable Touch ID settings for devices without Touch ID
 		if (hasTouchID() == NO) {
 			PSSpecifier *specifier = [self specifierForID:@"IgnoreBioFailure"];
@@ -35,7 +35,7 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	
+
 	// add the Show Love button to the navbar
 	NSString *path = [BUNDLE_PATH stringByAppendingPathComponent:@"Heart.png"];
 	UIImage *heartImage = [[UIImage alloc] initWithContentsOfFile:path];
@@ -50,11 +50,11 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	
+
 	// make the Theme link cell update it's label
 	//[self reloadSpecifierID:@"Theme" animated:NO]; // this causes the header cell to mis-render!?
 	[self reloadSpecifiers];
-	
+
 	// tint navbar
 	if (IS_IOS_OR_NEWER(iOS_8_0)) {
 		self.navigationController.navigationController.navigationBar.tintColor = TINT_COLOR;
@@ -70,7 +70,7 @@
 	} else {
 		self.navigationController.navigationBar.tintColor = nil;
 	}
-	
+
 	[super viewWillDisappear:animated];
 }
 
@@ -80,7 +80,7 @@
 
 - (id)readPreferenceValue:(PSSpecifier *)specifier {
 	NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH];
-	
+
 	if (!settings[specifier.properties[@"key"]]) {
 		return specifier.properties[@"default"];
 	}
@@ -92,7 +92,7 @@
 	[settings addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:PREFS_PLIST_PATH]];
 	[settings setObject:value forKey:specifier.properties[@"key"]];
 	[settings writeToFile:PREFS_PLIST_PATH atomically:YES];
-	
+
 	CFStringRef notificationValue = (__bridge CFStringRef)specifier.properties[@"PostNotification"];
 	if (notificationValue) {
 		CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationValue, NULL, NULL, YES);
@@ -105,16 +105,16 @@
 	// send a nice tweet ;)
 	SLComposeViewController *composeController = [SLComposeViewController
 												  composeViewControllerForServiceType:SLServiceTypeTwitter];
-	
-	[composeController setInitialText:@"I'm using Ah!Ah!Ah! (Themeable Unlock Alarm) by @Sticktron to scare away nosey people."];
-	
+
+	[composeController setInitialText:@"I'm using Ah!Ah!Ah! by @Sticktron to scare away nosey people."];
+
 	[self presentViewController:composeController
 					   animated:YES
 					 completion:nil];
 }
 
 - (void)openEmail {
-	NSString *subject = @"Support for Ah!Ah!Ah! (beta)";
+	NSString *subject = @"Support for Ah!Ah!Ah! 2";
 	NSString *body = @"(Please type something here.)";
 	NSString *urlString = [NSString stringWithFormat:@"mailto:sticktron@hotmail.com?subject=%@&body=%@", subject, body];
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
@@ -122,23 +122,23 @@
 
 - (void)openTwitter {
 	NSURL *url;
-	
+
 	if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetbot:"]]) {
 		url = [NSURL URLWithString:@"tweetbot:///user_profile/sticktron"];
-		
+
 	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitterrific:"]]) {
 		url = [NSURL URLWithString:@"twitterrific:///profile?screen_name=sticktron"];
-		
+
 	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"tweetings:"]]) {
 		url = [NSURL URLWithString:@"tweetings:///user?screen_name=sticktron"];
-		
+
 	} else if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter:"]]) {
 		url = [NSURL URLWithString:@"twitter://user?screen_name=sticktron"];
-		
+
 	} else {
 		url = [NSURL URLWithString:@"http://twitter.com/sticktron"];
 	}
-	
+
 	[[UIApplication sharedApplication] openURL:url];
 }
 
