@@ -2,6 +2,7 @@
 A themeable unlock error alarm inspired by Jurassic Park.
 
 ###New in 2.0 beta
+* Support for iOS 9.x
 * Support for user-created themes (eg. from Cydia)
 * Overrides mute setting while alarm is playing
 * Set a volume level just for the alarm
