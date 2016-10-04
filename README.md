@@ -1,6 +1,6 @@
 # Ah!Ah!Ah! You didn't say the magic word!
 
-[![GitHub Release](https://img.shields.io/github/release/sticktron/AhAhAh.svg?style=flat)]()
+[![GitHub Release](https://img.shields.io/github/release/sticktron/AhAhAh.svg?style=flat)](https://github.com/Sticktron/AhAhAh/releases/tag/2.0-beta-1)
 [![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)]()
 [![Supported Versions](https://img.shields.io/badge/supported_versions-iOS_7.0_--_iOS_9.3.3-lightgrey.svg)]()
 [![Contact: @sticktron](https://img.shields.io/badge/contact-@sticktron-blue.svg?style=flat)](https://twitter.com/sticktron)
