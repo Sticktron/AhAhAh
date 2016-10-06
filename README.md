@@ -1,4 +1,4 @@
-# Ah!Ah!Ah! You didn't say the magic word!
+# Ah!Ah!Ah!
 
 [![GitHub Release](https://img.shields.io/github/release/sticktron/AhAhAh.svg?style=flat)](https://github.com/Sticktron/AhAhAh/releases/tag/2.0-beta-1)
 [![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)]()
@@ -7,7 +7,7 @@
 
 Ah!Ah!Ah! is a themeable unlock error alarm inspired by Jurassic Park. Think of it like a car alarm for your iPhone/iPod/iPad, except it triggers a video when someone tries to unlock your device. Supports iOS 7 through 9. Includes are a few themes to get you started.
 
-![Jurassic Theme](/docs/jurassic-theme-on-black-phone.jpg)
+![Header Image](/docs/readme-header.jpg)
 
 
 ## What's new in version 2
