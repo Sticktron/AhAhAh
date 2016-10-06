@@ -7,7 +7,7 @@
 
 Ah!Ah!Ah! is a themeable unlock error alarm inspired by Jurassic Park. Think of it like a car alarm for your iPhone/iPod/iPad, except that it triggers a video when someone tries to unlock your device. The nosey intruder / potential thief will not be able to turn off the device or silence the alarm.
 
-Three themes are included, the new default "Jurassic" theme, the old "Classic" theme, and a Kevin Hart theme. Theme packages can be created by users and uploaded to Cydia. The [AhAhAh-Sample-Theme](http://github.com/sticktron/AhAhAh-Sample-Theme) project can be cloned and modified, and is ready to be packaged into a deb for distribution. Themes can also be created on-the-fly by importing videos or images from your Camera Roll.
+Three themes are included: the new default "Jurassic" theme, the old "Classic" theme, and a Kevin Hart theme. Theme packages can be created by users and uploaded to Cydia. The [AhAhAh-Sample-Theme](http://github.com/sticktron/AhAhAh-Sample-Theme) project can be cloned and modified, and is ready to be packaged into a deb for distribution. A custom theme can also be created on-the-fly in the tweak's settings by importing videos or images from your Camera Roll.
 
 ![Header Image](/docs/readme-themes.jpg)
 
