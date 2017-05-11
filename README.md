@@ -1,13 +1,24 @@
 # Ah!Ah!Ah! - You didn't say the magic word!
 
-[![GitHub Release](https://img.shields.io/github/release/sticktron/AhAhAh.svg?style=flat)](https://github.com/Sticktron/AhAhAh/releases/tag/2.0-beta-1)
+<!-- [![GitHub Release](https://img.shields.io/github/release/sticktron/AhAhAh.svg?style=flat)](https://github.com/Sticktron/AhAhAh/releases/tag/2.0-beta-1) -->
+
 [![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)]()
-[![Supported Versions](https://img.shields.io/badge/supported_versions-iOS_7.0_--_iOS_9.3.3-lightgrey.svg)]()
-[![Contact: @sticktron](https://img.shields.io/badge/contact-@sticktron-blue.svg?style=flat)](https://twitter.com/sticktron)
+[![Supported Versions](https://img.shields.io/badge/supports-iOS_7.x_--_10.x-lightgrey.svg)]()
+[![Supported Devices](https://img.shields.io/badge/devices-iPhone,_iPad,_iPod_Touch-lightgrey.svg)]()
 
-Ah!Ah!Ah! is a themeable unlock error alarm inspired by Jurassic Park. Think of it like a car alarm for your iPhone/iPod/iPad, except that it triggers a video when someone tries to unlock your device. The nosey intruder / potential thief will not be able to turn off the device or silence the alarm.
+[![Status Beta](https://img.shields.io/badge/status-Beta-red.svg)]()
+[![GitHub Issues](https://img.shields.io/github/issues/sticktron/ahahah.svg)](https://github.com/Sticktron/AhAhAh/issues)
 
-Three themes are included: the new default "Jurassic" theme, the old "Classic" theme, and a Kevin Hart theme. Theme packages can be created by users and uploaded to Cydia. The [AhAhAh-Sample-Theme](http://github.com/sticktron/AhAhAh-Sample-Theme) project can be cloned and modified, and is ready to be packaged into a deb for distribution. A custom theme can also be created on-the-fly in the tweak's settings by importing videos or images from your Camera Roll.
+Ah!Ah!Ah! is a themeable unlock error alarm inspired by Jurassic Park.
+Think of it like a car alarm for your iPhone/iPod/iPad, except that it triggers a video when someone tries to unlock your device.
+
+Three themes are included: the new default "Jurassic" theme, the old "Classic" theme, and a Kevin Hart "Mind Your Damn Business" theme.
+
+Personal themes can be created quickly by selecting videos from your Camera Roll.
+
+Themers can easily create third-party themes and share them as Debian (.deb) packages.
+See my [AhAhAh-Sample-Theme](http://github.com/sticktron/AhAhAh-Sample-Theme) project for an example of the custom theme format.
+
 
 ![Header Image](/docs/readme-themes.jpg)
 
@@ -15,12 +26,13 @@ Three themes are included: the new default "Jurassic" theme, the old "Classic" t
 ## Compatibility
 
 - Supports iPhone, iPod, iPad
-- Supports iOS 7, 8, 9
+- Supports iOS 7, 8, 9, 10
 - Requires Jailbreak
 
 
 ## What's new in version 2
 
+- Support for iOS 10
 - Support for iOS 9
 - New "Jurassic" default theme
 - Support for user-created themes (eg. from Cydia)
@@ -39,8 +51,9 @@ Three themes are included: the new default "Jurassic" theme, the old "Classic" t
 
 ## Availability
 
-While in beta Ah!Ah!Ah! is being hosted on my [personal repository](https://sticktron.github.com/repo). Add it to Cydia under the Sources Tab.
+While in beta Ah!Ah!Ah! is being hosted on my [personal repository](https://sticktron.github.com/repo).
 
+Cydia Source URL:
 ```
 https://sticktron.github.com/repo
 ```
@@ -51,3 +64,6 @@ https://sticktron.github.com/repo
 * /r/jailbreak community for the idea
 * Steven Spielberg for Jurassic Park
 * milodarling for the iOS 8 update
+
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/Sticktron.svg?style=social&label=Follow)](http://twitter.com/sticktron)
