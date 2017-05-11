@@ -1,12 +1,10 @@
 # Ah!Ah!Ah! - You didn't say the magic word!
 
 <!-- [![GitHub Release](https://img.shields.io/github/release/sticktron/AhAhAh.svg?style=flat)](https://github.com/Sticktron/AhAhAh/releases/tag/2.0-beta-1) -->
-
+[![Status Beta](https://img.shields.io/badge/status-Beta-red.svg)]()
 [![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)]()
 [![Supported Versions](https://img.shields.io/badge/supports-iOS_7.x_--_10.x-lightgrey.svg)]()
 [![Supported Devices](https://img.shields.io/badge/devices-iPhone,_iPad,_iPod_Touch-lightgrey.svg)]()
-
-[![Status Beta](https://img.shields.io/badge/status-Beta-red.svg)]()
 [![GitHub Issues](https://img.shields.io/github/issues/sticktron/ahahah.svg)](https://github.com/Sticktron/AhAhAh/issues)
 
 Ah!Ah!Ah! is a themeable unlock error alarm inspired by Jurassic Park.
@@ -66,4 +64,5 @@ https://sticktron.github.com/repo
 * milodarling for the iOS 8 update
 
 
-[![Twitter Follow](https://img.shields.io/twitter/follow/Sticktron.svg?style=social&label=Follow)](http://twitter.com/sticktron)
+[![Twitter Follow](https://img.shields.io/twitter/follow/sticktron.svg?style=social&label=Follow)](http://twitter.com/sticktron)
+
