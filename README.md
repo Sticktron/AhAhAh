@@ -23,9 +23,8 @@ See my [AhAhAh-Sample-Theme](http://github.com/sticktron/AhAhAh-Sample-Theme) pr
 
 ## Compatibility
 
-- Supports iPhone, iPod, iPad
 - Supports iOS 7, 8, 9, 10
-- Requires Jailbreak
+- Requires a jailbroken iPhone, iPad or iPod Touch.
 
 
 ## What's new in version 2
