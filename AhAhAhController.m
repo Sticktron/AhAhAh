@@ -9,10 +9,10 @@
 #import "AhAhAhController.h"
 #import "Common.h"
 #import "Privates.h"
+// #import <version.h>
 #import <AVFoundation/AVAudioSession.h>
 #import <MediaPlayer/MPMoviePlayerController.h>
 #import <MediaPlayer/MPMusicPlayerController.h>
-#import <version.h>
 
 
 /* AhAhAh Controller */
@@ -189,7 +189,9 @@
 }
 
 - (void)show {
-	HBLogWarn(@"---------- Ah!Ah!Ah! You didn't say the magic word! ----------");
+	HBLogWarn(@"********** Ah!Ah!Ah! You didn't say the magic word! **********");
+	HBLogWarn(@"********** Ah!Ah!Ah! You didn't say the magic word! **********");
+	HBLogWarn(@"********** Ah!Ah!Ah! You didn't say the magic word! **********");
 	
 	// make sure counter gets reset
 	self.failedAttempts = 0;
