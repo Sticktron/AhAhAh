@@ -1,9 +1,12 @@
 Package: com.sticktron.ahahah
-Name: Ah!Ah!Ah! (iOS 9)
-Version: 2.0-beta-one
+Name: Ah!Ah!Ah! 2 Beta (iOS 7-10)
+Version: 2.0-beta2
 Architecture: iphoneos-arm
 Depends: firmware (>= 7.0), mobilesubstrate, preferenceloader
-Description: Themeable unlock error alarm inspired by Jurassic Park.
+Description: Trigger a video alarm when someone tries to unlock your phone.
+ * Import videos from your Camera Roll.
+ * Supports third-party videos ("themes").
+ * Comes with three themes, including "Ah!Ah!Ah! you didn't say the magic word!" from Jurassic Park.
 Author: Sticktron <sticktron@hotmail.com>
 Maintainer: Sticktron
 Icon: file:///Library/PreferenceBundles/AhAhAhPrefs.bundle/Icon.png
