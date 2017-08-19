@@ -32,6 +32,7 @@
 - (void)allowIdleSleep;
 - (void)setIdleTimerDisabled:(_Bool)arg1;
 - (void)resetLockScreenIdleTimerWithDuration:(double)arg1;
+- (void)_resetLockScreenIdleTimerWithDuration:(double)arg1 mode:(int)arg2;
 @end
 
 @interface SBLockScreenViewController : UIViewController
@@ -40,8 +41,29 @@
 
 @interface SBLockScreenManager : NSObject
 + (id)sharedInstance;
+// iOS 7-9
 - (BOOL)attemptUnlockWithPasscode:(id)passcode;
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)event;
+// iOS 10
+// - (void)attemptUnlockWithPasscode:(id)passcode;
+@property (nonatomic, assign) BOOL isUILocked;
+- (_Bool)_attemptUnlockWithPasscode:(id)arg1 mesa:(_Bool)arg2 finishUIUnlock:(_Bool)arg3;
+- (_Bool)_attemptUnlockWithPasscode:(id)arg1 finishUIUnlock:(_Bool)arg2;
+- (void)_setMesaUnlockingDisabled:(_Bool)arg1 forReason:(id)arg2;
+- (_Bool)unlockWithRequest:(id)arg1 completion:(id/*block*/)arg2;
+@end
+
+@interface SBDashBoardMesaUnlockBehavior : NSObject
+@end
+
+@interface SBDashBoardViewController : UIViewController
+- (void)setInScreenOffMode:(BOOL)arg1 forAutoUnlock:(BOOL)arg2;
+@end
+
+@interface SBDashBoardPasscodeViewController : UIViewController
+- (void)_passcodeLockViewPasscodeEntered:(id)arg1 viaMesa:(_Bool)arg2;
+- (void)passcodeLockViewPasscodeEntered:(id)arg1;
+- (_Bool)handleEvent:(id)arg1;
 @end
 
 @interface SBUIBiometricEventMonitor : NSObject
@@ -66,4 +88,17 @@
 - (BOOL)getVolume:(float *)arg1 forCategory:(id)arg2;
 - (BOOL)getActiveCategoryVolume:(float *)arg1 andName:(id *)arg2;
 - (BOOL)setActiveCategoryVolumeTo:(float)arg1;
+@end
+
+@interface SBLockHardwareButton : NSObject
+- (void)_sendButtonUpEventToAppForRecognizer:(id)arg1;
+- (_Bool)_tryToSendButtonDownEventsToAppForRecognizer:(id)arg1;
+- (void)longPress:(id)arg1;
+- (void)singlePress:(id)arg1;
+- (void)buttonDown:(id)arg1;
+@property(readonly, nonatomic) _Bool isButtonDown;
+@end
+
+@interface UIPressesEvent (Private)
+@property (nonatomic, retain) UIPress *_triggeringPhysicalButton;
 @end

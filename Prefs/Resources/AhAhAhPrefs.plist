@@ -90,14 +90,17 @@
 		
 		
 		<!--+ SOUND +-->
+		<!--
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Sound</string>
 		</dict>
-		
+		-->
+	
 		<!-- Force Volume (YES) -->
+		<!--
 		<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
@@ -114,8 +117,10 @@
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
+		-->
 		
 		<!-- Volume Slider (75%) -->
+		<!--
 		<dict>
 			<key>cell</key>
 			<string>PSSliderCell</string>
@@ -138,7 +143,7 @@
 			<key>PostNotification</key>
 			<string>com.sticktron.ahahah.prefschanged</string>
 		</dict>
-		
+		-->
 		
 		<!--+ Max Failed Unlocks (2) +-->
  		<dict>
@@ -274,21 +279,6 @@
 			<string>Send a Tweet</string>
 		</dict>
 		
-		<!-- Reddit -->
-		<dict>
-			<key>action</key>
-			<string>openReddit</string>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>AhAhAhButtonCell</string>
-			<key>icon</key>
-			<string>Reddit.png</string>
-			<key>label</key>
-			<string>Get help at /r/jailbreak</string>
-		</dict>
-		
-		
 		<!-- GIVE SUPPORT -->
 		<dict>
 			<key>cell</key>
@@ -322,7 +312,7 @@
 			<key>icon</key>
 			<string>PayPal.png</string>
 			<key>label</key>
-			<string>Contribute via PayPal</string>
+			<string>Send a Donation</string>
 		</dict>
 		
 		
@@ -334,7 +324,7 @@
 			<string>1</string>
 			<key>footerText</key>
 			<string>
-Copyright © 2014-2016 Sticktron</string>
+Copyright © 2014-2017 Sticktron</string>
 		</dict>
 		
 		<!-- Credits -->

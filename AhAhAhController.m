@@ -25,9 +25,9 @@
 @property (nonatomic, assign) BOOL isShowing;
 @property (nonatomic, assign) BOOL ignoreBioFailure;
 @property (nonatomic, assign) BOOL disableLockButton;
-@property (nonatomic, assign) BOOL forceVolume;
-@property (nonatomic, assign) float volumeLevel;
-@property (nonatomic, assign) float originalVolume;
+// // @property (nonatomic, assign) BOOL forceVolume;
+// // @property (nonatomic, assign) float volumeLevel;
+// @property (nonatomic, assign) float originalVolume;
 @property (nonatomic, assign) BOOL wasMuted;
 @property (nonatomic, strong) NSString *contentMode;
 @property (nonatomic, strong) NSString *theme;
@@ -66,8 +66,9 @@
 	self.contentMode = prefs[@"ContentMode"] ?: @"Default";
 	self.videoFile = nil;
 	self.imageFile = nil;
-	self.forceVolume = prefs[@"ForceVolume"] ? [prefs[@"ForceVolume"] boolValue] : YES;
-	self.volumeLevel = prefs[@"VolumeLevel"] ? [prefs[@"VolumeLevel"] floatValue] / 100.0f : 0.75f;
+	
+	// self.forceVolume = prefs[@"ForceVolume"] ? [prefs[@"ForceVolume"] boolValue] : YES;
+	// self.volumeLevel = prefs[@"VolumeLevel"] ? [prefs[@"VolumeLevel"] floatValue] / 100.0f : 0.75f;
 	
 	// Determine if the user has selected a theme, video, or image.
 	// If there is no selection, auto-select the default theme.
@@ -96,22 +97,22 @@
 		self.imageFile = [USER_IMAGES_PATH stringByAppendingPathComponent:self.imageFile];
 	}
 	
+	/*
 	HBLogDebug(@"== Prefs ============================");
 	HBLogDebug(@"self.isEnabled = %@", self.isEnabled ? @"YES" : @"NO");
 	HBLogDebug(@"self.maxFailures = %d", self.maxFailures);
 	HBLogDebug(@"self.ignoreBioFailure = %@", self.ignoreBioFailure ? @"YES" : @"NO");
 	HBLogDebug(@"self.disableLockButton = %@", self.disableLockButton ? @"YES" : @"NO");
-	HBLogDebug(@"-------------------------------------");
 	HBLogDebug(@"self.contentMode = %@", self.contentMode);
-	HBLogDebug(@"-------------------------------------");
 	HBLogDebug(@"self.theme = %@", self.theme);
 	HBLogDebug(@"self.videoFile = %@", self.videoFile);
 	HBLogDebug(@"self.imageFile = %@", self.imageFile);
-	HBLogDebug(@"-------------------------------------");
-	HBLogDebug(@"self.forceVolume = %@", self.forceVolume ? @"YES" : @"NO");
-	HBLogDebug(@"self.volumeLevel = %f", self.volumeLevel);
+	// HBLogDebug(@"-------------------------------------");
+	// HBLogDebug(@"self.forceVolume = %@", self.forceVolume ? @"YES" : @"NO");
+	// HBLogDebug(@"self.volumeLevel = %f", self.volumeLevel);
 	HBLogDebug(@"self.wasMuted = %@", self.wasMuted ? @"YES" : @"NO");
 	HBLogDebug(@"=====================================");
+	*/
 }
 
 - (void)loadThemeSettingsFromPlist {
@@ -196,15 +197,11 @@
 	// make sure counter gets reset
 	self.failedAttempts = 0;
 	
-	// delay sleep
-	[[NSClassFromString(@"SBBacklightController") sharedInstance] preventIdleSleepForNumberOfSeconds:30.0f];
-
 	// create the overlay view for the alarm
 	self.overlay = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
 	self.overlay.opaque = YES;
 	self.overlay.backgroundColor = [UIColor blackColor];
-	
-	
+		
 	// add the overlay view to the main window,
 	// and set the window level to waaay above statusbar ...
 	
@@ -239,17 +236,17 @@
 		[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error: nil];
 		
 		// apply the volume override if option is set
-		if (self.forceVolume) {
-			float originalVolume = 0.0f;
-	    	if (![[AVSystemController sharedAVSystemController] getVolume:&originalVolume forCategory:AVAudioSessionCategoryPlayback]) {
-	            originalVolume = 0.5f;
-				HBLogDebug(@"failed to get original volume level, setting to %f", originalVolume);
-	        }
-			HBLogDebug(@"original volume for category is: %f, originalVolume", originalVolume);
-			self.originalVolume = originalVolume;
-			
-        	[[AVSystemController sharedAVSystemController] setActiveCategoryVolumeTo:self.volumeLevel];
-		}
+		// if (self.forceVolume) {
+		// 	float originalVolume = 0.0f;
+	    // 	if (![[AVSystemController sharedAVSystemController] getVolume:&originalVolume forCategory:AVAudioSessionCategoryPlayback]) {
+	    //         originalVolume = 0.5f;
+		// 		HBLogDebug(@"failed to get original volume level, setting to %f", originalVolume);
+	    //     }
+		// 	HBLogDebug(@"original volume for category is: %f, originalVolume", originalVolume);
+		// 	self.originalVolume = originalVolume;
+		//
+        // 	[[AVSystemController sharedAVSystemController] setActiveCategoryVolumeTo:self.volumeLevel];
+		// }
 		
 	} else if (self.imageFile) {
 		HBLogDebug(@"using image: %@", self.imageFile);
@@ -266,6 +263,13 @@
 		}
 	}
 	
+	// delay sleep
+	Class $SBBacklightController = NSClassFromString(@"SBBacklightController");
+	[[$SBBacklightController sharedInstance] preventIdleSleepForNumberOfSeconds:30.0f];
+	// if ([[$SBBacklightController sharedInstance] respondsToSelector:@selector(_resetLockScreenIdleTimerWithDuration:mode:)]) {
+	// 	[[$SBBacklightController sharedInstance] _resetLockScreenIdleTimerWithDuration:1 mode:0];
+	// }
+	
 	self.isShowing = YES;
 }
 
@@ -273,9 +277,9 @@
 	HBLogWarn(@"---------- Ah!Ah!Ah! is going away ----------");
 	
 	// restore original volume level
-	if (self.forceVolume) {
-		[[AVSystemController sharedAVSystemController] setActiveCategoryVolumeTo:self.originalVolume];
-	}
+	// if (self.forceVolume) {
+	// 	[[AVSystemController sharedAVSystemController] setActiveCategoryVolumeTo:self.originalVolume];
+	// }
 	
 	// kill the movie player
 	if (self.player) {
